@@ -129,19 +129,17 @@
       align-items: flex-start;
     }
     .main-content { flex: 1; min-width: 0; }
-    .main-sidebar { width: 320px; flex-shrink: 0; }
+    .main-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
 
     /* Hero / Carousel */
     .hero-wrap {
       position: relative;
       width: 100%;
-      padding-bottom: 100%;
+      height: 640px;
       overflow: hidden;
       background: #1a2a10;
     }
     .carousel-track {
-      position: absolute;
-      top: 0; left: 0;
       display: flex;
       width: 300%;
       height: 100%;
@@ -197,7 +195,9 @@
     /* Sidebar panels */
     .panel {
       padding: 14px 16px;
-      margin-bottom: 2px;
+      height: 319px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .panel-light-bg { background: #f2f5ec; }
     .panel-dark-bg  { background: var(--color-green-olive); color: white; }
@@ -292,6 +292,9 @@
       background: var(--color-green-olive);
       padding: 14px 16px;
       color: white;
+      height: 320px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .news-panel h3 {
       font-size: 16px;
@@ -319,6 +322,7 @@
       position: relative;
       overflow: hidden;
       background: #111;
+      height: 320px;
     }
     .video-panel img {
       width: 100%;
@@ -347,6 +351,9 @@
       background: var(--color-green-tile);
       padding: 14px 16px;
       color: white;
+      height: 320px;
+      box-sizing: border-box;
+      overflow: hidden;
     }
     .supported-panel h3 {
       font-size: 20px;
@@ -551,9 +558,8 @@
 
     <!-- Video/image -->
     <div class="video-panel">
-      <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=320&h=260&fit=crop&crop=center&q=80"
-           alt="saving the rainforest means changing people's lives"
-           style="height: 260px;">
+      <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=320&h=320&fit=crop&crop=center&q=80"
+           alt="saving the rainforest means changing people's lives">
       <div class="video-caption">saving the rainforest means changing people's lives</div>
       <div class="video-play">
         <a href="#" class="btn-gs">view video</a>
