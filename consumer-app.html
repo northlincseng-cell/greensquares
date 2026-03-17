@@ -47,8 +47,9 @@
     .screen.active { display: flex; }
 
     /* ── Screen 1: Home ── */
-    .home-header { background: linear-gradient(160deg, #1b3410 0%, #2d5518 60%, #4a8820 100%); padding: 60px 24px 24px; flex-shrink: 0; position: relative; }
+    .home-header { background: linear-gradient(160deg, #2e7d32 0%, #388e3c 60%, #4caf50 100%); padding: 60px 24px 24px; flex-shrink: 0; position: relative; }
     .home-header-logo { position: absolute; top: 16px; left: 20px; height: 28px; width: auto; opacity: 0.85; }
+    .screen-logo { position: absolute; top: 16px; left: 20px; height: 26px; width: auto; opacity: 0.85; }
     .home-greeting { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
     .home-name { font-size: 18px; font-weight: bold; color: white; margin-bottom: 20px; }
     .home-balance-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
@@ -69,14 +70,14 @@
     .home-stat-val { font-size: 18px; font-weight: bold; color: #1b3410; }
     .home-stat-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
     /* In-app notification */
-    .app-notif { position:absolute; top:60px; left:12px; right:12px; background:#1b3410; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; z-index:300; transform:translateY(-130%); transition:transform 0.35s ease; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+    .app-notif { position:absolute; top:60px; left:12px; right:12px; background:#1b3410; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; z-index:300; transform:translateY(-350%); transition:transform 0.35s ease; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
     .app-notif.show { transform:translateY(0); }
     .app-notif-icon { font-size:22px; flex-shrink:0; }
     .app-notif-title { font-size:12px; font-weight:bold; color:white; }
     .app-notif-sub { font-size:10px; color:rgba(255,255,255,0.6); margin-top:2px; }
 
     /* ── Screen 2: Earn ── */
-    .earn-header { background: #1b3410; padding: 60px 24px 20px; flex-shrink: 0; }
+    .earn-header { background: #2e7d32; padding: 60px 24px 20px; flex-shrink: 0; position: relative; }
     .earn-title { font-size: 20px; font-weight: bold; color: white; margin-bottom: 4px; text-transform: lowercase; }
     .earn-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
     .earn-body { flex: 1; overflow-y: auto; background: white; padding: 20px; }
@@ -101,7 +102,7 @@
     .boost-text strong { font-size: 13px; display: block; margin-bottom: 2px; }
 
     /* ── Screen 3: History ── */
-    .history-header { background: #1b3410; padding: 60px 24px 16px; flex-shrink: 0; }
+    .history-header { background: #2e7d32; padding: 60px 24px 16px; flex-shrink: 0; position: relative; }
     .history-title { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; }
     .history-total { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
     .history-body { flex: 1; overflow-y: auto; background: #f7faf3; }
@@ -119,7 +120,7 @@
     .hi-prd { font-size: 9px; background: #e8f0ff; color: #1a3a88; padding: 2px 7px; border-radius: 8px; border: 1px solid #c8d4f0; }
 
     /* ── Screen 4: Redeem ── */
-    .redeem-header { background: #1b3410; padding: 60px 24px 16px; flex-shrink: 0; }
+    .redeem-header { background: #2e7d32; padding: 60px 24px 16px; flex-shrink: 0; position: relative; }
     .redeem-title { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; }
     .redeem-balance { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
     .redeem-body { flex: 1; overflow-y: auto; background: #f7faf3; padding: 14px; }
@@ -131,16 +132,16 @@
     .pca-loc { font-size: 10px; color: #aaa; }
     .pca-standard { font-size: 9px; background: #e4f0d0; color: #2d5518; padding: 1px 5px; border-radius: 4px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 2px; }
     .pca-action { font-size: 10px; color: #6ab023; font-weight: bold; margin-bottom: 8px; }
-    .pca-btn { width: 100%; background: #1b3410; color: white; border: none; border-radius: 8px; padding: 9px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; }
-    .pca-btn:hover { background: #2d5518; }
+    .pca-btn { width: 100%; background: #2e7d32; color: white; border: none; border-radius: 8px; padding: 9px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; }
+    .pca-btn:hover { background: #388e3c; }
     .redeem-confirm { background: #e4f0d0; border: 1px solid #b8d898; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 11px; color: #2d5518; line-height: 1.6; display: none; }
 
     /* ── Screen 5: Impact ── */
-    .impact-header { background: linear-gradient(160deg, #0e1e08 0%, #1b3410 100%); padding: 60px 24px 20px; flex-shrink: 0; }
+    .impact-header { background: linear-gradient(160deg, #1b5e20 0%, #2e7d32 100%); padding: 60px 24px 20px; flex-shrink: 0; position: relative; }
     .impact-title { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; }
     .impact-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
     .impact-body { flex: 1; overflow-y: auto; background: #f7faf3; padding: 14px; }
-    .impact-big-card { background: linear-gradient(135deg, #1b3410, #2d5518); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+    .impact-big-card { background: linear-gradient(135deg, #2e7d32, #388e3c); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
     .ibc-val { font-size: 42px; font-weight: bold; color: #6ab023; line-height: 1; }
     .ibc-unit { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
     .ibc-sub { font-size: 10px; color: rgba(255,255,255,0.45); line-height: 1.5; }
@@ -149,7 +150,7 @@
     .im-icon { font-size: 16px; margin-bottom: 5px; }
     .im-val { font-size: 16px; font-weight: bold; color: #1b3410; }
     .im-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
-    .verra-badge { background: #1b3410; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+    .verra-badge { background: #2e7d32; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
     .vb-text { font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.5; }
     .vb-logo { font-size: 11px; font-weight: bold; color: #6ab023; text-transform: uppercase; letter-spacing: 0.5px; }
 
@@ -257,12 +258,14 @@
         <!-- Screen 2: Earn -->
         <div class="screen" id="screen-earn">
           <div class="earn-header">
+            <img src="assets/images/gs-icon-white.png" alt="MGS" class="screen-logo">
             <div class="earn-title">earn</div>
             <div class="earn-sub">show this at checkout to link your GS account</div>
           </div>
           <div class="earn-body">
             <div class="qr-wrap">
               <div class="qr-card">
+                <img src="assets/images/gs-logo.png" alt="My Green Squares" style="height:32px;width:auto;display:block;margin:0 auto 14px;">
                 <div class="qr-frame" id="appQr"></div>
                 <div class="qr-member-id" id="qrMemberId">MEM001</div>
                 <div class="qr-hint">scan at MGS retailer checkout</div>
@@ -285,6 +288,7 @@
         <!-- Screen 3: History -->
         <div class="screen" id="screen-history">
           <div class="history-header">
+            <img src="assets/images/gs-icon-white.png" alt="MGS" class="screen-logo">
             <div class="history-title">history</div>
             <div class="history-total" id="historyTotal">— transactions · — GS earned</div>
           </div>
@@ -294,6 +298,7 @@
         <!-- Screen 4: Redeem -->
         <div class="screen" id="screen-redeem">
           <div class="redeem-header">
+            <img src="assets/images/gs-icon-white.png" alt="MGS" class="screen-logo">
             <div class="redeem-title">direct my GS</div>
             <div class="redeem-balance" id="redeemBalance">— GS available</div>
           </div>
@@ -309,6 +314,7 @@
         <!-- Screen 5: Impact -->
         <div class="screen" id="screen-impact">
           <div class="impact-header">
+            <img src="assets/images/gs-icon-white.png" alt="MGS" class="screen-logo">
             <div class="impact-title">your impact</div>
             <div class="impact-sub" id="impactLifetime">— GS lifetime · Verra VCS</div>
           </div>
