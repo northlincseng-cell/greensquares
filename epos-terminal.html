@@ -152,6 +152,7 @@
     .rcpt-tag { font-size: 9px; font-weight: bold; padding: 2px 7px; border-radius: 8px; }
     .rcpt-tag-t1   { background: #e4f0d0; color: #2d5518; }
     .rcpt-tag-t2   { background: #e0eaff; color: #1a3a88; }
+    .rcpt-line-retailer { background: #f5fcf0; border-left: 3px solid #6ab023; }
     .rcpt-tag-promo{ background: #d4f0b4; color: #1b5e08; border: 1px solid #8ed060; }
     .rcpt-tag-scan { background: #6ab023; color: white; animation: tagFade 2.2s forwards; }
     @keyframes tagFade { 0%,60%{ opacity:1; } 100%{ opacity:0; } }
@@ -284,7 +285,7 @@
         <div id="rcpItems"></div>
         <hr class="receipt-divider">
         <div class="receipt-row"><span>basket value</span><span id="rcpBasket">—</span></div>
-        <div class="receipt-row gs"><span>🌿 tier 1 (basket)</span><span id="rcpT1">—</span></div>
+        <div class="receipt-row gs"><span id="rcpT1Label">🌿 retailer contribution</span><span id="rcpT1">—</span></div>
         <div class="receipt-row gs" id="rcpT2Row"><span>🔵 tier 2 (brands)</span><span id="rcpT2">—</span></div>
         <div class="receipt-row total"><span>total green squares</span><span id="rcpTotal">—</span></div>
         <div class="receipt-message" id="rcpMessage"></div>
@@ -354,7 +355,7 @@
     <!-- GS totals -->
     <div class="gs-totals">
       <div class="gs-totals-row">
-        <span class="gs-totals-label">TIER 1 · basket £<span id="totBasket">0.00</span> × <span id="totRate">—</span> GS/£</span>
+        <span class="gs-totals-label"><span id="totT1Retailer">RETAILER</span> CONTRIBUTION · <span id="totRate">—</span> GS/£ · ≈<span id="totPct">—</span>% · basket £<span id="totBasket">0.00</span></span>
         <span class="gs-totals-val" id="totT1">0 GS</span>
       </div>
       <div class="gs-totals-row">
@@ -683,16 +684,25 @@ function renderReceipt(newIdx) {
 
   var html = '';
 
-  // Basket value / own-brand line (Tier 1) — only show when basket value > 0
+  // Basket total line (goods — no GS here)
   if (currentRetailer && basketVal > 0) {
     html += '<div class="rcpt-line">'+
       '<div class="rcpt-icon" style="background:'+currentRetailer.bg+'">OB</div>'+
       '<div class="rcpt-detail">'+
         '<div class="rcpt-prod-name">Groceries &amp; own brands</div>'+
-        '<div class="rcpt-prod-sub">basket value: £'+basketVal.toFixed(2)+'</div>'+
-        '<div class="rcpt-tags"><span class="rcpt-tag rcpt-tag-t1" id="basketGsTag">🌿 +'+fmt(t1)+' GS (Tier 1 · '+currentRetailer.gsPerTxn+' GS/£)</span></div>'+
+        '<div class="rcpt-prod-sub">basket subtotal</div>'+
       '</div>'+
       '<div class="rcpt-basket-right"><div class="rcpt-basket-val">£'+basketVal.toFixed(2)+'</div></div>'+
+    '</div>';
+    // Retailer GS contribution — separate line, clearly retailer-funded
+    var pct = currentRetailer.gsPerTxn; // rate used as ~% indicator
+    html += '<div class="rcpt-line rcpt-line-retailer">'+
+      '<div class="rcpt-icon" style="background:#2d5518;">🌿</div>'+
+      '<div class="rcpt-detail">'+
+        '<div class="rcpt-prod-name">'+currentRetailer.name+' Green Squares Contribution</div>'+
+        '<div class="rcpt-prod-sub">Retailer-funded · all purchases · approx '+pct+'% of basket</div>'+
+        '<div class="rcpt-tags"><span class="rcpt-tag rcpt-tag-t1" id="basketGsTag">🌿 +'+fmt(t1)+' GS · '+currentRetailer.gsPerTxn+' GS per £1 spent</span></div>'+
+      '</div>'+
     '</div>';
   }
 
@@ -750,6 +760,8 @@ function recalc() {
   // Totals bar
   document.getElementById('totBasket').textContent = basketVal.toFixed(2);
   document.getElementById('totRate').textContent = rate||'—';
+  document.getElementById('totT1Retailer').textContent = currentRetailer ? currentRetailer.name.toUpperCase() : 'RETAILER';
+  document.getElementById('totPct').textContent = rate||'—';
   document.getElementById('totT1').textContent = fmt(t1)+' GS';
   document.getElementById('totT2').textContent = fmt(t2)+' GS';
   document.getElementById('totGrand').textContent = fmt(grand);
@@ -847,6 +859,7 @@ function showReceipt(txn, t1, t2, grand, basketVal, now) {
   document.getElementById('rcpRetailer').textContent = currentRetailer.name;
   document.getElementById('rcpDate').textContent = now.toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('rcpBasket').textContent = '£'+basketVal.toFixed(2);
+  document.getElementById('rcpT1Label').textContent = '🌿 '+currentRetailer.name+' contribution (retailer funded · ≈'+currentRetailer.gsPerTxn+'%)';
   document.getElementById('rcpT1').textContent = '+'+fmt(t1)+' GS';
   document.getElementById('rcpT2').textContent = '+'+fmt(t2)+' GS';
   document.getElementById('rcpTotal').textContent = fmt(grand)+' GS';
