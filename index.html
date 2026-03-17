@@ -123,13 +123,20 @@
     }
     .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
 
+    /* Squares area wrapper */
+    .squares-area {
+      background: var(--color-green-pale);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     /* Main two-column area */
     .main-area {
       display: flex;
       align-items: flex-start;
       gap: 8px;
-      background: var(--color-green-pale);
-      padding: 8px;
     }
     .main-content { flex: 1; min-width: 0; }
     .main-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -290,8 +297,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      background: var(--color-green-pale);
-      padding: 0 8px 8px 8px;
     }
 
     /* News panel */
@@ -474,6 +479,9 @@
     </nav>
   </header>
 
+  <!-- Squares area -->
+  <div class="squares-area">
+
   <!-- Main two-column -->
   <div class="main-area">
 
@@ -594,6 +602,8 @@
     </div>
 
   </div><!-- /bottom-strip -->
+
+  </div><!-- /squares-area -->
 
   <!-- Footer pointer tab -->
   <div class="footer-pointer-wrap"></div>
