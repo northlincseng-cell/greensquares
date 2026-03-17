@@ -58,7 +58,10 @@
     .cd-member-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; color: white; flex-shrink: 0; }
     .cd-member-name { font-size: 13px; color: white; font-weight: bold; }
     .cd-member-balance { font-size: 10px; color: rgba(255,255,255,0.55); }
-    .cd-no-member { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .cd-no-member { background:rgba(255,200,0,0.18); border:1px solid rgba(255,200,0,0.5); border-radius:7px; padding:12px 14px; text-align:center; }
+    .cd-no-member-icon { font-size:24px; line-height:1; }
+    .cd-no-member-main { font-size:14px; font-weight:bold; color:rgba(255,255,255,0.97); margin-top:5px; text-transform:uppercase; letter-spacing:0.5px; }
+    .cd-no-member-sub { font-size:10px; color:rgba(255,255,255,0.6); margin-top:3px; line-height:1.4; }
     .cd-message { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.6; font-style: italic; padding: 10px 14px; background: rgba(0,0,0,0.15); border-radius: 6px; border-left: 3px solid rgba(255,255,255,0.3); margin-bottom: 16px; }
     .cd-qr { display: flex; align-items: center; gap: 14px; }
     .cd-qr-box { width: 68px; height: 68px; background: white; border-radius: 5px; padding: 5px; flex-shrink: 0; display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; }
@@ -89,6 +92,25 @@
     .cp-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #aaa; margin-bottom: 10px; }
 
     .member-linked-badge { font-size: 10px; background: #e4f0d0; color: #2d5518; padding: 3px 10px; border-radius: 10px; border: 1px solid #b8d898; font-weight: bold; white-space: nowrap; }
+
+    /* Loyalty card banner */
+    .loyalty-banner { display:flex; align-items:center; gap:12px; background:#fff8e1; border:2px solid #ffb300; border-radius:7px; padding:11px 14px; margin-bottom:10px; transition:all 0.3s; }
+    .loyalty-banner.linked { background:#e4f0d0; border-color:#6ab023; animation:none; }
+    @keyframes loyaltyPulse { 0%,100%{ border-color:#ffb300; box-shadow:none; } 50%{ border-color:#ff8f00; box-shadow:0 0 0 3px rgba(255,179,0,0.25); } }
+    .loyalty-banner:not(.linked) { animation:loyaltyPulse 2.2s ease-in-out infinite; }
+    .loyalty-banner-icon { font-size:26px; flex-shrink:0; line-height:1; }
+    .loyalty-banner-head { font-size:13px; font-weight:bold; color:#7a4f00; text-transform:uppercase; letter-spacing:0.5px; }
+    .loyalty-banner.linked .loyalty-banner-head { color:#2d5518; }
+    .loyalty-banner-sub { font-size:10px; color:#a06a00; margin-top:2px; }
+    .loyalty-banner.linked .loyalty-banner-sub { color:#5a9a1d; }
+
+    /* Receipt QR section */
+    .receipt-qr-row { display:flex; align-items:center; gap:13px; margin:10px 0 6px; }
+    .receipt-qr-info { flex:1; min-width:0; }
+    .receipt-qr-label { font-size:8px; text-transform:uppercase; letter-spacing:0.6px; color:#aaa; margin-bottom:3px; }
+    .receipt-qr-code { font-family:'Courier New',monospace; font-size:11px; font-weight:bold; color:#1b3410; letter-spacing:0.5px; }
+    .receipt-qr-exp { font-size:9px; color:#aaa; margin-top:2px; }
+    .receipt-qr-hint { font-size:9px; color:#6ab023; margin-top:1px; }
 
     /* Basket scan controls */
     .basket-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -265,6 +287,16 @@
         <div class="receipt-row gs" id="rcpT2Row"><span>🔵 tier 2 (brands)</span><span id="rcpT2">—</span></div>
         <div class="receipt-row total"><span>total green squares</span><span id="rcpTotal">—</span></div>
         <div class="receipt-message" id="rcpMessage"></div>
+        <hr class="receipt-divider">
+        <div class="receipt-qr-row">
+          <div id="rcpQrGrid"></div>
+          <div class="receipt-qr-info">
+            <div class="receipt-qr-label">one-time redemption code</div>
+            <div class="receipt-qr-code" id="rcpQrCode">MGS-----------</div>
+            <div class="receipt-qr-exp">valid 24 hours · single use</div>
+            <div class="receipt-qr-hint">→ scan in my green squares app</div>
+          </div>
+        </div>
         <button class="receipt-close" onclick="closeReceipt()">close receipt / new transaction</button>
       </div>
     </div>
@@ -338,7 +370,13 @@
 
     <!-- Payment + loyalty card -->
     <div class="payment-section">
-      <div class="payment-title">💳 payment — loyalty card</div>
+      <div class="loyalty-banner" id="loyaltyBanner">
+        <div class="loyalty-banner-icon">🪪</div>
+        <div>
+          <div class="loyalty-banner-head" id="loyaltyBannerHead">scan loyalty card</div>
+          <div class="loyalty-banner-sub" id="loyaltyBannerSub">does the customer have an MGS loyalty card?</div>
+        </div>
+      </div>
       <div class="payment-member">
         <select id="memberLookup" onchange="quickLinkMember(this.value)">
           <option value="">— does customer have a loyalty card? —</option>
@@ -385,12 +423,12 @@ var defaultMembers = [
 ];
 
 var defaultProducts = [
-  { id:'PRD001', productName:'Nescafe Gold Blend 200g',  brand:'Nestlé',   sku:'NES-GOLD-200', gsPerUnit:25,  campaignId:'CAM006', active:true, color:'#c05000' },
-  { id:'PRD002', productName:'Nescafe Original 300g',    brand:'Nestlé',   sku:'NES-ORIG-300', gsPerUnit:18,  campaignId:'CAM006', active:true, color:'#c05000' },
-  { id:'PRD003', productName:"Samsung 55\" QLED TV",     brand:'Samsung',  sku:'SAM-QLED-55',  gsPerUnit:250, campaignId:'CAM007', active:true, color:'#1428a0' },
-  { id:'PRD004', productName:'Samsung Galaxy S25',       brand:'Samsung',  sku:'SAM-GAL-S25',  gsPerUnit:85,  campaignId:'CAM007', active:true, color:'#1428a0' },
-  { id:'PRD005', productName:'Persil Bio Liquid 2.5kg',  brand:'Unilever', sku:'UNI-PERS-25',  gsPerUnit:12,  campaignId:'CAM008', active:true, color:'#003087' },
-  { id:'PRD006', productName:'Dove Body Wash 500ml',     brand:'Unilever', sku:'UNI-DOVE-500',  gsPerUnit:8,   campaignId:'CAM008', active:true, color:'#003087' }
+  { id:'PRD001', productName:'Nescafe Gold Blend 200g',  brand:'Nestlé',   sku:'NES-GOLD-200', gsPerUnit:25,  price:4.50,   campaignId:'CAM006', active:true, color:'#c05000' },
+  { id:'PRD002', productName:'Nescafe Original 300g',    brand:'Nestlé',   sku:'NES-ORIG-300', gsPerUnit:18,  price:3.80,   campaignId:'CAM006', active:true, color:'#c05000' },
+  { id:'PRD003', productName:"Samsung 55\" QLED TV",     brand:'Samsung',  sku:'SAM-QLED-55',  gsPerUnit:250, price:799.00, campaignId:'CAM007', active:true, color:'#1428a0' },
+  { id:'PRD004', productName:'Samsung Galaxy S25',       brand:'Samsung',  sku:'SAM-GAL-S25',  gsPerUnit:85,  price:1099.00,campaignId:'CAM007', active:true, color:'#1428a0' },
+  { id:'PRD005', productName:'Persil Bio Liquid 2.5kg',  brand:'Unilever', sku:'UNI-PERS-25',  gsPerUnit:12,  price:8.50,   campaignId:'CAM008', active:true, color:'#003087' },
+  { id:'PRD006', productName:'Dove Body Wash 500ml',     brand:'Unilever', sku:'UNI-DOVE-500',  gsPerUnit:8,   price:3.20,   campaignId:'CAM008', active:true, color:'#003087' }
 ];
 
 var defaultMemberTxns = [
@@ -458,7 +496,8 @@ function buildProductPicker() {
   document.getElementById('productPicker').innerHTML =
     '<option value="">— scan / add GS product —</option>' +
     prods.map(function(p){
-      return '<option value="'+p.id+'">'+p.productName+' ['+p.sku+'] +'+p.gsPerUnit+' GS ('+p.brand+')</option>';
+      var price = p.price ? ' · £'+p.price.toFixed(2) : '';
+      return '<option value="'+p.id+'">'+p.productName+price+' — +'+p.gsPerUnit+' GS ('+p.brand+')</option>';
     }).join('');
 }
 
@@ -558,13 +597,22 @@ function setMember(id) {
   currentMember = id ? members.find(function(m){ return m.id===id; }) : null;
   var badge = document.getElementById('memberBadge');
   var link  = document.getElementById('viewAccountLink');
+  var banner = document.getElementById('loyaltyBanner');
+  var bannerHead = document.getElementById('loyaltyBannerHead');
+  var bannerSub  = document.getElementById('loyaltyBannerSub');
   if (currentMember) {
     badge.style.display = 'inline-flex'; badge.textContent = currentMember.name+' linked ✓';
     link.style.display = 'inline-flex'; link.href = 'account.html?member='+currentMember.id;
     document.getElementById('memberLookup').value = currentMember.id;
+    banner.classList.add('linked');
+    bannerHead.textContent = currentMember.name+' — loyalty card linked ✓';
+    bannerSub.textContent = 'current balance: '+fmt(currentMember.gsBalance)+' GS · GS will be credited on sale complete';
   } else {
     badge.style.display = 'none'; link.style.display = 'none';
     document.getElementById('memberLookup').value = '';
+    banner.classList.remove('linked');
+    bannerHead.textContent = 'scan loyalty card';
+    bannerSub.textContent = 'does the customer have an MGS loyalty card?';
   }
   updateCustomerMember();
   recalc();
@@ -581,7 +629,11 @@ function updateCustomerMember() {
       '</div>'+
     '</div>';
   } else {
-    box.innerHTML = '<div class="cd-no-member">🔗 link your account at checkout to earn GS</div>';
+    box.innerHTML = '<div class="cd-no-member">'+
+      '<div class="cd-no-member-icon">🪪</div>'+
+      '<div class="cd-no-member-main">scan loyalty card</div>'+
+      '<div class="cd-no-member-sub">present MGS card or app at checkout<br>to earn green squares</div>'+
+    '</div>';
   }
 }
 
@@ -597,6 +649,11 @@ function addProduct(id) {
     prd._promo = retailerPromos.find(function(p){
       return p.retailerName === currentRetailer.name && p.active && p.products.indexOf(prd.id) !== -1;
     }) || null;
+  }
+  // Auto-add product price to basket total
+  if (prd.price) {
+    var curVal = parseFloat(document.getElementById('basketValue').value) || 0;
+    document.getElementById('basketValue').value = (curVal + prd.price).toFixed(2);
   }
   var newIdx = basketItems.length;
   basketItems.push(prd);
@@ -623,8 +680,8 @@ function renderReceipt(newIdx) {
 
   var html = '';
 
-  // Basket value / own-brand line (Tier 1)
-  if (currentRetailer) {
+  // Basket value / own-brand line (Tier 1) — only show when basket value > 0
+  if (currentRetailer && basketVal > 0) {
     html += '<div class="rcpt-line">'+
       '<div class="rcpt-icon" style="background:'+currentRetailer.bg+'">OB</div>'+
       '<div class="rcpt-detail">'+
@@ -639,6 +696,7 @@ function renderReceipt(newIdx) {
   // Scanned GS products
   html += basketItems.map(function(p, i){
     var isNew = (i === newIdx);
+    var price = p.price ? '£'+p.price.toFixed(2) : '';
     var tags = '<span class="rcpt-tag rcpt-tag-t2">🔵 +'+p.gsPerUnit+' GS ('+p.brand+')</span>';
     if (p._promo) tags += ' <span class="rcpt-tag rcpt-tag-promo">🌿 +'+p._promo.gsPerUnit+' GS — '+p._promo.name+'</span>';
     if (isNew) tags += ' <span class="rcpt-tag rcpt-tag-scan">SCANNED ✓</span>';
@@ -649,6 +707,7 @@ function renderReceipt(newIdx) {
         '<div class="rcpt-prod-sub">'+p.sku+' · '+p.brand+'</div>'+
         '<div class="rcpt-tags">'+tags+'</div>'+
       '</div>'+
+      '<div class="rcpt-basket-right"><div class="rcpt-basket-val">'+price+'</div></div>'+
       '<button class="rcpt-remove" onclick="removeBasketItem('+i+')">×</button>'+
     '</div>';
   }).join('');
@@ -800,12 +859,52 @@ function showReceipt(txn, t1, t2, grand, basketVal, now) {
     'you have earned 🌿 '+fmt(grand)+' green squares at '+currentRetailer.name+
     '. your contribution is helping protect the amazon rainforest. thank you.';
 
+  // One-time QR redemption code
+  var qrSeed = txn.id + now.getTime();
+  var qrCode = 'MGS-'+txn.id.slice(-8).toUpperCase()+'-'+(now.getTime()%10000).toString(16).toUpperCase();
+  buildReceiptQr(qrSeed);
+  document.getElementById('rcpQrCode').textContent = qrCode;
+
   document.getElementById('receiptOverlay').classList.add('show');
 }
 
 function closeReceipt() {
   document.getElementById('receiptOverlay').classList.remove('show');
   clearBasket();
+}
+
+// ── One-time QR code generator ────────────────────────────────────────────────
+function buildReceiptQr(seed) {
+  var N = 17;
+  var g = new Array(N * N).fill(0);
+  // QR finder patterns (7×7) in 3 corners
+  function setFinder(ox, oy) {
+    for (var r = 0; r < 7; r++) for (var c = 0; c < 7; c++) {
+      var on = (r===0||r===6||c===0||c===6) || (r>=2&&r<=4&&c>=2&&c<=4);
+      g[(oy+r)*N+(ox+c)] = on ? 1 : 0;
+    }
+  }
+  setFinder(0, 0); setFinder(N-7, 0); setFinder(0, N-7);
+  // Timing lines
+  for (var i = 8; i < N-8; i++) { g[6*N+i] = i%2===0?1:0; g[i*N+6] = i%2===0?1:0; }
+  // Seed-based data fill
+  var h = 0x1a2b3c4d;
+  for (var s = 0; s < seed.length; s++) h = (Math.imul(h, 37) + seed.charCodeAt(s)) | 0;
+  function rng() { h ^= h << 13; h ^= (h >>> 17); h ^= h << 5; return (h >>> 0) % 2; }
+  for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+    var inFinder = (x<8&&y<8)||(x>N-9&&y<8)||(x<8&&y>N-9);
+    var onTiming = (x===6||y===6);
+    rng(); // consume for consistency
+    if (!inFinder && !onTiming && g[y*N+x]===0) g[y*N+x] = rng();
+  }
+  // Render into container
+  var container = document.getElementById('rcpQrGrid');
+  var px = 4;
+  container.style.cssText = 'display:grid;grid-template-columns:repeat('+N+','+px+'px);gap:0;' +
+    'width:'+(N*px+8)+'px;height:'+(N*px+8)+'px;padding:4px;background:white;border-radius:3px;flex-shrink:0;';
+  container.innerHTML = g.map(function(v) {
+    return '<div style="width:'+px+'px;height:'+px+'px;background:'+(v?'#1b3410':'white')+'"></div>';
+  }).join('');
 }
 
 // ── Dev panel ─────────────────────────────────────────────────────────────────
