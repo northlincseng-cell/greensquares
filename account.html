@@ -75,7 +75,7 @@
     .txn-retailer { font-size: 12px; font-weight: bold; color: #1b3410; }
     .txn-products { font-size: 10px; color: #3a6acc; margin-top: 2px; }
     .txn-meta { font-size: 10px; color: #bbb; margin-top: 2px; }
-    .txn-gs-val { font-size: 14px; font-weight: bold; color: #6ab023; white-space: nowrap; }
+    .txn-gs-val { font-size: 14px; font-weight: bold; color: #6ab023; white-space: nowrap; display: flex; align-items: center; justify-content: flex-end; }
     .txn-gs-t { font-size: 9px; color: #bbb; white-space: nowrap; text-align: right; }
 
     /* ── Impact grid ── */
@@ -514,7 +514,7 @@ function txnHtml(t) {
       (t.products&&t.products.length?'<div class="txn-products">🔵 '+t.products.map(function(p){return p.name+' +'+p.gs+' GS';}).join(' · ')+'</div>':'')+
       '<div class="txn-meta">'+fmtDate(t.date)+' · '+t.time+' · basket £'+(t.basketValue||0).toFixed(2)+'</div>'+
     '</div>'+
-    '<div style="text-align:right;"><div class="txn-gs-val">+'+fmt(t.gsEarned)+' 🌿</div>'+
+    '<div style="text-align:right;"><div class="txn-gs-val">+'+fmt(t.gsEarned)+'<img src="assets/images/gs-logo.png" style="height:18px;vertical-align:middle;margin-left:4px;"></div>'+
     '<div class="txn-gs-t">T1: +'+t.t1Gs+(t.t2Gs?' · T2: +'+t.t2Gs:'')+'</div></div>'+
   '</div>';
 }
