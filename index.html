@@ -6,53 +6,53 @@
   <title>mygreensquares.com — balancing what you take out with what you give back</title>
   <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
   <style>
-    body { background-color: #c8dca0; margin: 0; font-family: Verdana, Geneva, Arial, sans-serif; }
+    body { background-color: var(--color-green-pale); margin: 0; }
 
     .page-wrapper {
-      max-width: 980px;
+      max-width: 960px;
       margin: 0 auto;
-      background: #e8eedd;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      background: var(--color-white);
+      box-shadow: 0 0 20px rgba(0,0,0,0.15);
     }
 
-    /* ── Header ── */
-    .site-header {
-      background: #8cc63f;
-      padding: 0 16px;
-    }
-    .header-top {
+    /* Utility / search bar */
+    .utility-bar {
+      background: var(--color-green-pale);
       display: flex;
       justify-content: flex-end;
-      padding: 6px 0 4px;
-      gap: 6px;
       align-items: center;
+      padding: 5px 12px;
+      gap: 5px;
     }
-    .header-top input {
-      width: 200px;
+    .utility-bar input {
+      width: 170px;
       padding: 4px 10px;
       font-size: 11px;
-      border: 1px solid rgba(255,255,255,0.5);
+      border: 1px solid #c8c8b8;
       border-radius: 3px;
-      background: rgba(255,255,255,0.85);
-      font-family: Verdana, Geneva, Arial, sans-serif;
-      color: #555;
+      background: rgba(255,255,255,0.8);
+      font-family: var(--font-primary);
+      color: var(--color-grey-text);
     }
-    .header-top input::placeholder { color: #999; }
-    .header-top button {
-      background: #66a323;
+    .utility-bar input::placeholder { color: var(--color-grey-meta); }
+    .utility-bar button {
+      background: var(--color-green-primary);
       color: white;
       border: none;
       border-radius: 3px;
       padding: 4px 10px;
       cursor: pointer;
       font-size: 13px;
-      font-weight: bold;
     }
-    .header-main {
+
+    /* Header */
+    .site-header {
+      background: var(--color-green-primary);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 10px;
+      height: 56px;
+      padding: 0 16px;
     }
     .logo {
       display: flex;
@@ -62,86 +62,79 @@
     }
     .logo-icon {
       display: grid;
-      grid-template-columns: repeat(3, 11px);
-      grid-template-rows: repeat(3, 11px);
+      grid-template-columns: repeat(3, 10px);
+      grid-template-rows: repeat(3, 10px);
       gap: 2px;
       position: relative;
     }
     .logo-icon span {
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.92);
       border-radius: 1px;
       display: block;
     }
-    .logo-icon .lo-leaf { background: transparent; position: relative; }
+    .logo-icon .lo-leaf {
+      background: transparent;
+      position: relative;
+    }
     .logo-icon .lo-leaf::after {
       content: '';
       position: absolute;
-      width: 24px; height: 24px;
-      background: rgba(255,255,255,0.95);
+      width: 22px;
+      height: 22px;
+      background: rgba(255,255,255,0.92);
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
-      top: -6px; left: -6px;
+      top: -5px;
+      left: -5px;
     }
     .logo-text {
-      font-size: 26px;
+      font-size: 22px;
       color: white;
       text-transform: lowercase;
-      font-weight: bold;
+      font-weight: normal;
       letter-spacing: -0.5px;
     }
-    .logo-text em { font-size: 16px; font-style: normal; font-weight: normal; }
-
-    .header-nav-acct {
+    .logo-text em {
+      font-size: 14px;
+      font-style: normal;
+      opacity: 0.82;
+    }
+    .site-nav {
       display: flex;
       align-items: center;
-      gap: 14px;
+      height: 56px;
     }
-    .main-nav {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-    .main-nav a {
+    .site-nav a {
       color: white;
       font-size: 13px;
       text-transform: lowercase;
       text-decoration: none;
-      padding: 0 12px;
-      transition: color 0.15s;
-    }
-    .main-nav a:hover { color: #1a3a00; }
-    .acct-btn {
-      background: #4a6a1a;
-      border-radius: 3px;
-      padding: 5px 12px;
+      padding: 0 14px;
+      height: 56px;
       display: flex;
       align-items: center;
-      gap: 0;
+      transition: background 0.15s;
     }
-    .acct-btn a {
-      color: white;
+    .site-nav a:hover { background: rgba(0,0,0,0.15); text-decoration: none; }
+    .site-nav .nav-acct {
+      background: rgba(0,0,0,0.18);
+      border-left: 1px solid rgba(255,255,255,0.2);
       font-size: 12px;
-      text-decoration: none;
-      text-transform: lowercase;
     }
-    .acct-btn a:hover { color: #c8e88a; }
-    .acct-pipe { color: rgba(255,255,255,0.4); margin: 0 6px; }
+    .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
 
-    /* ── Main two-column ── */
+    /* Main two-column area */
     .main-area {
       display: flex;
-      align-items: stretch;
-      gap: 3px;
-      padding: 3px;
-      background: #b8cc88;
+      align-items: flex-start;
     }
     .main-content { flex: 1; min-width: 0; }
-    .main-sidebar { width: 290px; flex-shrink: 0; display: flex; flex-direction: column; gap: 3px; }
+    .main-sidebar { width: 220px; flex-shrink: 0; }
 
-    /* ── Carousel ── */
+    /* Hero / Carousel */
     .hero-wrap {
       position: relative;
-      height: 500px;
+      height: 430px;
       overflow: hidden;
       background: #1a2a10;
     }
@@ -162,194 +155,239 @@
       object-fit: cover;
       display: block;
     }
-    .carousel-dots {
+    .hero-overlay {
       position: absolute;
-      bottom: 12px;
-      left: 14px;
+      bottom: 0; left: 0; right: 0;
+      padding: 24px 28px 28px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    }
+    .hero-title {
+      font-size: 36px;
+      color: white;
+      text-transform: lowercase;
+      font-weight: normal;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      max-width: 320px;
+    }
+    .hero-body {
+      font-size: 12px;
+      color: rgba(255,255,255,0.88);
+      margin-bottom: 14px;
+      max-width: 300px;
+      line-height: 1.5;
+    }
+    .hero-body a { color: var(--color-green-bright); }
+    .carousel-dots {
       display: flex;
       gap: 5px;
+      margin-top: 10px;
     }
     .dot {
-      width: 12px; height: 12px;
+      width: 11px; height: 11px;
       border-radius: 2px;
-      background: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.3);
       border: none; cursor: pointer;
-      padding: 0;
     }
-    .dot.on { background: #8cc63f; }
+    .dot.on { background: var(--color-green-bright); }
 
-    /* ── Right sidebar panels ── */
-    .panel-create {
-      background: #4a6a1e;
-      color: white;
-      padding: 16px 18px;
-      flex: 1;
+    /* Sidebar panels */
+    .panel {
+      padding: 14px 16px;
+      margin-bottom: 2px;
     }
-    .panel-create h3 {
-      font-size: 18px;
+    .panel-light-bg { background: #f2f5ec; }
+    .panel-dark-bg  { background: var(--color-green-olive); color: white; }
+    .panel-green-bg { background: var(--color-green-tile); color: white; }
+
+    .panel h3 {
+      font-size: 20px;
       font-weight: normal;
-      color: white;
-      margin-bottom: 10px;
-      line-height: 1.25;
+      text-transform: lowercase;
+      margin-bottom: 12px;
     }
-    .panel-create p {
+    .panel-light-bg h3 { color: var(--color-grey-dark); }
+    .panel-dark-bg h3  { color: white; font-weight: bold; }
+    .panel-green-bg h3 { color: white; font-weight: bold; }
+
+    .cta-accent {
       font-size: 12px;
-      color: rgba(255,255,255,0.82);
+      font-weight: bold;
+      color: var(--color-green-bright);
+      text-transform: lowercase;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+    .panel-body-text {
+      font-size: 12px;
+      color: #666;
       line-height: 1.5;
       margin-bottom: 12px;
     }
-    .btn-join {
-      display: block;
-      text-align: center;
-      background: #8cc63f;
+    .panel-dark-bg .panel-body-text { color: rgba(255,255,255,0.78); }
+
+    /* Buttons */
+    .btn-gs {
+      display: inline-block;
+      background: var(--color-green-primary);
       color: white;
-      border: none;
+      border: 1px solid var(--color-green-dark);
       border-radius: 3px;
-      padding: 9px 16px;
-      font-size: 13px;
-      font-family: Verdana, Geneva, Arial, sans-serif;
+      padding: 7px 16px;
+      font-size: 12px;
+      font-family: var(--font-primary);
+      text-transform: lowercase;
       text-decoration: none;
       cursor: pointer;
-      margin-bottom: 8px;
-      font-weight: bold;
+      transition: background 0.15s;
     }
-    .btn-join:hover { background: #66a323; color: white; text-decoration: none; }
+    .btn-gs:hover { background: var(--color-green-dark); text-decoration: none; color: white; }
+    .btn-gs.full { display: block; text-align: center; }
+    .btn-gs.dark { background: #4a5a35; border-color: rgba(255,255,255,0.2); }
+
     .btn-fb {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 6px;
       background: #3b5998;
       color: white;
       border-radius: 3px;
-      padding: 7px 12px;
+      padding: 6px 12px;
       font-size: 12px;
       text-decoration: none;
+      margin-top: 6px;
     }
-    .btn-fb:hover { background: #2d4373; color: white; text-decoration: none; }
-    .fb-f { font-weight: bold; font-size: 15px; }
+    .btn-fb:hover { background: #2d4373; text-decoration: none; color: white; }
+    .fb-icon { font-weight: bold; font-size: 14px; }
 
-    /* Video placeholder panel */
-    .panel-video {
-      position: relative;
-      overflow: hidden;
-      background: #2a3a1a;
-      min-height: 200px;
+    /* Social feed */
+    .social-item {
       display: flex;
-      align-items: flex-end;
-    }
-    .panel-video img {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0.85;
-    }
-    .panel-video-placeholder {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, #2a4a10 0%, #4a7a20 50%, #1a3a08 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       font-size: 11px;
-      color: rgba(255,255,255,0.4);
-      font-style: italic;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.4;
     }
-    .video-overlay {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      padding: 10px 14px 14px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-    }
-    .video-title {
-      font-size: 22px;
-      color: white;
-      font-weight: normal;
-      line-height: 1.2;
-      margin-bottom: 8px;
-    }
-    .btn-play {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.7);
-      color: white;
-      font-size: 16px;
-      text-decoration: none;
-      background: rgba(0,0,0,0.3);
-      margin-bottom: 6px;
-    }
-    .btn-play:hover { background: rgba(140,198,63,0.6); border-color: white; text-decoration: none; color: white; }
+    .social-item:last-child { border-bottom: none; }
+    .sbird { font-size: 13px; color: var(--color-green-bright); flex-shrink: 0; }
+    .stime { color: var(--color-green-bright); font-size: 10px; }
+    .slink { color: var(--color-green-bright); text-decoration: none; }
 
-    /* ── Bottom 3-col strip ── */
+    /* Bottom 3-col strip */
     .bottom-strip {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 3px;
-      padding: 3px;
-      background: #b8cc88;
-    }
-    .strip-panel {
-      padding: 18px 16px 20px;
-      min-height: 140px;
-    }
-    .strip-dark {
-      background: #2a3a52;
-      color: white;
-    }
-    .strip-mid {
-      background: #66a323;
-      color: white;
-    }
-    .strip-bright {
-      background: #8cc63f;
-      color: white;
-    }
-    .strip-panel h3 {
-      font-size: 18px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 8px;
-      line-height: 1.2;
-      text-transform: lowercase;
-    }
-    .strip-panel p {
-      font-size: 12px;
-      color: rgba(255,255,255,0.85);
-      line-height: 1.5;
-      margin-bottom: 10px;
-    }
-    .strip-panel a.more {
-      font-size: 11px;
-      color: rgba(255,255,255,0.7);
-      text-decoration: underline;
-    }
-    .strip-panel a.more:hover { color: white; }
-    .strip-big {
-      font-size: 28px;
-      font-weight: bold;
-      color: white;
-      line-height: 1.1;
-      margin-bottom: 6px;
+      gap: 2px;
     }
 
-    /* ── Footer ── */
-    .footer-tab { line-height: 0; background: #b8cc88; padding: 0 3px; }
-    .footer-tab::before {
+    /* News panel */
+    .news-panel {
+      background: var(--color-green-olive);
+      padding: 14px 16px;
+      color: white;
+    }
+    .news-panel h3 {
+      font-size: 16px;
+      font-weight: normal;
+      color: white;
+      text-transform: lowercase;
+      margin-bottom: 12px;
+    }
+    .news-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--color-green-bright);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .news-excerpt {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    /* Video panel */
+    .video-panel {
+      position: relative;
+      overflow: hidden;
+      background: #111;
+    }
+    .video-panel img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0.82;
+    }
+    .video-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      font-size: 11px;
+      padding: 6px 10px;
+      line-height: 1.3;
+    }
+    .video-play {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -70%);
+    }
+
+    /* Supported by */
+    .supported-panel {
+      background: var(--color-green-tile);
+      padding: 14px 16px;
+      color: white;
+    }
+    .supported-panel h3 {
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      text-transform: lowercase;
+      margin-bottom: 12px;
+    }
+    .partner-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 3px;
+      margin-bottom: 8px;
+    }
+    .partner-box {
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      border-radius: 2px;
+      font-weight: bold;
+      font-size: 11px;
+    }
+    .supported-desc {
+      font-size: 10px;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+
+    /* Footer */
+    .footer-pointer-wrap { line-height: 0; }
+    .footer-pointer-wrap::before {
       content: '';
       display: block;
       width: 0; height: 0;
       border-left: 14px solid transparent;
       border-right: 14px solid transparent;
-      border-top: 12px solid #e8eedd;
-      margin-left: 22px;
+      border-top: 14px solid white;
+      margin-left: 24px;
     }
     footer {
-      background: #3c4c28;
+      background: var(--color-green-olive);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -371,7 +409,7 @@
       font-size: 11px;
       text-decoration: none;
     }
-    .soc-btn:hover { background: rgba(255,255,255,0.25); text-decoration: none; color: white; }
+    .soc-btn:hover { background: rgba(255,255,255,0.25); text-decoration: none; }
     .footer-right { text-align: right; }
     .fnav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; margin-bottom: 4px; }
     .fnav a {
@@ -389,59 +427,62 @@
 <body>
 <div class="page-wrapper">
 
+  <!-- Utility bar -->
+  <div class="utility-bar">
+    <input type="text" placeholder="type to search site">
+    <button>&#9906;</button>
+  </div>
+
   <!-- Header -->
   <header class="site-header">
-    <div class="header-top">
-      <input type="text" placeholder="type to search site">
-      <button>&#128269;</button>
-    </div>
-    <div class="header-main">
-      <a href="index.html" class="logo">
-        <div class="logo-icon">
-          <span></span><span></span><span></span>
-          <span></span><span></span><span></span>
-          <span class="lo-leaf"></span><span></span><span></span>
-        </div>
-        <span class="logo-text">mygreensquares<em>.com</em></span>
-      </a>
-      <div class="header-nav-acct">
-        <nav class="main-nav">
-          <a href="index.html">home</a>
-          <a href="#">about</a>
-          <a href="#">social</a>
-          <a href="map.html">projects</a>
-          <a href="#">eshop</a>
-        </nav>
-        <div class="acct-btn">
-          <a href="account.html">my account</a>
-          <span class="acct-pipe">|</span>
-          <a href="account.html">sign up</a>
-        </div>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span class="lo-leaf"></span><span></span><span></span>
       </div>
-    </div>
+      <span class="logo-text">mygreensquares<em>.com</em></span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">about</a>
+      <a href="index.html">projects</a>
+      <a href="index.html">contact</a>
+      <a href="index.html">news</a>
+      <a href="account.html" class="nav-acct">my account</a>
+      <span class="nav-pipe">|</span>
+      <a href="account.html" class="nav-acct">sign up</a>
+    </nav>
   </header>
 
   <!-- Main two-column -->
   <div class="main-area">
 
-    <!-- Carousel (left) -->
+    <!-- Hero (left/main) -->
     <div class="main-content">
       <div class="hero-wrap" id="heroWrap">
         <div class="carousel-track" id="carouselTrack">
           <div class="carousel-slide">
-            <img src="assets/images/frog.png" alt="Green Squares — save the rainforest">
+            <img src="assets/images/frog.png" alt="Green Squares — frog">
           </div>
           <div class="carousel-slide">
-            <img src="assets/images/yoga.png" alt="Green Squares — balance your lifestyle">
+            <img src="assets/images/yoga.png" alt="Green Squares — lifestyle">
           </div>
           <div class="carousel-slide">
-            <img src="assets/images/amazon.png" alt="Green Squares — Amazon rainforest project">
+            <img src="assets/images/amazon.png" alt="Green Squares — Amazon rainforest">
           </div>
         </div>
-        <div class="carousel-dots">
-          <button class="dot on" aria-label="slide 1" onclick="goTo(0)"></button>
-          <button class="dot" aria-label="slide 2" onclick="goTo(1)"></button>
-          <button class="dot" aria-label="slide 3" onclick="goTo(2)"></button>
+        <div class="hero-overlay">
+          <h1 class="hero-title">balancing what you take out with what you give back</h1>
+          <p class="hero-body">
+            We all take from the environment but through Green Squares, you can now put something back,
+            creating your very own protection fund. <a href="#">see more</a>
+          </p>
+          <a href="account.html" class="btn-gs">how we work</a>
+          <div class="carousel-dots">
+            <button class="dot on" aria-label="slide 1" onclick="goTo(0)"></button>
+            <button class="dot" aria-label="slide 2" onclick="goTo(1)"></button>
+            <button class="dot" aria-label="slide 3" onclick="goTo(2)"></button>
+          </div>
         </div>
       </div>
     </div>
@@ -449,23 +490,38 @@
     <!-- Right sidebar -->
     <div class="main-sidebar">
 
-      <!-- Create account panel -->
-      <div class="panel-create">
-        <h3>create your own<br>environmental account</h3>
-        <p>Getting started couldn't be easier, so click here and start to balance your lifestyle straight away.</p>
-        <p>If you have Facebook, use the link below and your account will be set up and linked automatically.</p>
-        <a href="account.html" class="btn-join">join green squares now</a>
+      <!-- Getting started -->
+      <div class="panel panel-light-bg">
+        <h3>getting you started</h3>
+        <p class="cta-accent">here's how to claim your<br>green squares reward.</p>
+        <p class="panel-body-text">
+          Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper
+          suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+        </p>
+        <a href="account.html" class="btn-gs full" style="margin-bottom:8px;">sign up now</a>
         <a href="#" class="btn-fb">
-          <span class="fb-f">f</span> Connect with Facebook
+          <span class="fb-icon">f</span> Connect with Facebook
         </a>
       </div>
 
-      <!-- Video panel — placeholder until image/video supplied -->
-      <div class="panel-video">
-        <div class="panel-video-placeholder">[ image coming soon ]</div>
-        <div class="video-overlay">
-          <div class="video-title">why save<br>rainforests?</div>
-          <a href="#" class="btn-play" title="Watch video">&#9654;</a>
+      <!-- Social square -->
+      <div class="panel panel-dark-bg">
+        <h3>social square</h3>
+        <div class="social-item">
+          <span class="sbird">🐦</span>
+          <span>Tesco have just purchased 300,000,000 green squares. great start! <span class="stime">5m ago</span></span>
+        </div>
+        <div class="social-item">
+          <span class="sbird">🐦</span>
+          <span>another tweet, this one with a link: <a href="#" class="slink">www.greensquares.global</a> <span class="stime">yesterday</span></span>
+        </div>
+        <div class="social-item">
+          <span class="sbird">🐦</span>
+          <span>The 2nd May is My Green Squares soft launch date. We celebrate this with a major... <span class="stime">29 may</span></span>
+        </div>
+        <div class="social-item">
+          <span class="sbird">🐦</span>
+          <span>Every Green Square protects 1 sq ft of Amazon rainforest. Find out more... <span class="stime">29 may</span></span>
         </div>
       </div>
 
@@ -476,49 +532,75 @@
   <!-- Bottom 3-column strip -->
   <div class="bottom-strip">
 
-    <div class="strip-panel strip-dark">
-      <h3>creating change</h3>
-      <p>helping you to balance the environmental impact of your lifestyle choices</p>
-      <a href="#" class="more">find out more &rsaquo;</a>
+    <!-- News -->
+    <div class="news-panel">
+      <h3>news</h3>
+      <div>
+        <div class="news-title">Amazon Deforestation Rate Falls for Third Consecutive Year</div>
+        <p class="news-excerpt">New satellite data from INPE shows a significant reduction across the Amazon basin, attributed to enforcement of conservation projects...</p>
+      </div>
+      <div>
+        <div class="news-title">UK Businesses Commit to Net Zero Through Green Squares</div>
+        <p class="news-excerpt">A coalition of leading UK retailers has pledged to offset their entire carbon footprint using certified Green Squares...</p>
+      </div>
+      <a href="#" class="btn-gs dark" style="margin-top:8px;">more news</a>
     </div>
 
-    <div class="strip-panel strip-mid">
-      <div class="strip-big">one green square</div>
-      <p>funds a square foot of rainforest for 10 months, building a real and lasting legacy</p>
-      <a href="#" class="more">how it works &rsaquo;</a>
+    <!-- Video/image -->
+    <div class="video-panel">
+      <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=320&h=260&fit=crop&crop=center&q=80"
+           alt="saving the rainforest means changing people's lives"
+           style="height: 260px;">
+      <div class="video-caption">saving the rainforest means changing people's lives</div>
+      <div class="video-play">
+        <a href="#" class="btn-gs">view video</a>
+      </div>
     </div>
 
-    <div class="strip-panel strip-bright">
-      <h3>shop &amp; collect<br>Green Squares</h3>
-      <p>collect Green Squares every time you shop with our partner retailers</p>
-      <a href="account.html" class="more">see all partners &rsaquo;</a>
+    <!-- Supported by -->
+    <div class="supported-panel">
+      <h3>supported by</h3>
+      <div class="partner-row">
+        <div class="partner-box" style="color:#cc0000;font-size:13px;">H&amp;M</div>
+        <div class="partner-box" style="color:#003399;">currys</div>
+        <div class="partner-box" style="background:#003399;color:white;font-size:10px;">PC World</div>
+      </div>
+      <div class="partner-row">
+        <div class="partner-box" style="background:#00aeef;color:white;">sky</div>
+        <div class="partner-box" style="background:#e8820c;color:white;font-size:10px;">Sainsbury's</div>
+        <div class="partner-box" style="background:#78ac3e;color:white;">ASDA</div>
+      </div>
+      <a href="#" style="font-size:11px;color:rgba(255,255,255,0.75);text-decoration:underline;">visit partner site</a>
+      <p class="supported-desc">Green Squares has been adopted by a number of leading global brands, providing loads of opportunities for you to collect.</p>
     </div>
 
   </div><!-- /bottom-strip -->
 
-  <!-- Footer tab -->
-  <div class="footer-tab"></div>
+  <!-- Footer pointer tab -->
+  <div class="footer-pointer-wrap"></div>
 
   <!-- Footer -->
   <footer>
     <div class="footer-left">
       <span class="footer-label">socialise with us — it's <strong>free</strong> and it <strong>helps!</strong></span>
       <a href="#" class="soc-btn">f</a>
-      <a href="#" class="soc-btn">&#9654;</a>
+      <a href="#" class="soc-btn">▶</a>
       <a href="#" class="soc-btn">t</a>
       <a href="#" class="soc-btn">P</a>
-      <a href="#" class="soc-btn">in</a>
+      <a href="#" class="soc-btn">g+</a>
+      <a href="#" class="soc-btn">📷</a>
+      <a href="#" class="soc-btn">~</a>
     </div>
     <div class="footer-right">
       <nav class="fnav">
-        <a href="account.html">my account</a>
+        <a href="#">my account</a>
         <a href="#">help</a>
         <a href="#">site map</a>
         <a href="#">terms &amp; conditions</a>
         <a href="#">legal</a>
         <a href="#">privacy</a>
       </nav>
-      <div class="footer-copy">a PROFOCO company &nbsp;|&nbsp; &copy; copyright 2026 mygreensquares</div>
+      <div class="footer-copy">a PROFOCO company &nbsp;|&nbsp; © copyright 2026 mygreensquares</div>
     </div>
   </footer>
 
