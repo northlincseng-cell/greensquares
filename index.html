@@ -131,14 +131,25 @@
     .main-content { flex: 1; min-width: 0; }
     .main-sidebar { width: 220px; flex-shrink: 0; }
 
-    /* Hero */
+    /* Hero / Carousel */
     .hero-wrap {
       position: relative;
       height: 430px;
       overflow: hidden;
       background: #1a2a10;
     }
-    .hero-wrap img {
+    .carousel-track {
+      display: flex;
+      width: 300%;
+      height: 100%;
+      transition: transform 0.6s ease;
+    }
+    .carousel-slide {
+      width: 33.333%;
+      height: 100%;
+      flex-shrink: 0;
+    }
+    .carousel-slide img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -448,9 +459,18 @@
 
     <!-- Hero (left/main) -->
     <div class="main-content">
-      <div class="hero-wrap">
-        <img src="https://images.unsplash.com/photo-1448375240586-882707db888b?w=760&h=430&fit=crop&q=80"
-             alt="Aerial view of Amazon rainforest canopy">
+      <div class="hero-wrap" id="heroWrap">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide">
+            <img src="assets/images/frog.png" alt="Green Squares — frog">
+          </div>
+          <div class="carousel-slide">
+            <img src="assets/images/yoga.png" alt="Green Squares — lifestyle">
+          </div>
+          <div class="carousel-slide">
+            <img src="assets/images/amazon.png" alt="Green Squares — Amazon rainforest">
+          </div>
+        </div>
         <div class="hero-overlay">
           <h1 class="hero-title">balancing what you take out with what you give back</h1>
           <p class="hero-body">
@@ -459,10 +479,9 @@
           </p>
           <a href="account.html" class="btn-gs">how we work</a>
           <div class="carousel-dots">
-            <button class="dot on" aria-label="slide 1"></button>
-            <button class="dot" aria-label="slide 2"></button>
-            <button class="dot" aria-label="slide 3"></button>
-            <button class="dot" aria-label="slide 4"></button>
+            <button class="dot on" aria-label="slide 1" onclick="goTo(0)"></button>
+            <button class="dot" aria-label="slide 2" onclick="goTo(1)"></button>
+            <button class="dot" aria-label="slide 3" onclick="goTo(2)"></button>
           </div>
         </div>
       </div>
@@ -586,5 +605,20 @@
   </footer>
 
 </div><!-- /page-wrapper -->
+
+<script>
+  var current = 0;
+  var total = 3;
+  var track = document.getElementById('carouselTrack');
+  var dots = document.querySelectorAll('.dot');
+
+  function goTo(n) {
+    current = n;
+    track.style.transform = 'translateX(-' + (100 / total * n) + '%)';
+    dots.forEach(function(d, i) { d.classList.toggle('on', i === n); });
+  }
+
+  setInterval(function() { goTo((current + 1) % total); }, 4000);
+</script>
 </body>
 </html>
