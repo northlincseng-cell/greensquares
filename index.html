@@ -398,18 +398,19 @@
     }
 
     /* Footer */
-    .footer-pointer-wrap { line-height: 0; }
+    .footer-pointer-wrap { line-height: 0; margin: 0; background: var(--color-green-pale); padding: 0 0 4px 0; }
     .footer-pointer-wrap::before {
       content: '';
       display: block;
       width: 0; height: 0;
       border-left: 14px solid transparent;
       border-right: 14px solid transparent;
-      border-top: 14px solid white;
+      border-top: 14px solid var(--color-green-pale);
       margin-left: 24px;
     }
     footer {
       background: var(--color-green-olive);
+      margin: 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
