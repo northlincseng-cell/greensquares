@@ -9,19 +9,13 @@
     body { background-color: var(--color-green-pale); margin: 0; }
     .page-wrapper { max-width: 960px; margin: 0 auto; background: var(--color-white); box-shadow: 0 0 20px rgba(0,0,0,0.15); }
 
-    /* Utility / header (shared — same as index) */
+    /* Utility / header (shared) */
     .utility-bar { background: var(--color-green-pale); display: flex; justify-content: flex-end; align-items: center; padding: 5px 12px; gap: 5px; }
     .utility-bar input { width: 170px; padding: 4px 10px; font-size: 11px; border: 1px solid #c8c8b8; border-radius: 3px; background: rgba(255,255,255,0.8); font-family: var(--font-primary); color: var(--color-grey-text); }
     .utility-bar input::placeholder { color: var(--color-grey-meta); }
     .utility-bar button { background: var(--color-green-primary); color: white; border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
     .site-header { background: var(--color-green-primary); display: flex; align-items: center; justify-content: space-between; padding: 38px 16px; }
     .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .logo-icon { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 2px; position: relative; }
-    .logo-icon span { background: rgba(255,255,255,0.92); border-radius: 1px; display: block; }
-    .logo-icon .lo-leaf { background: transparent; position: relative; }
-    .logo-icon .lo-leaf::after { content: ''; position: absolute; width: 22px; height: 22px; background: rgba(255,255,255,0.92); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); top: -5px; left: -5px; }
-    .logo-text { font-size: 22px; color: white; text-transform: lowercase; font-weight: normal; letter-spacing: -0.5px; }
-    .logo-text em { font-size: 14px; font-style: normal; opacity: 0.82; }
     .site-nav { display: flex; align-items: stretch; }
     .site-nav a { color: white; font-size: 13px; text-transform: lowercase; text-decoration: none; padding: 0 14px; display: flex; align-items: center; transition: background 0.15s; }
     .site-nav a:hover { background: rgba(0,0,0,0.15); text-decoration: none; }
@@ -29,8 +23,7 @@
     .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
 
     /* Footer (shared) */
-    .footer-pointer-wrap::before { content: ''; display: block; width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 14px solid white; margin-left: 24px; }
-    footer { background: var(--color-green-olive); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
+    footer { background: var(--color-green-olive); margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
     .footer-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .footer-label { font-size: 11px; color: rgba(255,255,255,0.55); }
     .footer-label strong { color: rgba(255,255,255,0.8); }
@@ -43,135 +36,70 @@
     .fnav a:hover { color: white; }
     .footer-copy { font-size: 10px; color: rgba(255,255,255,0.35); }
 
-    /* ---- Account page specific ---- */
-    .main-area { display: flex; align-items: stretch; min-height: 600px; }
+    /* Squares area wrapper — matches index.html */
+    .squares-area { background: var(--color-green-pale); padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .main-area { display: flex; align-items: flex-start; gap: 4px; }
     .main-content { flex: 1; min-width: 0; }
-    .main-sidebar { width: 220px; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
+    .main-sidebar { width: 315px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
+    .bottom-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+
+    /* Shared panel base */
+    .panel { padding: 14px 16px; height: 315px; box-sizing: border-box; overflow: hidden; border-radius: 8px; }
+
+    /* Placeholder panels */
+    .panel-placeholder { background: var(--color-green-category); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 2px dashed rgba(255,255,255,0.25); }
+    .ph-icon { font-size: 34px; opacity: 0.65; margin-bottom: 10px; }
+    .ph-label { font-size: 16px; color: white; text-transform: lowercase; font-weight: normal; }
+    .ph-hint { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 6px; text-transform: lowercase; }
+
+    /* ---- Account main square ---- */
+    .acct-main {
+      height: 633px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #1a2a10;
+    }
 
     /* Account hero */
     .acct-hero {
       position: relative;
-      min-height: 230px;
-      background: url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=760&h=230&fit=crop&q=80') center/cover no-repeat;
+      height: 300px;
+      flex-shrink: 0;
+      background: url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=760&h=300&fit=crop&q=80') center/cover no-repeat;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       padding: 20px 20px 16px;
     }
-    .acct-hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55));
-    }
+    .acct-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)); }
     .acct-hero > * { position: relative; z-index: 1; }
 
     .acct-top { display: flex; align-items: flex-start; gap: 14px; }
-    .avatar {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 2px solid rgba(255,255,255,0.6);
-      flex-shrink: 0;
-    }
+    .avatar { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.6); flex-shrink: 0; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
-
     .acct-greeting { color: white; }
     .acct-hi { font-size: 18px; font-weight: normal; text-transform: lowercase; }
     .acct-count { font-size: 22px; font-weight: normal; }
     .acct-count strong { font-size: 32px; font-weight: bold; }
 
     .acct-actions { display: flex; gap: 6px; margin-top: 8px; }
-    .action-sq {
-      width: 34px; height: 34px;
-      background: var(--color-green-tile);
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      text-decoration: none;
-      color: white;
-      transition: background 0.15s;
-    }
+    .action-sq { width: 34px; height: 34px; background: var(--color-green-tile); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 14px; text-decoration: none; color: white; transition: background 0.15s; }
     .action-sq:hover { background: var(--color-green-dark); }
     .action-label { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 3px; text-align: center; }
     .action-wrap { display: flex; flex-direction: column; align-items: center; }
 
-    .did-you-know {
-      background: rgba(0,0,0,0.35);
-      border-radius: 3px;
-      padding: 8px 12px;
-      font-size: 11px;
-      color: rgba(255,255,255,0.85);
-      max-width: 340px;
-    }
+    .did-you-know { background: rgba(0,0,0,0.35); border-radius: 3px; padding: 8px 12px; font-size: 11px; color: rgba(255,255,255,0.85); max-width: 340px; }
     .did-you-know strong { color: var(--color-green-bright); }
 
     /* Sponsors */
-    .acct-sponsors { padding: 16px; }
-    .sponsors-label {
-      font-size: 18px;
-      color: var(--color-grey-dark);
-      font-weight: normal;
-      text-transform: lowercase;
-      margin-bottom: 12px;
-    }
-    .sponsors-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 4px;
-      margin-bottom: 8px;
-    }
-    .sp-logo {
-      background: white;
-      border: 1px solid #e0e0d8;
-      border-radius: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 38px;
-      font-weight: bold;
-      font-size: 10px;
-    }
-    .acct-invite {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=740&h=60&fit=crop&q=60') center/cover;
-      padding: 8px 16px;
-      border-radius: 2px;
-      margin-top: 4px;
-    }
+    .acct-sponsors { flex: 1; padding: 16px; background: white; overflow: hidden; }
+    .sponsors-label { font-size: 18px; color: var(--color-grey-dark); font-weight: normal; text-transform: lowercase; margin-bottom: 12px; }
+    .sponsors-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 8px; }
+    .sp-logo { background: white; border: 1px solid #e0e0d8; border-radius: 2px; display: flex; align-items: center; justify-content: center; height: 38px; font-weight: bold; font-size: 10px; }
+    .acct-invite { display: flex; align-items: center; justify-content: space-between; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=740&h=60&fit=crop&q=60') center/cover; padding: 8px 16px; border-radius: 2px; margin-top: 4px; }
     .acct-invite span { font-size: 12px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
-
-    /* Tile sidebar */
-    .tile {
-      flex: 1;
-      padding: 14px;
-      color: white;
-      position: relative;
-      min-height: 110px;
-    }
-    .tile-g  { background: var(--color-green-tile); }
-    .tile-d  { background: var(--color-green-category); }
-
-    .tile-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-    .tile-name { font-size: 15px; font-weight: normal; text-transform: lowercase; line-height: 1.2; }
-    .tile-ico { font-size: 22px; opacity: 0.7; }
-    .tile-hr { border: none; border-top: 1px solid rgba(255,255,255,0.22); margin: 8px 0; }
-
-    .tile-num { font-size: 32px; font-weight: bold; line-height: 1; margin-bottom: 3px; }
-    .tile-src { font-size: 11px; color: rgba(255,255,255,0.72); }
-    .tile-num2 { font-size: 24px; font-weight: bold; line-height: 1; margin-top: 10px; margin-bottom: 2px; }
-
-    /* Progress squares */
-    .psq { display: flex; flex-wrap: wrap; gap: 2px; margin: 5px 0; }
-    .sq { width: 7px; height: 7px; background: var(--color-green-bright); border-radius: 1px; }
-    .sq.e { background: rgba(255,255,255,0.18); }
-
-    /* More indicator */
-    .tile-more { text-align: center; color: rgba(255,255,255,0.4); font-size: 18px; margin-top: 4px; }
 
     .btn-gs { display: inline-block; background: var(--color-green-primary); color: white; border: 1px solid var(--color-green-dark); border-radius: 3px; padding: 6px 14px; font-size: 12px; font-family: var(--font-primary); text-transform: lowercase; text-decoration: none; cursor: pointer; }
     .btn-gs:hover { background: var(--color-green-dark); text-decoration: none; color: white; }
@@ -187,14 +115,14 @@
     <button>&#9906;</button>
   </div>
 
-  <!-- Header (logged in) -->
+  <!-- Header -->
   <header class="site-header">
     <a href="index.html" class="logo">
       <img src="assets/images/logo.png" alt="My Green Squares" height="52">
     </a>
     <nav class="site-nav">
       <a href="index.html">about</a>
-      <a href="index.html">projects</a>
+      <a href="map.html">projects</a>
       <a href="index.html">contact</a>
       <a href="index.html">news</a>
       <a href="account.html" class="nav-acct">my account</a>
@@ -203,173 +131,118 @@
     </nav>
   </header>
 
-  <!-- Main area: account content + tile sidebar -->
-  <div class="main-area">
+  <!-- Squares area -->
+  <div class="squares-area">
 
-    <!-- Left: account hero + sponsors -->
-    <div class="main-content">
+    <!-- Main two-column row -->
+    <div class="main-area">
 
-      <!-- Account hero -->
-      <div class="acct-hero">
+      <!-- Main square: account content (633px) -->
+      <div class="main-content">
+        <div class="acct-main">
 
-        <div class="acct-top">
-          <div class="avatar">
-            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=52&h=52&fit=crop&crop=face&q=80"
-                 alt="Profile photo">
-          </div>
-          <div>
-            <div class="acct-greeting">
-              <div class="acct-hi">hi James,</div>
-              <div class="acct-count">you own <strong>3,521</strong> green squares</div>
+          <!-- Account hero -->
+          <div class="acct-hero">
+            <div class="acct-top">
+              <div class="avatar">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=52&h=52&fit=crop&crop=face&q=80" alt="Profile photo">
+              </div>
+              <div>
+                <div class="acct-greeting">
+                  <div class="acct-hi">hi James,</div>
+                  <div class="acct-count">you own <strong>3,521</strong> green squares</div>
+                </div>
+                <div class="acct-actions" style="margin-top:10px;">
+                  <div class="action-wrap">
+                    <a href="#" class="action-sq">f</a>
+                    <div class="action-label">share</div>
+                  </div>
+                  <div class="action-wrap">
+                    <a href="#" class="action-sq">t</a>
+                    <div class="action-label">tweet</div>
+                  </div>
+                  <div class="action-wrap">
+                    <a href="#" class="action-sq">g+</a>
+                    <div class="action-label">g+</div>
+                  </div>
+                  <div class="action-wrap">
+                    <a href="#" class="action-sq">P</a>
+                    <div class="action-label">pin</div>
+                  </div>
+                  <div class="action-wrap">
+                    <a href="#" class="action-sq" style="background: var(--color-green-dark); border: 1px solid rgba(255,255,255,0.3);">🎁</a>
+                    <div class="action-label">gift</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="acct-actions" style="margin-top:10px;">
-              <div class="action-wrap">
-                <a href="#" class="action-sq">f</a>
-                <div class="action-label">share</div>
-              </div>
-              <div class="action-wrap">
-                <a href="#" class="action-sq">t</a>
-                <div class="action-label">tweet</div>
-              </div>
-              <div class="action-wrap">
-                <a href="#" class="action-sq">g+</a>
-                <div class="action-label">g+</div>
-              </div>
-              <div class="action-wrap">
-                <a href="#" class="action-sq">P</a>
-                <div class="action-label">pin</div>
-              </div>
-              <div class="action-wrap">
-                <a href="#" class="action-sq" style="background: var(--color-green-dark); border: 1px solid rgba(255,255,255,0.3);">🎁</a>
-                <div class="action-label">gift</div>
-              </div>
+            <div class="did-you-know">
+              <strong>did you know?</strong> X feet of rainforest is destroyed every day — it costs the world far more money to replace what the trees provide for free than it costs to save them.
+            </div>
+          </div><!-- /acct-hero -->
+
+          <!-- Corporate sponsors -->
+          <div class="acct-sponsors">
+            <div class="sponsors-label">corporate sponsors</div>
+            <div class="sponsors-grid">
+              <div class="sp-logo" style="color:#003399;">currys</div>
+              <div class="sp-logo" style="background:#00aeef;color:white;">sky</div>
+              <div class="sp-logo" style="color:#cc0000;">H&amp;M</div>
+              <div class="sp-logo" style="background:#e8820c;color:white;font-size:9px;">Sainsbury's</div>
+              <div class="sp-logo" style="background:#78ac3e;color:white;">ASDA</div>
+              <div class="sp-logo" style="background:#003399;color:white;font-size:9px;">PC World</div>
+              <div class="sp-logo" style="background:#003087;color:white;font-size:9px;">Thomas Cook</div>
+              <div class="sp-logo" style="background:#003399;color:white;font-size:9px;">PC World</div>
+              <div class="sp-logo" style="color:#003399;">currys</div>
+              <div class="sp-logo" style="background:#003087;color:white;font-size:9px;">Thomas Cook</div>
+              <div class="sp-logo" style="background:#00aeef;color:white;">sky</div>
+              <div class="sp-logo" style="color:#cc0000;">H&amp;M</div>
+            </div>
+            <div class="acct-invite">
+              <span>Help balance your lifestyle with Green Squares</span>
+              <a href="#" class="btn-gs sm">invite a friend</a>
             </div>
           </div>
+
+        </div><!-- /acct-main -->
+      </div><!-- /main-content -->
+
+      <!-- Sidebar: 2 placeholder panels -->
+      <div class="main-sidebar">
+        <div class="panel panel-placeholder">
+          <div class="ph-icon">📊</div>
+          <div class="ph-label">your squares summary</div>
+          <div class="ph-hint">dashboard coming soon</div>
         </div>
-
-        <div class="did-you-know">
-          <strong>did you know?</strong> X feet of rainforest is destroyed every day — it costs the world far more money to replace what the trees provide for free than it costs to save them.
-        </div>
-
-      </div><!-- /acct-hero -->
-
-      <!-- Corporate sponsors -->
-      <div class="acct-sponsors">
-        <div class="sponsors-label">corporate sponsors</div>
-        <div class="sponsors-grid">
-          <div class="sp-logo" style="color:#003399;">currys</div>
-          <div class="sp-logo" style="background:#00aeef;color:white;">sky</div>
-          <div class="sp-logo" style="color:#cc0000;">H&amp;M</div>
-          <div class="sp-logo" style="background:#e8820c;color:white;font-size:9px;">Sainsbury's</div>
-          <div class="sp-logo" style="background:#78ac3e;color:white;">ASDA</div>
-          <div class="sp-logo" style="background:#003399;color:white;font-size:9px;">PC World</div>
-
-          <div class="sp-logo" style="background:#003087;color:white;font-size:9px;">Thomas Cook</div>
-          <div class="sp-logo" style="background:#003399;color:white;font-size:9px;">PC World</div>
-          <div class="sp-logo" style="color:#003399;">currys</div>
-          <div class="sp-logo" style="background:#003087;color:white;font-size:9px;">Thomas Cook</div>
-          <div class="sp-logo" style="background:#00aeef;color:white;">sky</div>
-          <div class="sp-logo" style="color:#cc0000;">H&amp;M</div>
-        </div>
-
-        <div class="acct-invite">
-          <span>Help balance your lifestyle with Green Squares</span>
-          <a href="#" class="btn-gs sm">invite a friend</a>
+        <div class="panel panel-placeholder">
+          <div class="ph-icon">🕐</div>
+          <div class="ph-label">latest activity</div>
+          <div class="ph-hint">activity feed coming soon</div>
         </div>
       </div>
 
-    </div><!-- /main-content -->
+    </div><!-- /main-area -->
 
-    <!-- Right: dashboard tiles -->
-    <div class="main-sidebar">
-
-      <!-- HOME -->
-      <div class="tile tile-g">
-        <div class="tile-hdr">
-          <div class="tile-name">home</div>
-          <div class="tile-ico">🏠</div>
-        </div>
-        <hr class="tile-hr">
-        <div class="tile-num">66</div>
-        <div class="tile-src">earned from British Gas</div>
-        <div class="psq">
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq e"></span>
-          <span class="sq e"></span><span class="sq e"></span><span class="sq e"></span>
-          <span class="sq e"></span>
-        </div>
+    <!-- Bottom strip: 3 placeholder panels -->
+    <div class="bottom-strip">
+      <div class="panel panel-placeholder">
+        <div class="ph-icon">🏆</div>
+        <div class="ph-label">achievements</div>
+        <div class="ph-hint">badges &amp; milestones coming soon</div>
       </div>
-
-      <!-- LEISURE & LIFESTYLE -->
-      <div class="tile tile-d">
-        <div class="tile-hdr">
-          <div class="tile-name">leisure &amp;<br>lifestyle</div>
-          <div class="tile-ico">☕</div>
-        </div>
-        <hr class="tile-hr">
-        <div class="tile-num">255</div>
-        <div class="tile-src">earned from sky</div>
-        <div class="psq">
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq e"></span><span class="sq e"></span><span class="sq e"></span>
-        </div>
+      <div class="panel panel-placeholder">
+        <div class="ph-icon">🌍</div>
+        <div class="ph-label">your impact</div>
+        <div class="ph-hint">environmental stats coming soon</div>
       </div>
-
-      <!-- HI-TECH & ELECTRICAL -->
-      <div class="tile tile-d">
-        <div class="tile-hdr">
-          <div class="tile-name">hi-tech &amp;<br>electrical</div>
-          <div class="tile-ico">📷</div>
-        </div>
-        <hr class="tile-hr">
-        <div class="tile-num">605</div>
-        <div class="tile-src">earned from Currys</div>
-        <div class="tile-num2">295</div>
-        <div class="tile-src">earned from PC World</div>
-        <div class="tile-more">⌄</div>
+      <div class="panel panel-placeholder">
+        <div class="ph-icon">⚙</div>
+        <div class="ph-label">settings</div>
+        <div class="ph-hint">account preferences coming soon</div>
       </div>
+    </div>
 
-      <!-- FOOD & DRINK -->
-      <div class="tile tile-d">
-        <div class="tile-hdr">
-          <div class="tile-name">food &amp; drink</div>
-          <div class="tile-ico">🍽</div>
-        </div>
-        <hr class="tile-hr">
-        <div class="tile-num">1,200</div>
-        <div class="tile-src">earned from Sainsbury's</div>
-        <div class="tile-num2">66</div>
-        <div class="tile-src">earned from ASDA</div>
-        <div class="tile-more">⌄</div>
-      </div>
-
-      <!-- TRAVEL -->
-      <div class="tile tile-g">
-        <div class="tile-hdr">
-          <div class="tile-name">travel</div>
-          <div class="tile-ico">✈</div>
-        </div>
-        <hr class="tile-hr">
-        <div class="tile-num">1,034</div>
-        <div class="tile-src">earned from Thomas Cook</div>
-        <div class="psq">
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq"></span>
-          <span class="sq"></span><span class="sq"></span><span class="sq e"></span>
-        </div>
-      </div>
-
-    </div><!-- /tile sidebar -->
-
-  </div><!-- /main-area -->
-
-  <!-- Footer pointer tab -->
-  <div class="footer-pointer-wrap"></div>
+  </div><!-- /squares-area -->
 
   <!-- Footer -->
   <footer>
