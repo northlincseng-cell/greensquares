@@ -82,6 +82,11 @@
     .receipt-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
     .receipt-row.gs { color: #6ab023; font-weight: bold; font-size: 13px; }
     .receipt-row.total { border-top: 2px solid #1b3410; margin-top: 6px; padding-top: 8px; font-weight: bold; font-size: 14px; color: #6ab023; }
+    .receipt-row.total-gbp { border-top: 2px solid #333; margin-top: 4px; padding-top: 6px; font-weight: bold; font-size: 15px; color: #111; }
+    .receipt-item-row { align-items: baseline; }
+    .rcpt-item-right { display: flex; gap: 8px; align-items: baseline; }
+    .rcpt-item-price { font-weight: 600; color: #111; min-width: 48px; text-align: right; }
+    .rcpt-item-gs { color: #3a6acc; font-size: 10px; }
     .receipt-message { margin-top: 12px; background: #f0f6e8; border-left: 3px solid #6ab023; padding: 8px 10px; font-size: 10px; color: #555; font-style: italic; line-height: 1.5; border-radius: 0 4px 4px 0; }
     .receipt-close { margin-top: 14px; width: 100%; padding: 9px; background: #1b3410; color: white; border: none; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; }
     .receipt-close:hover { background: #2d5518; }
@@ -283,8 +288,8 @@
         </div>
         <hr class="receipt-divider">
         <div id="rcpItems"></div>
+        <div class="receipt-row total-gbp"><span>TOTAL</span><span id="rcpBasket">—</span></div>
         <hr class="receipt-divider">
-        <div class="receipt-row"><span>basket value</span><span id="rcpBasket">—</span></div>
         <div class="receipt-row gs"><span id="rcpT1Label">🌿 retailer contribution</span><span id="rcpT1">—</span></div>
         <div class="receipt-row gs" id="rcpT2Row"><span>🔵 tier 2 (brands)</span><span id="rcpT2">—</span></div>
         <div class="receipt-row total"><span>total green squares</span><span id="rcpTotal">—</span></div>
@@ -867,8 +872,15 @@ function showReceipt(txn, t1, t2, grand, basketVal, now) {
   t2Row.style.display = t2 > 0 ? '' : 'none';
 
   document.getElementById('rcpItems').innerHTML = basketItems.map(function(p){
-    return '<div class="receipt-row"><span>'+p.productName+'</span><span style="color:#3a6acc;">+'+p.gsPerUnit+' GS</span></div>';
-  }).join('');
+    var priceStr = p.price ? '<span class="rcpt-item-price">£'+p.price.toFixed(2)+'</span>' : '';
+    return '<div class="receipt-row receipt-item-row"><span>'+p.productName+'</span>'+
+      '<span class="rcpt-item-right">'+priceStr+'<span class="rcpt-item-gs">+'+p.gsPerUnit+' GS</span></span></div>';
+  }).join('')+
+  (basketVal > 0 && basketItems.length === 0 ? '' :
+    (basketItems.length > 0 && basketVal > basketItems.reduce(function(s,p){return s+(p.price||0);},0) ?
+      '<div class="receipt-row receipt-item-row"><span>Groceries &amp; own brands</span>'+
+      '<span class="rcpt-item-right"><span class="rcpt-item-price">£'+(basketVal - basketItems.reduce(function(s,p){return s+(p.price||0);},0)).toFixed(2)+'</span></span></div>' : '')
+  );
 
   var qrSection = document.getElementById('rcpQrSection');
 
