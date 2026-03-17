@@ -14,7 +14,7 @@
     .utility-bar input { width: 170px; padding: 4px 10px; font-size: 11px; border: 1px solid #c8c8b8; border-radius: 3px; background: rgba(255,255,255,0.8); font-family: var(--font-primary); color: var(--color-grey-text); }
     .utility-bar input::placeholder { color: var(--color-grey-meta); }
     .utility-bar button { background: var(--color-green-primary); color: white; border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
-    .site-header { background: var(--color-green-primary); display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 16px; }
+    .site-header { background: var(--color-green-primary); display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; }
     .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .logo-icon { display: grid; grid-template-columns: repeat(3, 10px); grid-template-rows: repeat(3, 10px); gap: 2px; position: relative; }
     .logo-icon span { background: rgba(255,255,255,0.92); border-radius: 1px; display: block; }
@@ -22,8 +22,8 @@
     .logo-icon .lo-leaf::after { content: ''; position: absolute; width: 22px; height: 22px; background: rgba(255,255,255,0.92); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); top: -5px; left: -5px; }
     .logo-text { font-size: 22px; color: white; text-transform: lowercase; font-weight: normal; letter-spacing: -0.5px; }
     .logo-text em { font-size: 14px; font-style: normal; opacity: 0.82; }
-    .site-nav { display: flex; align-items: center; height: 56px; }
-    .site-nav a { color: white; font-size: 13px; text-transform: lowercase; text-decoration: none; padding: 0 14px; height: 56px; display: flex; align-items: center; transition: background 0.15s; }
+    .site-nav { display: flex; align-items: stretch; }
+    .site-nav a { color: white; font-size: 13px; text-transform: lowercase; text-decoration: none; padding: 0 14px; display: flex; align-items: center; transition: background 0.15s; }
     .site-nav a:hover { background: rgba(0,0,0,0.15); text-decoration: none; }
     .site-nav .nav-acct { background: rgba(0,0,0,0.18); border-left: 1px solid rgba(255,255,255,0.2); font-size: 12px; }
     .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
@@ -190,12 +190,7 @@
   <!-- Header (logged in) -->
   <header class="site-header">
     <a href="index.html" class="logo">
-      <div class="logo-icon">
-        <span></span><span></span><span></span>
-        <span></span><span></span><span></span>
-        <span class="lo-leaf"></span><span></span><span></span>
-      </div>
-      <span class="logo-text">mygreensquares<em>.com</em></span>
+      <img src="assets/images/logo.png" alt="My Green Squares" height="52">
     </a>
     <nav class="site-nav">
       <a href="index.html">about</a>
