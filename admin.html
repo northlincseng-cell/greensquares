@@ -3,431 +3,916 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>mygreensquares.com — pin management</title>
-  <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
+  <title>MGS — Admin Dashboard</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
   <style>
-    body { background-color: var(--color-green-pale); margin: 0; }
-    .page-wrapper { max-width: 960px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-primary, 'Helvetica Neue', Arial, sans-serif); font-size: 13px; color: #333; background: #eef2e8; height: 100vh; overflow: hidden; }
 
-    /* Header (shared) */
-    .utility-bar { background: var(--color-green-pale); display: flex; justify-content: flex-end; align-items: center; padding: 5px 12px; gap: 5px; }
-    .utility-bar input { width: 170px; padding: 4px 10px; font-size: 11px; border: 1px solid #c8c8b8; border-radius: 3px; background: rgba(255,255,255,0.8); font-family: var(--font-primary); }
-    .utility-bar button { background: var(--color-green-primary); color: white; border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
-    .site-header { background: var(--color-green-primary); display: flex; align-items: center; justify-content: space-between; padding: 38px 16px; }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .site-nav { display: flex; align-items: stretch; }
-    .site-nav a { color: white; font-size: 13px; text-transform: lowercase; text-decoration: none; padding: 0 14px; display: flex; align-items: center; transition: background 0.15s; }
-    .site-nav a:hover { background: rgba(0,0,0,0.15); }
-    .site-nav .nav-acct { background: rgba(0,0,0,0.18); border-left: 1px solid rgba(255,255,255,0.2); font-size: 12px; }
-    .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
+    /* ── Shell ── */
+    .shell { display: flex; height: 100vh; }
 
-    /* Footer */
-    footer { background: var(--color-green-olive); margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
-    .footer-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .footer-label { font-size: 11px; color: rgba(255,255,255,0.55); }
-    .footer-label strong { color: rgba(255,255,255,0.8); }
-    .soc-btn { width: 26px; height: 26px; background: rgba(255,255,255,0.12); border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 11px; text-decoration: none; }
-    .footer-right { text-align: right; }
-    .fnav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; margin-bottom: 4px; }
-    .fnav a { font-size: 10px; color: rgba(255,255,255,0.55); text-decoration: none; padding: 0 6px; border-right: 1px solid rgba(255,255,255,0.2); }
-    .fnav a:last-child { border-right: none; }
-    .fnav a:hover { color: white; }
-    .footer-copy { font-size: 10px; color: rgba(255,255,255,0.35); }
+    /* ── Sidebar ── */
+    .sidebar { width: 225px; flex-shrink: 0; background: #1b3410; display: flex; flex-direction: column; }
+    .sidebar-logo { padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+    .sidebar-logo img { height: 34px; }
+    .sidebar-logo-text { color: rgba(255,255,255,0.65); font-size: 10px; line-height: 1.4; text-transform: lowercase; }
+    .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+    .nav-group-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.28); padding: 13px 16px 4px; }
+    .sidebar-nav a { display: flex; align-items: center; gap: 9px; padding: 9px 16px; color: rgba(255,255,255,0.65); font-size: 12px; text-transform: lowercase; cursor: pointer; transition: background 0.12s, color 0.12s; text-decoration: none; border-left: 3px solid transparent; }
+    .sidebar-nav a:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+    .sidebar-nav a.active { background: rgba(106,176,35,0.22); color: white; border-left-color: #6ab023; }
+    .nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+    .sidebar-footer { padding: 10px 16px 14px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: block; color: rgba(255,255,255,0.42); font-size: 11px; text-decoration: none; padding: 4px 0; }
+    .sidebar-footer a:hover { color: rgba(255,255,255,0.85); }
 
-    /* Admin layout */
-    .admin-wrapper { padding: 20px; }
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 2px solid var(--color-green-mid);
+    /* ── Topbar ── */
+    .topbar { background: white; border-bottom: 1px solid #dde8d0; padding: 0 22px; height: 50px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .topbar-section { font-size: 15px; color: #1b3410; text-transform: lowercase; font-weight: normal; }
+    .topbar-right { display: flex; gap: 7px; align-items: center; }
+
+    /* ── Content ── */
+    .content { flex: 1; overflow-y: auto; padding: 20px 22px 30px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Sec header ── */
+    .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .sec-title { font-size: 17px; color: #1b3410; text-transform: lowercase; font-weight: normal; }
+
+    /* ── KPI grid ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+    .kpi-card { background: white; border-radius: 7px; padding: 14px 16px; border: 1px solid #dde8d0; }
+    .kpi-card.highlight { background: #6ab023; border-color: #5a9a1d; }
+    .kpi-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: #999; margin-bottom: 5px; }
+    .kpi-card.highlight .kpi-label { color: rgba(255,255,255,0.7); }
+    .kpi-value { font-size: 26px; font-weight: bold; color: #1b3410; line-height: 1; margin-bottom: 4px; }
+    .kpi-card.highlight .kpi-value { color: white; }
+    .kpi-sub { font-size: 10px; color: #aaa; }
+    .kpi-card.highlight .kpi-sub { color: rgba(255,255,255,0.6); }
+
+    /* ── Layout helpers ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+
+    /* ── Panel ── */
+    .panel { background: white; border-radius: 7px; border: 1px solid #dde8d0; overflow: hidden; margin-bottom: 16px; }
+    .panel-header { padding: 11px 15px; border-bottom: 1px solid #eef2e8; display: flex; align-items: center; justify-content: space-between; background: #fafcf7; }
+    .panel-title { font-size: 12px; font-weight: bold; color: #1b3410; text-transform: lowercase; }
+    .panel-body { padding: 15px; }
+
+    /* ── Campaign cards ── */
+    .campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .campaign-card { background: white; border: 1px solid #dde8d0; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+    .cc-header { background: #1b3410; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
+    .cc-client { font-size: 14px; color: white; font-weight: bold; text-transform: lowercase; }
+    .cc-id { font-size: 9px; color: rgba(255,255,255,0.45); font-family: monospace; margin-top: 2px; }
+    .cc-body { padding: 13px 15px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+    .cc-progress-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 4px; }
+    .prog-bar { background: #e4f0d0; border-radius: 3px; height: 7px; overflow: hidden; }
+    .prog-fill { background: #6ab023; height: 100%; border-radius: 3px; }
+    .cc-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .cc-meta-item .ml { font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; color: #bbb; margin-bottom: 1px; }
+    .cc-meta-item .mv { font-size: 12px; color: #333; font-weight: bold; }
+    .cc-message { font-size: 10px; color: #555; font-style: italic; background: #f6faf0; border-left: 3px solid #6ab023; padding: 6px 9px; border-radius: 0 3px 3px 0; line-height: 1.45; }
+    .cc-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+    .chip { font-size: 9px; padding: 2px 6px; border-radius: 3px; background: #e4f0d0; color: #2d5518; }
+    .chip-vcs { background: #e8f4d0; }
+    .chip-fossil { background: #fff3e0; color: #7a4500; }
+    .chip-nz { background: #e0f0ff; color: #1a4a88; }
+    .cc-footer { padding: 8px 15px; background: #fafcf7; border-top: 1px solid #eef2e8; display: flex; gap: 6px; }
+
+    /* ── Status pills ── */
+    .pill { font-size: 9px; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; font-weight: bold; flex-shrink: 0; }
+    .pill-active   { background: #6ab023; color: white; }
+    .pill-draft    { background: #aaa; color: white; }
+    .pill-paused   { background: #f0a500; color: white; }
+    .pill-complete { background: #3c3c28; color: rgba(255,255,255,0.7); }
+
+    /* ── Table ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .data-table th { text-align: left; padding: 7px 12px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; border-bottom: 2px solid #eef2e8; background: #fafcf7; font-weight: normal; white-space: nowrap; }
+    .data-table td { padding: 8px 12px; border-bottom: 1px solid #f5f7f2; vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #fafdf7; }
+
+    /* ── Pin badge / tags ── */
+    .pin-badge { background: #2d5518; color: white; font-size: 9px; padding: 1px 5px; border-radius: 2px; font-family: monospace; }
+    .tag { display: inline-block; border-radius: 2px; padding: 1px 6px; font-size: 9px; font-weight: bold; }
+    .tag-food    { background: #e4f0d0; color: #2d5518; }
+    .tag-leisure { background: #e0eaff; color: #2244aa; }
+    .tag-hi-tech { background: #ede0ff; color: #6600cc; }
+    .tag-travel  { background: #fff3e0; color: #885500; }
+    .tag-home    { background: #ffe0e0; color: #882222; }
+
+    /* ── Equivalence cards ── */
+    .equiv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+    .equiv-card { background: white; border: 1px solid #dde8d0; border-radius: 7px; padding: 18px; }
+    .equiv-icon { font-size: 22px; margin-bottom: 8px; }
+    .equiv-val { font-size: 30px; font-weight: bold; color: #6ab023; line-height: 1; margin-bottom: 3px; }
+    .equiv-lbl { font-size: 11px; font-weight: bold; color: #1b3410; margin-bottom: 3px; }
+    .equiv-sub { font-size: 10px; color: #999; line-height: 1.4; }
+
+    /* ── Retailer grid ── */
+    .retailer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+    .retailer-card { background: white; border: 1px solid #dde8d0; border-radius: 7px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .ret-name { font-size: 14px; font-weight: bold; color: #1b3410; }
+    .ret-cat  { font-size: 10px; color: #888; text-transform: lowercase; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 11px; }
+    .form-group label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 4px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 9px;
+      font-size: 12px; font-family: inherit; color: #333; background: white;
     }
-    .admin-title { font-size: 22px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0; }
-    .admin-header-actions { display: flex; gap: 8px; align-items: center; }
-
-    .admin-main { display: flex; gap: 18px; align-items: flex-start; }
-
-    /* Left: form + mini-map */
-    .admin-form-col { width: 370px; flex-shrink: 0; }
-    .admin-form-panel { background: #f9faf5; border: 1px solid var(--color-green-mid); border-radius: 8px; padding: 16px; }
-    .form-title { font-size: 15px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0 0 12px 0; }
-
-    .mini-map-wrap { position: relative; margin-bottom: 12px; border-radius: 4px; overflow: hidden; border: 1px solid var(--color-green-mid); }
-    #adminMap { height: 220px; }
-    .mini-map-hint { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.55); color: white; font-size: 10px; padding: 4px 8px; text-align: center; pointer-events: none; z-index: 1000; }
-
-    .form-group { margin-bottom: 9px; }
-    .form-group label { display: block; font-size: 10px; color: #888; text-transform: lowercase; margin-bottom: 3px; letter-spacing: 0.3px; }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      box-sizing: border-box;
-      border: 1px solid #d0d8c0;
-      border-radius: 3px;
-      padding: 6px 8px;
-      font-size: 12px;
-      font-family: var(--font-primary);
-      color: var(--color-grey-dark);
-      background: white;
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: #6ab023; box-shadow: 0 0 0 2px rgba(106,176,35,0.14);
     }
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus { outline: none; border-color: var(--color-green-primary); }
-    .form-row { display: grid; gap: 8px; }
+    .form-row { display: grid; gap: 10px; }
     .form-row-2 { grid-template-columns: 1fr 1fr; }
-    .form-group textarea { resize: vertical; min-height: 56px; }
-    .form-buttons { display: flex; gap: 8px; margin-top: 14px; }
+    .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .form-group textarea { resize: vertical; min-height: 58px; }
+    .form-section-label { font-size: 10px; font-weight: bold; color: #1b3410; text-transform: lowercase; background: #f0f6e8; border-radius: 4px; padding: 7px 10px; margin: 14px 0 10px; border-left: 3px solid #6ab023; }
 
-    /* Right: pins list */
-    .admin-list-col { flex: 1; min-width: 0; }
-    .admin-list-panel { border: 1px solid var(--color-green-mid); border-radius: 8px; overflow: hidden; }
-    .list-header { background: var(--color-green-pale); padding: 11px 14px; border-bottom: 1px solid var(--color-green-mid); display: flex; align-items: center; justify-content: space-between; }
-    .list-header h3 { font-size: 15px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0; }
-    .pin-badge { background: var(--color-green-primary); color: white; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 6px; }
-
-    .pin-row { padding: 9px 14px; border-bottom: 1px solid #f0f0e8; }
-    .pin-row:last-child { border-bottom: none; }
-    .pin-row:hover { background: #fbfcf8; }
-    .pin-row-main { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; flex-wrap: wrap; }
-    .pin-id-badge { background: var(--color-green-category); color: white; font-size: 9px; padding: 1px 5px; border-radius: 2px; font-family: monospace; flex-shrink: 0; }
-    .pin-retailer { font-size: 11px; font-weight: bold; color: var(--color-green-primary); }
-    .pin-user { font-size: 11px; color: #666; }
-    .pin-squares { font-size: 11px; color: var(--color-green-tile); font-weight: bold; }
-    .pin-date { font-size: 10px; color: #aaa; margin-left: auto; }
-    .pin-row-title { font-size: 11px; color: #333; margin-bottom: 2px; }
-    .pin-row-coords { font-size: 10px; color: #bbb; margin-bottom: 5px; font-family: monospace; }
-    .pin-row-actions { display: flex; gap: 5px; }
-
-    .empty-state { padding: 30px; text-align: center; color: #aaa; font-size: 13px; }
-
-    /* Buttons */
-    .btn-gs { display: inline-block; background: var(--color-green-primary); color: white; border: 1px solid var(--color-green-dark); border-radius: 3px; padding: 6px 14px; font-size: 12px; font-family: var(--font-primary); text-transform: lowercase; cursor: pointer; transition: background 0.15s; text-decoration: none; }
-    .btn-gs:hover { background: var(--color-green-dark); color: white; }
-    .btn-admin { background: white; color: var(--color-grey-dark); border: 1px solid #d0d8c0; border-radius: 3px; padding: 6px 12px; font-size: 12px; font-family: var(--font-primary); text-transform: lowercase; cursor: pointer; }
-    .btn-admin:hover { background: #f5f5f0; }
-    .btn-danger { color: #cc3333; border-color: #cc3333; }
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.12s; }
+    .btn-primary   { background: #6ab023; color: white; border-color: #5a9a1d; }
+    .btn-primary:hover { background: #5a9a1d; color: white; }
+    .btn-secondary { background: white; color: #555; border-color: #ccd8b8; }
+    .btn-secondary:hover { background: #f5f8f0; }
+    .btn-danger    { background: white; color: #cc3333; border-color: #ffcccc; }
     .btn-danger:hover { background: #fff5f5; }
-    .btn-edit { background: var(--color-green-pale); color: var(--color-green-primary); border: 1px solid var(--color-green-mid); border-radius: 2px; padding: 3px 8px; font-size: 10px; cursor: pointer; font-family: var(--font-primary); }
-    .btn-edit:hover { background: var(--color-green-mid); }
-    .btn-delete { background: #fff5f5; color: #cc3333; border: 1px solid #ffcccc; border-radius: 2px; padding: 3px 8px; font-size: 10px; cursor: pointer; font-family: var(--font-primary); }
-    .btn-delete:hover { background: #ffe5e5; }
+    .btn-sm  { padding: 5px 10px; font-size: 11px; }
+    .btn-xs  { padding: 3px 8px; font-size: 10px; }
 
-    /* Map pin (same as map.html) */
-    .mgs-pin { width: 22px; height: 22px; background: var(--color-green-primary); border-radius: 4px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
-    .mgs-pin-new { background: #cc7700; }
+    /* ── Modal ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2000; align-items: flex-start; justify-content: center; padding: 30px 20px; overflow-y: auto; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; border-radius: 8px; width: 100%; max-width: 720px; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.32); }
+    .modal.modal-sm { max-width: 440px; }
+    .modal-header { background: #1b3410; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-title { color: white; font-size: 14px; text-transform: lowercase; }
+    .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
+    .modal-close:hover { color: white; }
+    .modal-body { padding: 20px; max-height: 72vh; overflow-y: auto; }
+    .modal-footer { padding: 12px 20px; background: #f6faf0; border-top: 1px solid #dde8d0; display: flex; justify-content: flex-end; gap: 8px; }
 
-    .dupe-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; padding: 8px 12px; font-size: 11px; color: #856404; margin-top: 8px; display: none; }
+    /* ── Mini map ── */
+    .mini-map-wrap { border: 1px solid #ccd8b8; border-radius: 4px; overflow: hidden; margin-bottom: 12px; position: relative; }
+    #adminMap { height: 200px; }
+    .mini-map-hint { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 4px 8px; text-align: center; pointer-events: none; z-index: 1000; }
+
+    /* ── Dupe warning ── */
+    .dupe-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; padding: 8px 11px; font-size: 11px; color: #856404; display: none; margin-top: 6px; }
+
+    /* ── Empty state ── */
+    .empty-state { padding: 40px; text-align: center; color: #bbb; }
+    .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+
+    /* ── Scrollbars ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #b8ccaa; border-radius: 3px; }
   </style>
 </head>
 <body>
-<div class="page-wrapper">
+<div class="shell">
 
-  <div class="utility-bar">
-    <input type="text" placeholder="type to search site">
-    <button>&#9906;</button>
-  </div>
-
-  <header class="site-header">
-    <a href="index.html" class="logo">
-      <img src="assets/images/logo.png" alt="My Green Squares" height="52">
-    </a>
-    <nav class="site-nav">
-      <a href="index.html">about</a>
-      <a href="map.html">projects</a>
-      <a href="index.html">contact</a>
-      <a href="index.html">news</a>
-      <a href="account.html" class="nav-acct">my account</a>
-      <span class="nav-pipe">|</span>
-      <a href="index.html" class="nav-acct">logout</a>
+  <!-- ── Sidebar ────────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/images/logo.png" alt="MGS">
+      <div class="sidebar-logo-text">my green squares<br>admin dashboard</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">analytics</div>
+      <a onclick="showSection('overview')" id="nav-overview" class="active">
+        <span class="nav-icon">📊</span> overview
+      </a>
+      <div class="nav-group-label">commercial</div>
+      <a onclick="showSection('campaigns')" id="nav-campaigns">
+        <span class="nav-icon">🤝</span> campaigns
+      </a>
+      <a onclick="showSection('retailers')" id="nav-retailers">
+        <span class="nav-icon">🏪</span> retailers
+      </a>
+      <div class="nav-group-label">map data</div>
+      <a onclick="showSection('pins')" id="nav-pins">
+        <span class="nav-icon">📍</span> pins
+      </a>
+      <div class="nav-group-label">methodology</div>
+      <a onclick="showSection('equivalence')" id="nav-equivalence">
+        <span class="nav-icon">⚖</span> gs equivalence
+      </a>
     </nav>
-  </header>
+    <div class="sidebar-footer">
+      <a href="map.html">🗺 view live map →</a>
+      <a href="index.html">🏠 website home</a>
+      <a onclick="exportAllData()" style="cursor:pointer;">📥 export all data</a>
+      <a onclick="resetAllData()" style="cursor:pointer;color:rgba(255,80,80,0.6);">↺ reset to defaults</a>
+    </div>
+  </aside>
 
-  <div class="admin-wrapper">
+  <!-- ── Main ───────────────────────────────────────────────────── -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar-section" id="topbarLabel">overview</span>
+      <div class="topbar-right">
+        <span id="topbarClock" style="font-size:11px;color:#aaa;"></span>
+      </div>
+    </header>
 
-    <div class="admin-header">
-      <h2 class="admin-title">📍 pin management</h2>
-      <div class="admin-header-actions">
-        <button onclick="exportPins()" class="btn-admin">export json</button>
-        <button onclick="resetToDefaults()" class="btn-admin btn-danger">reset to defaults</button>
-        <a href="map.html" class="btn-gs">view map</a>
+    <main class="content">
+
+      <!-- ══ OVERVIEW ══════════════════════════════════════════════ -->
+      <section id="sec-overview" class="section active">
+
+        <div class="kpi-grid" id="kpiGrid"></div>
+
+        <div class="two-col">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">campaign progress</span>
+              <button onclick="showSection('campaigns')" class="btn btn-secondary btn-xs">manage</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>client</th><th>contracted</th><th>issued</th><th>progress</th><th>status</th></tr></thead>
+              <tbody id="overviewCamBody"></tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">carbon impact to date</span></div>
+            <div class="panel-body" id="carbonPanel"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">recent pins</span>
+            <button onclick="showSection('pins')" class="btn btn-secondary btn-xs">all pins</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>id</th><th>retailer</th><th>user</th><th>squares</th><th>category</th><th>date</th></tr></thead>
+            <tbody id="recentPinsBody"></tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ══ CAMPAIGNS ═════════════════════════════════════════════ -->
+      <section id="sec-campaigns" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">campaigns</h2>
+          <button onclick="openCampaignModal()" class="btn btn-primary">+ new campaign</button>
+        </div>
+        <div class="campaign-grid" id="campaignGrid"></div>
+      </section>
+
+      <!-- ══ PINS ══════════════════════════════════════════════════ -->
+      <section id="sec-pins" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">pins <span id="pinCountLabel" style="font-size:13px;color:#aaa;"></span></h2>
+          <button onclick="openPinModal()" class="btn btn-primary">+ add pin</button>
+        </div>
+        <div class="panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>id</th><th>title</th><th>retailer</th><th>user</th>
+                <th>squares</th><th>category</th><th>coords</th><th>date</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="allPinsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══ RETAILERS ═════════════════════════════════════════════ -->
+      <section id="sec-retailers" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">retailers</h2>
+          <button onclick="openRetailerModal()" class="btn btn-primary">+ add retailer</button>
+        </div>
+        <div class="retailer-grid" id="retailerGrid"></div>
+      </section>
+
+      <!-- ══ EQUIVALENCE ═══════════════════════════════════════════ -->
+      <section id="sec-equivalence" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">green square equivalence</h2>
+          <button onclick="saveEquivalence()" class="btn btn-primary">save settings</button>
+        </div>
+
+        <div class="panel" style="margin-bottom:14px;">
+          <div class="panel-body" style="padding:14px 16px;">
+            <p style="font-size:12px;color:#555;line-height:1.65;max-width:760px;">
+              Each <strong>Green Square</strong> holds a standardised equivalence value — a calculable, comparable measure of carbon offset and fossil fuel reduction.
+              This value underpins every campaign and every consumer message. The minimum standard is <strong>Verra VCS</strong>; no lower-grade credits are accepted.
+              Net Zero and offset contributions must sum to 100%.
+            </p>
+          </div>
+        </div>
+
+        <div class="equiv-grid" id="equivCards"></div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">edit global equivalence settings</span></div>
+          <div class="panel-body">
+            <div class="form-section-label">📐 per green square values</div>
+            <div class="form-row form-row-3">
+              <div class="form-group"><label>carbon (kg CO₂e) per GS</label><input type="number" id="eqCarbon" step="0.001" min="0"></div>
+              <div class="form-group"><label>VCS credits per GS</label><input type="number" id="eqVcs" step="0.0001" min="0"></div>
+              <div class="form-group"><label>fossil fuel reduction (litres) per GS</label><input type="number" id="eqFossil" step="0.001" min="0"></div>
+            </div>
+            <div class="form-row form-row-4">
+              <div class="form-group"><label>net zero %</label><input type="number" id="eqNetZeroPct" step="1" min="0" max="100"></div>
+              <div class="form-group"><label>offset %</label><input type="number" id="eqOffsetPct" step="1" min="0" max="100"></div>
+              <div class="form-group"><label>carbon standard</label>
+                <select id="eqStandard">
+                  <option value="Verra VCS">Verra VCS (minimum)</option>
+                  <option value="Gold Standard">Gold Standard</option>
+                  <option value="Verra VCS + Gold Standard">Verra VCS + Gold Standard</option>
+                  <option value="REDD+">REDD+</option>
+                  <option value="UK ETS">UK ETS (regulated)</option>
+                </select>
+              </div>
+              <div class="form-group"><label>approved by</label><input type="text" id="eqApprovedBy"></div>
+            </div>
+            <div class="form-section-label">📋 project reference</div>
+            <div class="form-row form-row-3">
+              <div class="form-group"><label>project reference</label><input type="text" id="eqProjectRef"></div>
+              <div class="form-group"><label>project name</label><input type="text" id="eqProjectName"></div>
+              <div class="form-group"><label>effective date</label><input type="date" id="eqEffectiveDate"></div>
+            </div>
+            <div class="form-row form-row-3">
+              <div class="form-group"><label>review date</label><input type="date" id="eqReviewDate"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══ CAMPAIGN MODAL ══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="campaignModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="camModalTitle">new campaign</span>
+      <button class="modal-close" onclick="closeCampaignModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="camId">
+
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>client name *</label><input type="text" id="camClient" placeholder="e.g. Sainsbury's"></div>
+        <div class="form-group"><label>status</label>
+          <select id="camStatus">
+            <option value="draft">draft</option>
+            <option value="active">active</option>
+            <option value="paused">paused</option>
+            <option value="complete">complete</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section-label">💷 commercial terms</div>
+      <div class="form-row form-row-4">
+        <div class="form-group"><label>contracted GS *</label><input type="number" id="camContractedGs" min="1" placeholder="50000"></div>
+        <div class="form-group"><label>GS issued to date</label><input type="number" id="camGsIssued" min="0" placeholder="0"></div>
+        <div class="form-group"><label>GS per transaction *</label><input type="number" id="camGsPerTxn" min="1" placeholder="120"></div>
+        <div class="form-group"><label>rate per GS (£)</label><input type="number" id="camRate" step="0.01" placeholder="1.00"></div>
+      </div>
+      <div class="form-row form-row-3">
+        <div class="form-group"><label>budget (£)</label><input type="number" id="camBudget" placeholder="50000"></div>
+        <div class="form-group"><label>start date</label><input type="date" id="camStart"></div>
+        <div class="form-group"><label>end date</label><input type="date" id="camEnd"></div>
+      </div>
+
+      <div class="form-section-label">💬 consumer messaging</div>
+      <div class="form-group">
+        <label>consumer message (shown on account / receipt) *</label>
+        <textarea id="camMessage" rows="3" placeholder="Your purchase is helping save the Amazon rainforest — every choice you make builds a future for your children."></textarea>
+      </div>
+      <div class="form-group">
+        <label>product codes (comma-separated)</label>
+        <input type="text" id="camProductCodes" placeholder="SAI-NECTAR-001, SAI-XMAS-2025">
+      </div>
+
+      <div class="form-section-label">⚖ gs equivalence for this campaign</div>
+      <div class="form-row form-row-3">
+        <div class="form-group"><label>carbon kg CO₂e per GS</label><input type="number" id="camCarbon" step="0.001" placeholder="0.450"></div>
+        <div class="form-group"><label>VCS credits per GS</label><input type="number" id="camVcs" step="0.0001" placeholder="0.0025"></div>
+        <div class="form-group"><label>fossil fuel reduction (L) per GS</label><input type="number" id="camFossil" step="0.001" placeholder="0.180"></div>
+      </div>
+      <div class="form-row form-row-3">
+        <div class="form-group"><label>net zero %</label><input type="number" id="camNetZero" step="1" min="0" max="100" placeholder="65"></div>
+        <div class="form-group"><label>offset %</label><input type="number" id="camOffset" step="1" min="0" max="100" placeholder="35"></div>
+        <div class="form-group"><label>carbon standard</label>
+          <select id="camStandard">
+            <option value="Verra VCS">Verra VCS</option>
+            <option value="Gold Standard">Gold Standard</option>
+            <option value="Verra VCS + Gold Standard">Verra VCS + Gold Standard</option>
+            <option value="REDD+">REDD+</option>
+            <option value="UK ETS">UK ETS</option>
+          </select>
+        </div>
       </div>
     </div>
-
-    <div class="admin-main">
-
-      <!-- Left: form + mini-map -->
-      <div class="admin-form-col">
-        <div class="admin-form-panel">
-          <div class="form-title" id="formTitle">add new pin</div>
-
-          <!-- Mini map — click to place pin -->
-          <div class="mini-map-wrap">
-            <div id="adminMap"></div>
-            <div class="mini-map-hint">click the map to set pin location</div>
-          </div>
-
-          <form id="pinForm" onsubmit="savePin(event)">
-            <input type="hidden" id="pinId">
-
-            <div class="form-row form-row-2">
-              <div class="form-group">
-                <label>latitude *</label>
-                <input type="number" id="pinLat" step="0.000001" placeholder="-5.300000" required>
-              </div>
-              <div class="form-group">
-                <label>longitude *</label>
-                <input type="number" id="pinLng" step="0.000001" placeholder="-60.050000" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>title *</label>
-              <input type="text" id="pinTitle" placeholder="e.g. Weekly Shop — Sainsbury's" required>
-            </div>
-
-            <div class="form-row form-row-2">
-              <div class="form-group">
-                <label>retailer *</label>
-                <input type="text" id="pinRetailer" placeholder="e.g. Sainsbury's" required>
-              </div>
-              <div class="form-group">
-                <label>product id</label>
-                <input type="text" id="pinProductId" placeholder="e.g. SAI-001">
-              </div>
-            </div>
-
-            <div class="form-row form-row-2">
-              <div class="form-group">
-                <label>user id</label>
-                <input type="text" id="pinUserId" placeholder="e.g. james001">
-              </div>
-              <div class="form-group">
-                <label>user name *</label>
-                <input type="text" id="pinUserName" placeholder="e.g. James T." required>
-              </div>
-            </div>
-
-            <div class="form-row form-row-2">
-              <div class="form-group">
-                <label>squares *</label>
-                <input type="number" id="pinSquares" placeholder="120" min="1" required>
-              </div>
-              <div class="form-group">
-                <label>date *</label>
-                <input type="date" id="pinDate" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>category</label>
-              <select id="pinCategory">
-                <option value="food">food &amp; drink</option>
-                <option value="leisure">leisure &amp; lifestyle</option>
-                <option value="hi-tech">hi-tech &amp; electrical</option>
-                <option value="travel">travel</option>
-                <option value="home">home</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>description</label>
-              <textarea id="pinDescription" rows="3" placeholder="Describe the purchase and its contribution to the project..."></textarea>
-            </div>
-
-            <div class="form-group">
-              <label>image url (optional)</label>
-              <input type="text" id="pinImage" placeholder="assets/images/amazon.png">
-            </div>
-
-            <div class="dupe-warning" id="dupeWarning"></div>
-
-            <div class="form-buttons">
-              <button type="submit" class="btn-gs" id="saveBtn">add pin</button>
-              <button type="button" class="btn-admin" onclick="resetForm()">cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Right: pins list -->
-      <div class="admin-list-col">
-        <div class="admin-list-panel">
-          <div class="list-header">
-            <h3>all pins <span id="pinCountBadge" class="pin-badge">0</span></h3>
-          </div>
-          <div id="pinsList"></div>
-        </div>
-      </div>
-
+    <div class="modal-footer">
+      <button onclick="closeCampaignModal()" class="btn btn-secondary">cancel</button>
+      <button onclick="saveCampaign()" class="btn btn-primary" id="camSaveBtn">create campaign</button>
     </div>
   </div>
+</div>
 
-  <footer>
-    <div class="footer-left">
-      <span class="footer-label">mygreensquares.com &mdash; <strong>admin</strong></span>
+<!-- ══ PIN MODAL ═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="pinModalTitle">add pin</span>
+      <button class="modal-close" onclick="closePinModal()">&times;</button>
     </div>
-    <div class="footer-right">
-      <nav class="fnav">
-        <a href="index.html">home</a>
-        <a href="map.html">projects map</a>
-        <a href="account.html">account</a>
-      </nav>
-      <div class="footer-copy">a PROFOCO company &nbsp;|&nbsp; © copyright 2026 mygreensquares</div>
+    <div class="modal-body">
+      <input type="hidden" id="pinId">
+      <div class="mini-map-wrap">
+        <div id="adminMap"></div>
+        <div class="mini-map-hint">click the map to set pin location</div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>latitude *</label><input type="number" id="pinLat" step="0.000001" placeholder="-5.300000"></div>
+        <div class="form-group"><label>longitude *</label><input type="number" id="pinLng" step="0.000001" placeholder="-60.050000"></div>
+      </div>
+      <div class="form-group"><label>title *</label><input type="text" id="pinTitle" placeholder="e.g. Weekly Shop — Sainsbury's"></div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>retailer *</label><input type="text" id="pinRetailer" placeholder="e.g. Sainsbury's"></div>
+        <div class="form-group"><label>product id</label><input type="text" id="pinProductId" placeholder="e.g. SAI-001"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>user id</label><input type="text" id="pinUserId" placeholder="e.g. james001"></div>
+        <div class="form-group"><label>user name *</label><input type="text" id="pinUserName" placeholder="e.g. James T."></div>
+      </div>
+      <div class="form-row form-row-3">
+        <div class="form-group"><label>squares *</label><input type="number" id="pinSquares" placeholder="120" min="1"></div>
+        <div class="form-group"><label>date *</label><input type="date" id="pinDate"></div>
+        <div class="form-group"><label>category</label>
+          <select id="pinCategory">
+            <option value="food">food &amp; drink</option>
+            <option value="leisure">leisure &amp; lifestyle</option>
+            <option value="hi-tech">hi-tech &amp; electrical</option>
+            <option value="travel">travel</option>
+            <option value="home">home</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>description</label><textarea id="pinDescription" rows="2" placeholder="Describe the purchase and its conservation contribution..."></textarea></div>
+      <div class="form-group"><label>image url</label><input type="text" id="pinImage" placeholder="assets/images/amazon.png"></div>
+      <div class="dupe-warning" id="dupeWarning"></div>
     </div>
-  </footer>
+    <div class="modal-footer">
+      <button onclick="closePinModal()" class="btn btn-secondary">cancel</button>
+      <button onclick="savePin()" class="btn btn-primary" id="pinSaveBtn">add pin</button>
+    </div>
+  </div>
+</div>
 
+<!-- ══ RETAILER MODAL ══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="retailerModal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" id="retModalTitle">add retailer</span>
+      <button class="modal-close" onclick="closeRetailerModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="retId">
+      <div class="form-group"><label>retailer name *</label><input type="text" id="retName"></div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>category</label>
+          <select id="retCategory">
+            <option value="grocery">grocery</option>
+            <option value="electrical">electrical</option>
+            <option value="fashion">fashion</option>
+            <option value="telecoms">telecoms</option>
+            <option value="travel">travel</option>
+            <option value="home">home</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>status</label>
+          <select id="retActive">
+            <option value="true">active</option>
+            <option value="false">inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeRetailerModal()" class="btn btn-secondary">cancel</button>
+      <button onclick="saveRetailer()" class="btn btn-primary">save retailer</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  var pins = [];
-  var editingId = null;
-  var adminMap, tempMarker;
+  // ── Default data ──────────────────────────────────────────────────────────
+  var defaultEquiv = {
+    carbonKgPerGs: 0.45, vcsCreditsPerGs: 0.0025, fossilLitresPerGs: 0.18,
+    netZeroPct: 65, offsetPct: 35, carbonStandard: 'Verra VCS',
+    projectRef: 'VCS-1566', projectName: 'Juma Sustainable Development Reserve',
+    effectiveDate: '2026-01-01', reviewDate: '2026-06-30', approvedBy: 'MGS Carbon Committee'
+  };
 
-  // ── Boundary (same as map.html) ───────────────────────────────────────────
-  var boundary = [
-    [-5.1,-59.3],[-4.6,-59.9],[-4.7,-60.8],
-    [-5.2,-61.3],[-6.0,-61.5],[-7.0,-61.0],
-    [-7.3,-60.0],[-6.8,-59.2],[-6.0,-59.1]
+  var defaultCampaigns = [
+    { id:'CAM001', clientName:"Sainsbury's", contractedGs:50000, gsIssued:12450, gsPerTxn:120, rate:1.00, budget:50000,
+      startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
+      consumerMessage:"Your Sainsbury's shop is helping save the Amazon rainforest — every item you buy plants a green square in the Juma Reserve.",
+      productCodes:'SAI-NECTAR-001, SAI-XMAS-2025',
+      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
+    { id:'CAM002', clientName:'Sky', contractedGs:25000, gsIssued:8730, gsPerTxn:255, rate:1.00, budget:25000,
+      startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
+      consumerMessage:"Your Sky subscription is protecting ancient Amazon rainforest for future generations — your choices are making a real difference.",
+      productCodes:'SKY-BB-2026, SKY-MOB-24M',
+      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
+    { id:'CAM003', clientName:'Currys', contractedGs:30000, gsIssued:9150, gsPerTxn:500, rate:1.00, budget:30000,
+      startDate:'2026-02-01', endDate:'2026-11-30', status:'active',
+      consumerMessage:"Every Currys purchase contributes to Amazon conservation — your tech choices are saving the planet one square at a time.",
+      productCodes:'CUR-SAMS-4K55, CUR-WM-AEG-001',
+      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
+    { id:'CAM004', clientName:'Thomas Cook', contractedGs:15000, gsIssued:3102, gsPerTxn:1034, rate:1.00, budget:15000,
+      startDate:'2026-01-15', endDate:'2026-10-31', status:'active',
+      consumerMessage:"Your Thomas Cook holiday is funding real conservation in the Amazon — your travel decisions are making a future for your children.",
+      productCodes:'TC-HOL-PT-26',
+      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
+    { id:'CAM005', clientName:'ASDA', contractedGs:40000, gsIssued:880, gsPerTxn:88, rate:1.00, budget:40000,
+      startDate:'2026-03-01', endDate:'2026-12-31', status:'active',
+      consumerMessage:"Your ASDA Green Token shop is protecting the Amazon rainforest — every purchase decision builds a better planet for everyone.",
+      productCodes:'ASDA-GT-MAR26',
+      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' }
   ];
 
-  // ── Load pins ─────────────────────────────────────────────────────────────
-  function loadPins() {
+  var defaultRetailers = [
+    { id:'RET001', name:"Sainsbury's", category:'grocery',    active:true  },
+    { id:'RET002', name:'Sky',         category:'telecoms',   active:true  },
+    { id:'RET003', name:'Currys',      category:'electrical', active:true  },
+    { id:'RET004', name:'Thomas Cook', category:'travel',     active:true  },
+    { id:'RET005', name:'ASDA',        category:'grocery',    active:true  },
+    { id:'RET006', name:'H&M',         category:'fashion',    active:true  },
+    { id:'RET007', name:'PC World',    category:'electrical', active:false }
+  ];
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  var pins = [], campaigns = [], retailers = [], equiv = {};
+  var editingPinId = null, editingCamId = null, editingRetId = null;
+  var adminMap, tempMarker, mapInitialised = false;
+
+  var boundary = [
+    [-5.1,-59.3],[-4.6,-59.9],[-4.7,-60.8],[-5.2,-61.3],[-6.0,-61.5],
+    [-7.0,-61.0],[-7.3,-60.0],[-6.8,-59.2],[-6.0,-59.1]
+  ];
+
+  // ── Load ──────────────────────────────────────────────────────────────────
+  function loadData() {
+    equiv     = JSON.parse(localStorage.getItem('mgs_equiv'))     || defaultEquiv;
+    campaigns = JSON.parse(localStorage.getItem('mgs_campaigns')) || defaultCampaigns;
+    retailers = JSON.parse(localStorage.getItem('mgs_retailers')) || defaultRetailers;
     var stored = localStorage.getItem('mgs_pins');
     if (stored) {
-      pins = JSON.parse(stored);
-      init();
+      pins = JSON.parse(stored); boot();
     } else {
       fetch('assets/data/pins.json')
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          pins = data;
-          localStorage.setItem('mgs_pins', JSON.stringify(pins));
-          init();
-        });
+        .then(function(r){ return r.json(); })
+        .then(function(d){ pins = d; persist('pins'); boot(); })
+        .catch(function(){ pins = []; boot(); });
     }
   }
 
-  function init() {
-    initMap();
-    renderList();
-    document.getElementById('pinDate').value = new Date().toISOString().split('T')[0];
+  function persist(what) {
+    if (what==='pins')      localStorage.setItem('mgs_pins',      JSON.stringify(pins));
+    if (what==='campaigns') localStorage.setItem('mgs_campaigns', JSON.stringify(campaigns));
+    if (what==='retailers') localStorage.setItem('mgs_retailers', JSON.stringify(retailers));
+    if (what==='equiv')     localStorage.setItem('mgs_equiv',     JSON.stringify(equiv));
   }
 
-  // ── Admin mini-map ────────────────────────────────────────────────────────
-  function initMap() {
-    adminMap = L.map('adminMap', { center: [-5.8, -60.2], zoom: 6 });
+  function boot() {
+    renderOverview(); renderCampaigns(); renderAllPins(); renderRetailers(); populateEquivForm();
+  }
 
-    L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      { attribution: '&copy; Esri', maxZoom: 18 }
-    ).addTo(adminMap);
+  // ── Clock ─────────────────────────────────────────────────────────────────
+  function tick() {
+    var d = new Date();
+    document.getElementById('topbarClock').textContent =
+      d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) + '  ' +
+      d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  }
+  tick(); setInterval(tick, 30000);
 
-    L.polygon(boundary, { color: '#6ab023', weight: 2, fillOpacity: 0.12 }).addTo(adminMap);
+  // ── Navigation ────────────────────────────────────────────────────────────
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+    document.querySelectorAll('.sidebar-nav a').forEach(function(a){ a.classList.remove('active'); });
+    document.getElementById('sec-'  + name).classList.add('active');
+    document.getElementById('nav-'  + name).classList.add('active');
+    document.getElementById('topbarLabel').textContent = name.replace('-',' ');
+    if (name === 'pins' && !mapInitialised) initAdminMap();
+  }
 
-    // Show existing pins as small dots with tooltips
-    pins.forEach(function(pin) {
-      L.circleMarker([pin.lat, pin.lng], {
-        radius: 5, color: '#6ab023', fillColor: '#6ab023', fillOpacity: 0.7, weight: 1
-      }).bindTooltip(pin.id + ' — ' + pin.userName).addTo(adminMap);
+  // ── Overview ──────────────────────────────────────────────────────────────
+  function renderOverview() {
+    var tCon  = campaigns.reduce(function(s,c){ return s+c.contractedGs; }, 0);
+    var tIss  = campaigns.reduce(function(s,c){ return s+c.gsIssued; }, 0);
+    var tSq   = pins.reduce(function(s,p){ return s+p.squares; }, 0);
+    var tCO2  = tSq * equiv.carbonKgPerGs;
+    var tVcs  = tSq * equiv.vcsCreditsPerGs;
+    var tFoss = tSq * equiv.fossilLitresPerGs;
+    var tRev  = campaigns.reduce(function(s,c){ return s+(c.contractedGs*(c.rate||1)); }, 0);
+    var aCams = campaigns.filter(function(c){ return c.status==='active'; }).length;
+
+    document.getElementById('kpiGrid').innerHTML = [
+      kpi('Total GS Contracted',  fmt(tCon),                    campaigns.length + ' campaigns',        false),
+      kpi('GS Issued',            fmt(tIss),                    pct(tIss,tCon) + '% of contracted',    true),
+      kpi('GS Remaining',         fmt(tCon-tIss),               'still to be earned',                  false),
+      kpi('Pins on Map',          pins.length,                  fmt(tSq) + ' total squares',            false),
+      kpi('CO₂e Offset',          (tCO2/1000).toFixed(2)+'t',  tVcs.toFixed(2)+' VCS credits',         false),
+      kpi('Fossil Fuel Saved',    tFoss.toFixed(0)+' L',        'equivalent reduction',                 false),
+      kpi('Active Campaigns',     aCams,                        campaigns.length + ' total',            false),
+      kpi('Campaign Revenue',     '£'+fmt(tRev),                'contracted value',                     false)
+    ].join('');
+
+    // Campaign table
+    document.getElementById('overviewCamBody').innerHTML = campaigns.map(function(c) {
+      var p = pct(c.gsIssued, c.contractedGs);
+      return '<tr><td><strong>' + c.clientName + '</strong></td><td>' + fmt(c.contractedGs) +
+        '</td><td>' + fmt(c.gsIssued) + '</td><td>' +
+        '<div class="prog-bar" style="width:90px;display:inline-block;vertical-align:middle">' +
+        '<div class="prog-fill" style="width:'+p+'%"></div></div> <span style="font-size:10px;color:#999">'+p+'%</span>' +
+        '</td><td><span class="pill pill-' + c.status + '">' + c.status + '</span></td></tr>';
+    }).join('');
+
+    // Carbon panel
+    document.getElementById('carbonPanel').innerHTML =
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+      cStat('🌿', (tCO2/1000).toFixed(3)+' tonnes', 'CO₂e offset to date') +
+      cStat('📜', tVcs.toFixed(4), 'VCS credits generated') +
+      cStat('⛽', tFoss.toFixed(1)+' L', 'fossil fuel equivalent') +
+      cStat('🏭', equiv.netZeroPct+'%', 'Net Zero contribution') +
+      '</div>' +
+      '<div style="margin-top:12px;font-size:10px;color:#888;background:#f6faf0;padding:9px 11px;border-radius:4px;">' +
+      'Standard: <strong>' + equiv.carbonStandard + '</strong> &nbsp;·&nbsp; ' +
+      'Project: <strong>' + equiv.projectRef + '</strong> &nbsp;·&nbsp; ' + equiv.projectName + '</div>';
+
+    // Recent pins
+    var recent = pins.slice().sort(function(a,b){ return b.date.localeCompare(a.date); }).slice(0,6);
+    document.getElementById('recentPinsBody').innerHTML = recent.map(function(p) {
+      return '<tr><td><span class="pin-badge">' + p.id + '</span></td>' +
+        '<td><strong>' + p.retailer + '</strong></td><td>' + p.userName + '</td>' +
+        '<td>🌿 ' + p.squares + '</td>' +
+        '<td><span class="tag tag-' + (p.category||'food') + '">' + (p.category||'—') + '</span></td>' +
+        '<td>' + p.date + '</td></tr>';
+    }).join('');
+  }
+
+  function kpi(label, value, sub, hi) {
+    return '<div class="kpi-card'+(hi?' highlight':'')+'"><div class="kpi-label">'+label+'</div>' +
+      '<div class="kpi-value">'+value+'</div><div class="kpi-sub">'+sub+'</div></div>';
+  }
+  function cStat(icon, val, lbl) {
+    return '<div style="background:#f6faf0;border-radius:6px;padding:11px;">' +
+      '<div style="font-size:18px;margin-bottom:4px">'+icon+'</div>' +
+      '<div style="font-size:17px;font-weight:bold;color:#1b3410;">'+val+'</div>' +
+      '<div style="font-size:10px;color:#aaa;">'+lbl+'</div></div>';
+  }
+  function fmt(n) { return parseInt(n||0).toLocaleString(); }
+  function pct(a, b) { return b > 0 ? Math.round(a/b*100) : 0; }
+
+  // ── Campaigns ─────────────────────────────────────────────────────────────
+  function renderCampaigns() {
+    var g = document.getElementById('campaignGrid');
+    if (!campaigns.length) {
+      g.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div>no campaigns yet</div>'; return;
+    }
+    g.innerHTML = campaigns.map(function(c) {
+      var p = pct(c.gsIssued, c.contractedGs);
+      var co2 = (c.gsIssued * c.carbonKgPerGs / 1000).toFixed(3);
+      return '<div class="campaign-card">' +
+        '<div class="cc-header">' +
+          '<div><div class="cc-client">' + c.clientName + '</div><div class="cc-id">' + c.id + '</div></div>' +
+          '<span class="pill pill-' + c.status + '">' + c.status + '</span>' +
+        '</div>' +
+        '<div class="cc-body">' +
+          '<div>' +
+            '<div class="cc-progress-label"><span>' + fmt(c.gsIssued) + ' / ' + fmt(c.contractedGs) + ' GS issued</span><span>' + p + '%</span></div>' +
+            '<div class="prog-bar"><div class="prog-fill" style="width:' + p + '%"></div></div>' +
+          '</div>' +
+          '<div class="cc-meta">' +
+            '<div class="cc-meta-item"><div class="ml">GS / txn</div><div class="mv">' + fmt(c.gsPerTxn) + '</div></div>' +
+            '<div class="cc-meta-item"><div class="ml">rate / GS</div><div class="mv">£' + (c.rate||1).toFixed(2) + '</div></div>' +
+            '<div class="cc-meta-item"><div class="ml">CO₂e offset</div><div class="mv">' + co2 + 't</div></div>' +
+            '<div class="cc-meta-item"><div class="ml">contract £</div><div class="mv">£' + fmt(c.contractedGs*(c.rate||1)) + '</div></div>' +
+            '<div class="cc-meta-item"><div class="ml">net zero</div><div class="mv">' + (c.netZeroPct||0) + '%</div></div>' +
+            '<div class="cc-meta-item"><div class="ml">standard</div><div class="mv" style="font-size:10px">' + (c.carbonStandard||'VCS') + '</div></div>' +
+          '</div>' +
+          '<div class="cc-message">"' + (c.consumerMessage||'') + '"</div>' +
+          '<div class="cc-chips">' +
+            '<span class="chip chip-vcs">⚖ ' + (c.carbonKgPerGs||0) + ' kg CO₂e / GS</span>' +
+            '<span class="chip chip-vcs">📜 ' + (c.vcsCreditsPerGs||0) + ' VCS / GS</span>' +
+            '<span class="chip chip-fossil">⛽ ' + (c.fossilLitresPerGs||0) + ' L / GS</span>' +
+            '<span class="chip chip-nz">Net Zero ' + (c.netZeroPct||0) + '%</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cc-footer">' +
+          '<button onclick="editCampaign(\'' + c.id + '\')" class="btn btn-secondary btn-xs">edit</button>' +
+          '<button onclick="deleteCampaign(\'' + c.id + '\')" class="btn btn-danger btn-xs">delete</button>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function openCampaignModal() {
+    editingCamId = null;
+    document.getElementById('camModalTitle').textContent = 'new campaign';
+    document.getElementById('camSaveBtn').textContent = 'create campaign';
+    document.getElementById('camId').value = '';
+    ['camClient','camProductCodes','camMessage'].forEach(function(f){ document.getElementById(f).value=''; });
+    ['camContractedGs','camGsIssued','camGsPerTxn','camBudget','camStart','camEnd'].forEach(function(f){ document.getElementById(f).value=''; });
+    document.getElementById('camRate').value = '1.00';
+    document.getElementById('camStatus').value = 'draft';
+    document.getElementById('camCarbon').value  = equiv.carbonKgPerGs;
+    document.getElementById('camVcs').value     = equiv.vcsCreditsPerGs;
+    document.getElementById('camFossil').value  = equiv.fossilLitresPerGs;
+    document.getElementById('camNetZero').value = equiv.netZeroPct;
+    document.getElementById('camOffset').value  = equiv.offsetPct;
+    document.getElementById('camStandard').value = equiv.carbonStandard;
+    document.getElementById('campaignModal').classList.add('open');
+  }
+
+  function editCampaign(id) {
+    var c = campaigns.find(function(x){ return x.id===id; }); if (!c) return;
+    editingCamId = id;
+    document.getElementById('camModalTitle').textContent = 'edit — ' + c.clientName;
+    document.getElementById('camSaveBtn').textContent = 'save changes';
+    document.getElementById('camId').value          = c.id;
+    document.getElementById('camClient').value      = c.clientName;
+    document.getElementById('camContractedGs').value = c.contractedGs;
+    document.getElementById('camGsIssued').value    = c.gsIssued || 0;
+    document.getElementById('camGsPerTxn').value    = c.gsPerTxn;
+    document.getElementById('camRate').value        = c.rate || 1.00;
+    document.getElementById('camBudget').value      = c.budget || '';
+    document.getElementById('camStart').value       = c.startDate || '';
+    document.getElementById('camEnd').value         = c.endDate || '';
+    document.getElementById('camStatus').value      = c.status;
+    document.getElementById('camMessage').value     = c.consumerMessage || '';
+    document.getElementById('camProductCodes').value = c.productCodes || '';
+    document.getElementById('camCarbon').value      = c.carbonKgPerGs;
+    document.getElementById('camVcs').value         = c.vcsCreditsPerGs;
+    document.getElementById('camFossil').value      = c.fossilLitresPerGs;
+    document.getElementById('camNetZero').value     = c.netZeroPct;
+    document.getElementById('camOffset').value      = c.offsetPct;
+    document.getElementById('camStandard').value    = c.carbonStandard;
+    document.getElementById('campaignModal').classList.add('open');
+  }
+
+  function saveCampaign() {
+    var clientName = (document.getElementById('camClient').value||'').trim();
+    if (!clientName) { alert('Client name is required.'); return; }
+    var cam = {
+      id: editingCamId || genId(campaigns, 'CAM'),
+      clientName:      clientName,
+      contractedGs:    parseInt(document.getElementById('camContractedGs').value)||0,
+      gsIssued:        parseInt(document.getElementById('camGsIssued').value)||0,
+      gsPerTxn:        parseInt(document.getElementById('camGsPerTxn').value)||0,
+      rate:            parseFloat(document.getElementById('camRate').value)||1.00,
+      budget:          parseInt(document.getElementById('camBudget').value)||0,
+      startDate:       document.getElementById('camStart').value,
+      endDate:         document.getElementById('camEnd').value,
+      status:          document.getElementById('camStatus').value,
+      consumerMessage: document.getElementById('camMessage').value,
+      productCodes:    document.getElementById('camProductCodes').value,
+      carbonKgPerGs:   parseFloat(document.getElementById('camCarbon').value)||equiv.carbonKgPerGs,
+      vcsCreditsPerGs: parseFloat(document.getElementById('camVcs').value)||equiv.vcsCreditsPerGs,
+      fossilLitresPerGs: parseFloat(document.getElementById('camFossil').value)||equiv.fossilLitresPerGs,
+      netZeroPct:      parseInt(document.getElementById('camNetZero').value)||equiv.netZeroPct,
+      offsetPct:       parseInt(document.getElementById('camOffset').value)||equiv.offsetPct,
+      carbonStandard:  document.getElementById('camStandard').value
+    };
+    if (editingCamId) {
+      var i = campaigns.findIndex(function(x){ return x.id===editingCamId; });
+      campaigns[i] = cam;
+    } else { campaigns.push(cam); }
+    persist('campaigns'); closeCampaignModal(); renderCampaigns(); renderOverview();
+  }
+
+  function deleteCampaign(id) {
+    if (!confirm('Delete campaign ' + id + '?')) return;
+    campaigns = campaigns.filter(function(c){ return c.id!==id; });
+    persist('campaigns'); renderCampaigns(); renderOverview();
+  }
+
+  function closeCampaignModal() {
+    document.getElementById('campaignModal').classList.remove('open'); editingCamId = null;
+  }
+
+  // ── Pins ──────────────────────────────────────────────────────────────────
+  function renderAllPins() {
+    document.getElementById('pinCountLabel').textContent = '(' + pins.length + ')';
+    document.getElementById('allPinsBody').innerHTML = pins.map(function(p) {
+      return '<tr>' +
+        '<td><span class="pin-badge">' + p.id + '</span></td>' +
+        '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.title + '</td>' +
+        '<td>' + p.retailer + '</td><td>' + p.userName + '</td>' +
+        '<td>🌿 ' + p.squares + '</td>' +
+        '<td><span class="tag tag-' + (p.category||'food') + '">' + (p.category||'—') + '</span></td>' +
+        '<td style="font-family:monospace;font-size:9px;color:#ccc;">' + p.lat + ', ' + p.lng + '</td>' +
+        '<td>' + p.date + '</td>' +
+        '<td style="white-space:nowrap;">' +
+          '<button onclick="editPin(\'' + p.id + '\')" class="btn btn-secondary btn-xs">edit</button> ' +
+          '<button onclick="deletePin(\'' + p.id + '\')" class="btn btn-danger btn-xs">del</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+
+  function initAdminMap() {
+    if (mapInitialised) return; mapInitialised = true;
+    adminMap = L.map('adminMap', { center:[-5.8,-60.2], zoom:6 });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { maxZoom:18 }).addTo(adminMap);
+    L.polygon(boundary, { color:'#6ab023', weight:2, fillOpacity:0.12 }).addTo(adminMap);
+    pins.forEach(function(p) {
+      L.circleMarker([p.lat,p.lng], { radius:5, color:'#6ab023', fillColor:'#6ab023', fillOpacity:0.7, weight:1 })
+       .bindTooltip(p.id + ' — ' + p.userName).addTo(adminMap);
     });
-
-    // Click to place new pin
     adminMap.on('click', function(e) {
-      var lat = parseFloat(e.latlng.lat.toFixed(6));
-      var lng = parseFloat(e.latlng.lng.toFixed(6));
+      var lat = parseFloat(e.latlng.lat.toFixed(6)), lng = parseFloat(e.latlng.lng.toFixed(6));
       document.getElementById('pinLat').value = lat;
       document.getElementById('pinLng').value = lng;
-      checkDupe(lat, lng);
-      placeTempMarker(lat, lng);
+      checkDupe(lat, lng); placeTempMarker(lat, lng);
     });
   }
 
   function placeTempMarker(lat, lng) {
     if (tempMarker) adminMap.removeLayer(tempMarker);
-    tempMarker = L.marker([lat, lng], {
-      icon: L.divIcon({
-        className: '',
-        html: '<div class="mgs-pin mgs-pin-new"></div>',
-        iconSize: [22, 22], iconAnchor: [11, 11]
-      })
-    }).addTo(adminMap);
+    tempMarker = L.circleMarker([lat,lng], { radius:7, color:'#cc7700', fillColor:'#ff9900', fillOpacity:0.9, weight:2 }).addTo(adminMap);
   }
 
-  // ── Duplicate location check ──────────────────────────────────────────────
   function checkDupe(lat, lng) {
-    var warn = document.getElementById('dupeWarning');
-    var dupe = pins.find(function(p) {
-      return p.id !== editingId &&
-             Math.abs(p.lat - lat) < 0.005 &&
-             Math.abs(p.lng - lng) < 0.005;
-    });
-    if (dupe) {
-      warn.style.display = 'block';
-      warn.textContent = '⚠ ' + dupe.id + ' (' + dupe.userName + ') is very close to this location. Move pin slightly.';
-    } else {
-      warn.style.display = 'none';
-    }
+    var w = document.getElementById('dupeWarning');
+    var d = pins.find(function(p){ return p.id!==editingPinId && Math.abs(p.lat-lat)<0.005 && Math.abs(p.lng-lng)<0.005; });
+    w.style.display = d ? 'block' : 'none';
+    if (d) w.textContent = '⚠ ' + d.id + ' (' + d.userName + ') is very close. Move pin slightly.';
   }
 
-  // ── Render pins list ──────────────────────────────────────────────────────
-  function renderList() {
-    var container = document.getElementById('pinsList');
-    document.getElementById('pinCountBadge').textContent = pins.length;
-
-    if (pins.length === 0) {
-      container.innerHTML = '<div class="empty-state">no pins yet — add one using the form on the left</div>';
-      return;
-    }
-
-    container.innerHTML = pins.map(function(pin) {
-      return (
-        '<div class="pin-row" id="row-' + pin.id + '">' +
-          '<div class="pin-row-main">' +
-            '<span class="pin-id-badge">' + pin.id + '</span>' +
-            '<span class="pin-retailer">' + pin.retailer + '</span>' +
-            '<span class="pin-user">' + pin.userName + '</span>' +
-            '<span class="pin-squares">🌿 ' + pin.squares + '</span>' +
-            '<span class="pin-date">' + pin.date + '</span>' +
-          '</div>' +
-          '<div class="pin-row-title">' + pin.title + '</div>' +
-          '<div class="pin-row-coords">📍 ' + pin.lat + ', ' + pin.lng + '</div>' +
-          '<div class="pin-row-actions">' +
-            '<button onclick="editPin(\'' + pin.id + '\')" class="btn-edit">edit</button>' +
-            '<button onclick="deletePin(\'' + pin.id + '\')" class="btn-delete">delete</button>' +
-          '</div>' +
-        '</div>'
-      );
-    }).join('');
+  function openPinModal() {
+    editingPinId = null;
+    document.getElementById('pinModalTitle').textContent = 'add pin';
+    document.getElementById('pinSaveBtn').textContent = 'add pin';
+    document.getElementById('pinId').value = '';
+    ['pinLat','pinLng','pinTitle','pinRetailer','pinProductId','pinUserId','pinUserName','pinSquares','pinDescription','pinImage'].forEach(function(f){ document.getElementById(f).value=''; });
+    document.getElementById('pinDate').value = today();
+    document.getElementById('pinCategory').value = 'food';
+    document.getElementById('dupeWarning').style.display = 'none';
+    document.getElementById('pinModal').classList.add('open');
+    setTimeout(function(){ if (adminMap) adminMap.invalidateSize(); }, 100);
   }
 
-  // ── Save pin (add or update) ──────────────────────────────────────────────
-  function savePin(e) {
-    e.preventDefault();
+  function editPin(id) {
+    var p = pins.find(function(x){ return x.id===id; }); if (!p) return;
+    editingPinId = id;
+    document.getElementById('pinModalTitle').textContent = 'edit pin — ' + id;
+    document.getElementById('pinSaveBtn').textContent = 'save changes';
+    document.getElementById('pinId').value          = p.id;
+    document.getElementById('pinLat').value         = p.lat;
+    document.getElementById('pinLng').value         = p.lng;
+    document.getElementById('pinTitle').value       = p.title;
+    document.getElementById('pinRetailer').value    = p.retailer;
+    document.getElementById('pinProductId').value   = p.productId || '';
+    document.getElementById('pinUserId').value      = p.userId || '';
+    document.getElementById('pinUserName').value    = p.userName;
+    document.getElementById('pinSquares').value     = p.squares;
+    document.getElementById('pinDate').value        = p.date;
+    document.getElementById('pinCategory').value    = p.category || 'food';
+    document.getElementById('pinDescription').value = p.description || '';
+    document.getElementById('pinImage').value       = p.image || '';
+    document.getElementById('pinModal').classList.add('open');
+    setTimeout(function(){ if (adminMap) { adminMap.setView([p.lat,p.lng],9); adminMap.invalidateSize(); placeTempMarker(p.lat,p.lng); } }, 100);
+  }
 
+  function savePin() {
     var lat = parseFloat(document.getElementById('pinLat').value);
     var lng = parseFloat(document.getElementById('pinLng').value);
-
-    // Block exact duplicate locations
-    var dupe = pins.find(function(p) {
-      return p.id !== editingId &&
-             Math.abs(p.lat - lat) < 0.005 &&
-             Math.abs(p.lng - lng) < 0.005;
-    });
-    if (dupe) {
-      alert('Pin ' + dupe.id + ' (' + dupe.userName + ') is too close to this location. Each pin must have a unique position.');
-      return;
-    }
-
+    if (!lat || !lng) { alert('Set a location on the map or enter coordinates.'); return; }
+    var dupe = pins.find(function(p){ return p.id!==editingPinId && Math.abs(p.lat-lat)<0.005 && Math.abs(p.lng-lng)<0.005; });
+    if (dupe) { alert('Pin ' + dupe.id + ' is too close. Each pin must have a unique position.'); return; }
     var pin = {
-      id:          editingId || generateId(),
-      lat:         lat,
-      lng:         lng,
+      id: editingPinId || genId(pins, 'PIN'),
+      lat: lat, lng: lng,
       title:       document.getElementById('pinTitle').value,
       description: document.getElementById('pinDescription').value,
       image:       document.getElementById('pinImage').value || 'assets/images/amazon.png',
@@ -439,92 +924,175 @@
       date:        document.getElementById('pinDate').value,
       category:    document.getElementById('pinCategory').value
     };
-
-    if (editingId) {
-      var idx = pins.findIndex(function(p) { return p.id === editingId; });
-      pins[idx] = pin;
-    } else {
-      pins.push(pin);
-    }
-
-    localStorage.setItem('mgs_pins', JSON.stringify(pins));
-    resetForm();
-    renderList();
+    if (editingPinId) { var i = pins.findIndex(function(x){ return x.id===editingPinId; }); pins[i] = pin; }
+    else { pins.push(pin); }
+    persist('pins'); closePinModal(); renderAllPins(); renderOverview();
   }
 
-  // ── Edit pin ──────────────────────────────────────────────────────────────
-  function editPin(id) {
-    var pin = pins.find(function(p) { return p.id === id; });
-    if (!pin) return;
-
-    editingId = id;
-    document.getElementById('formTitle').textContent = 'edit pin — ' + id;
-    document.getElementById('saveBtn').textContent = 'save changes';
-    document.getElementById('pinId').value        = pin.id;
-    document.getElementById('pinLat').value       = pin.lat;
-    document.getElementById('pinLng').value       = pin.lng;
-    document.getElementById('pinTitle').value     = pin.title;
-    document.getElementById('pinDescription').value = pin.description || '';
-    document.getElementById('pinImage').value     = pin.image || '';
-    document.getElementById('pinRetailer').value  = pin.retailer;
-    document.getElementById('pinProductId').value = pin.productId || '';
-    document.getElementById('pinUserId').value    = pin.userId || '';
-    document.getElementById('pinUserName').value  = pin.userName;
-    document.getElementById('pinSquares').value   = pin.squares;
-    document.getElementById('pinDate').value      = pin.date;
-    document.getElementById('pinCategory').value  = pin.category || 'food';
-
-    adminMap.setView([pin.lat, pin.lng], 9);
-    placeTempMarker(pin.lat, pin.lng);
-
-    document.querySelector('.admin-form-col').scrollIntoView({ behavior: 'smooth' });
-  }
-
-  // ── Delete pin ────────────────────────────────────────────────────────────
   function deletePin(id) {
-    if (!confirm('Delete pin ' + id + '? This cannot be undone.')) return;
-    pins = pins.filter(function(p) { return p.id !== id; });
-    localStorage.setItem('mgs_pins', JSON.stringify(pins));
-    renderList();
+    if (!confirm('Delete pin ' + id + '?')) return;
+    pins = pins.filter(function(p){ return p.id!==id; });
+    persist('pins'); renderAllPins(); renderOverview();
   }
 
-  // ── Reset form ────────────────────────────────────────────────────────────
-  function resetForm() {
-    editingId = null;
-    document.getElementById('formTitle').textContent = 'add new pin';
-    document.getElementById('saveBtn').textContent   = 'add pin';
-    document.getElementById('pinForm').reset();
-    document.getElementById('pinDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('dupeWarning').style.display = 'none';
-    if (tempMarker) { adminMap.removeLayer(tempMarker); tempMarker = null; }
+  function closePinModal() {
+    document.getElementById('pinModal').classList.remove('open');
+    if (tempMarker && adminMap) { adminMap.removeLayer(tempMarker); tempMarker = null; }
+    editingPinId = null;
   }
 
-  // ── Generate next ID ──────────────────────────────────────────────────────
-  function generateId() {
-    var max = pins.reduce(function(m, p) {
-      var n = parseInt(p.id.replace('PIN', '')) || 0;
-      return Math.max(m, n);
-    }, 0);
-    return 'PIN' + String(max + 1).padStart(3, '0');
+  // ── Retailers ─────────────────────────────────────────────────────────────
+  function renderRetailers() {
+    var g = document.getElementById('retailerGrid');
+    g.innerHTML = retailers.map(function(r) {
+      var cams = campaigns.filter(function(c){ return c.status==='active' && c.productCodes && c.clientName===r.name; }).length;
+      return '<div class="retailer-card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+          '<div><div class="ret-name">' + r.name + '</div><div class="ret-cat">' + r.category + '</div></div>' +
+          '<span class="pill ' + (r.active ? 'pill-active' : 'pill-draft') + '">' + (r.active ? 'active' : 'inactive') + '</span>' +
+        '</div>' +
+        '<div style="font-size:10px;color:#6ab023;">' + (cams ? cams + ' active campaign' + (cams>1?'s':'') : 'no active campaigns') + '</div>' +
+        '<div style="display:flex;gap:5px;">' +
+          '<button onclick="editRetailer(\'' + r.id + '\')" class="btn btn-secondary btn-xs">edit</button>' +
+          '<button onclick="deleteRetailer(\'' + r.id + '\')" class="btn btn-danger btn-xs">del</button>' +
+        '</div></div>';
+    }).join('');
   }
 
-  // ── Export JSON ───────────────────────────────────────────────────────────
-  function exportPins() {
-    var blob = new Blob([JSON.stringify(pins, null, 2)], { type: 'application/json' });
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href = url; a.download = 'pins.json'; a.click();
+  function openRetailerModal() {
+    editingRetId = null;
+    document.getElementById('retModalTitle').textContent = 'add retailer';
+    document.getElementById('retId').value = '';
+    document.getElementById('retName').value = '';
+    document.getElementById('retCategory').value = 'grocery';
+    document.getElementById('retActive').value = 'true';
+    document.getElementById('retailerModal').classList.add('open');
+  }
+
+  function editRetailer(id) {
+    var r = retailers.find(function(x){ return x.id===id; }); if (!r) return;
+    editingRetId = id;
+    document.getElementById('retModalTitle').textContent = 'edit retailer';
+    document.getElementById('retId').value       = r.id;
+    document.getElementById('retName').value     = r.name;
+    document.getElementById('retCategory').value = r.category;
+    document.getElementById('retActive').value   = String(r.active);
+    document.getElementById('retailerModal').classList.add('open');
+  }
+
+  function saveRetailer() {
+    var name = (document.getElementById('retName').value||'').trim();
+    if (!name) { alert('Name required.'); return; }
+    var ret = {
+      id:       editingRetId || genId(retailers, 'RET'),
+      name:     name,
+      category: document.getElementById('retCategory').value,
+      active:   document.getElementById('retActive').value === 'true'
+    };
+    if (editingRetId) { var i = retailers.findIndex(function(x){ return x.id===editingRetId; }); retailers[i] = ret; }
+    else { retailers.push(ret); }
+    persist('retailers'); closeRetailerModal(); renderRetailers();
+  }
+
+  function deleteRetailer(id) {
+    if (!confirm('Delete retailer ' + id + '?')) return;
+    retailers = retailers.filter(function(r){ return r.id!==id; });
+    persist('retailers'); renderRetailers();
+  }
+
+  function closeRetailerModal() {
+    document.getElementById('retailerModal').classList.remove('open'); editingRetId = null;
+  }
+
+  // ── Equivalence ───────────────────────────────────────────────────────────
+  function populateEquivForm() {
+    document.getElementById('eqCarbon').value        = equiv.carbonKgPerGs;
+    document.getElementById('eqVcs').value           = equiv.vcsCreditsPerGs;
+    document.getElementById('eqFossil').value        = equiv.fossilLitresPerGs;
+    document.getElementById('eqNetZeroPct').value    = equiv.netZeroPct;
+    document.getElementById('eqOffsetPct').value     = equiv.offsetPct;
+    document.getElementById('eqStandard').value      = equiv.carbonStandard;
+    document.getElementById('eqProjectRef').value    = equiv.projectRef;
+    document.getElementById('eqProjectName').value   = equiv.projectName;
+    document.getElementById('eqEffectiveDate').value = equiv.effectiveDate;
+    document.getElementById('eqReviewDate').value    = equiv.reviewDate;
+    document.getElementById('eqApprovedBy').value    = equiv.approvedBy;
+    renderEquivCards();
+  }
+
+  function renderEquivCards() {
+    document.getElementById('equivCards').innerHTML = [
+      eCard('🌿', equiv.carbonKgPerGs + ' kg', 'CO₂e per green square',        'Fossil carbon offset per GS — minimum Verra VCS standard'),
+      eCard('📜', equiv.vcsCreditsPerGs,        'VCS credits per green square',  'Verified Carbon Standard — Verra registry only'),
+      eCard('⛽', equiv.fossilLitresPerGs+' L', 'Fossil fuel reduction per GS',  'Equivalent fossil fuel reduction in litres per GS'),
+      eCard('🏭', equiv.netZeroPct+'%',         'Net Zero contribution',          'Proportion of GS value allocated to the Net Zero pathway'),
+      eCard('🌳', equiv.offsetPct+'%',          'Offset contribution',            'Proportion allocated to verified forestry carbon offset'),
+      eCard('📋', equiv.carbonStandard,         'Carbon standard',               equiv.projectRef + ' · ' + equiv.projectName)
+    ].join('');
+  }
+
+  function eCard(icon, val, lbl, sub) {
+    return '<div class="equiv-card"><div class="equiv-icon">' + icon + '</div>' +
+      '<div class="equiv-val">' + val + '</div>' +
+      '<div class="equiv-lbl">' + lbl + '</div>' +
+      '<div class="equiv-sub">' + sub + '</div></div>';
+  }
+
+  function saveEquivalence() {
+    equiv = {
+      carbonKgPerGs:    parseFloat(document.getElementById('eqCarbon').value),
+      vcsCreditsPerGs:  parseFloat(document.getElementById('eqVcs').value),
+      fossilLitresPerGs: parseFloat(document.getElementById('eqFossil').value),
+      netZeroPct:       parseInt(document.getElementById('eqNetZeroPct').value),
+      offsetPct:        parseInt(document.getElementById('eqOffsetPct').value),
+      carbonStandard:   document.getElementById('eqStandard').value,
+      projectRef:       document.getElementById('eqProjectRef').value,
+      projectName:      document.getElementById('eqProjectName').value,
+      effectiveDate:    document.getElementById('eqEffectiveDate').value,
+      reviewDate:       document.getElementById('eqReviewDate').value,
+      approvedBy:       document.getElementById('eqApprovedBy').value
+    };
+    persist('equiv'); renderEquivCards(); renderOverview();
+    alert('Equivalence settings saved.');
+  }
+
+  // ── Export / Reset ────────────────────────────────────────────────────────
+  function exportAllData() {
+    var d = { pins:pins, campaigns:campaigns, retailers:retailers, equivalence:equiv, exported: new Date().toISOString() };
+    var blob = new Blob([JSON.stringify(d, null, 2)], { type:'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'mgs-data-' + today() + '.json'; a.click();
     URL.revokeObjectURL(url);
   }
 
-  // ── Reset to seed data ────────────────────────────────────────────────────
-  function resetToDefaults() {
-    if (!confirm('Reset all pins to the default seed data? All changes will be lost.')) return;
-    localStorage.removeItem('mgs_pins');
-    location.reload();
+  function resetAllData() {
+    if (!confirm('Reset ALL data to factory defaults? All changes will be lost.')) return;
+    localStorage.clear(); location.reload();
   }
 
-  loadPins();
+  // ── Utilities ─────────────────────────────────────────────────────────────
+  function genId(arr, prefix) {
+    var max = arr.reduce(function(m,x){ return Math.max(m, parseInt((x.id||'').replace(prefix,''))||0); }, 0);
+    return prefix + String(max+1).padStart(3,'0');
+  }
+  function today() { return new Date().toISOString().split('T')[0]; }
+
+  // ── Modal close on backdrop ───────────────────────────────────────────────
+  ['campaignModal','pinModal','retailerModal'].forEach(function(id) {
+    document.getElementById(id).addEventListener('click', function(e) {
+      if (e.target === this) {
+        if (id==='campaignModal') closeCampaignModal();
+        if (id==='pinModal')      closePinModal();
+        if (id==='retailerModal') closeRetailerModal();
+      }
+    });
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key==='Escape') { closeCampaignModal(); closePinModal(); closeRetailerModal(); }
+  });
+
+  loadData();
 </script>
 </body>
 </html>
