@@ -344,6 +344,41 @@
       margin-bottom: 12px;
     }
 
+    /* Video lightbox modal */
+    .video-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .video-modal.open { display: flex; }
+    .video-modal-inner {
+      position: relative;
+      width: 90%;
+      max-width: 820px;
+    }
+    .video-modal video {
+      width: 100%;
+      display: block;
+      border-radius: 4px;
+      background: #000;
+    }
+    .video-modal-close {
+      position: absolute;
+      top: -36px; right: 0;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.8;
+    }
+    .video-modal-close:hover { opacity: 1; }
+
     /* Video panel */
     .video-panel {
       position: relative;
@@ -596,7 +631,7 @@
            alt="saving the rainforest means changing people's lives">
       <div class="video-caption">saving the rainforest means changing people's lives</div>
       <div class="video-play">
-        <a href="#" class="btn-gs">view video</a>
+        <a href="#" class="btn-gs" onclick="openVideo();return false;">view video</a>
       </div>
     </div>
 
@@ -646,6 +681,16 @@
     </div>
   </footer>
 
+  <!-- Video lightbox -->
+  <div class="video-modal" id="videoModal" onclick="closeVideo(event)">
+    <div class="video-modal-inner">
+      <button class="video-modal-close" onclick="closeVideo()">&times;</button>
+      <video id="gsVideo" controls preload="none">
+        <source src="assets/video/greensquares-story.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
 </div><!-- /page-wrapper -->
 
 <script>
@@ -665,6 +710,25 @@
   }
 
   setInterval(function() { goTo((current + 1) % total); }, 6000);
+
+  var modal = document.getElementById('videoModal');
+  var vid   = document.getElementById('gsVideo');
+
+  function openVideo() {
+    modal.classList.add('open');
+    vid.play();
+  }
+
+  function closeVideo(e) {
+    // Close if clicking the backdrop or the close button (not the video itself)
+    if (e && e.target !== modal) return;
+    modal.classList.remove('open');
+    vid.pause();
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { modal.classList.remove('open'); vid.pause(); }
+  });
 </script>
 </body>
 </html>
