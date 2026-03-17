@@ -229,6 +229,7 @@
       <a onclick="showSection('products')"  id="nav-products"><span class="nav-icon">📦</span> gs products</a>
       <a onclick="showSection('relations')" id="nav-relations"><span class="nav-icon">🔗</span> relationships</a>
       <a onclick="showSection('retailers')" id="nav-retailers"><span class="nav-icon">🏪</span> retailers</a>
+      <a onclick="showSection('promos')"   id="nav-promos"><span class="nav-icon">🎯</span> retailer promos</a>
 
       <div class="nav-group-label">map data</div>
       <a onclick="showSection('pins')" id="nav-pins"><span class="nav-icon">📍</span> pins</a>
@@ -367,6 +368,23 @@
           <button onclick="openRetailerModal()" class="btn btn-primary">+ add retailer</button>
         </div>
         <div class="retailer-grid" id="retailerGrid"></div>
+      </section>
+
+      <!-- ══ RETAILER PROMOTIONS ══ -->
+      <section id="sec-promos" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">retailer promotions</h2>
+          <button onclick="openPromoModal()" class="btn btn-primary">+ add promotion</button>
+        </div>
+        <div style="margin-bottom:12px;font-size:11px;color:#888;">
+          Retailer-funded GS campaigns on specific products. The retailer brands and funds the promotion — positioning themselves as green partners. Distinct from brand Tier 2 campaigns. Displayed on the EPOS terminal and consumer app when the promotion is active.
+        </div>
+        <div class="panel">
+          <table class="data-table" id="promosTable">
+            <thead><tr><th>retailer</th><th>promotion name</th><th>description</th><th>eligible products</th><th>GS / item</th><th>dates</th><th>status</th><th></th></tr></thead>
+            <tbody id="promosBody"></tbody>
+          </table>
+        </div>
       </section>
 
       <!-- ══ PINS ══ -->
@@ -658,6 +676,41 @@
   </div>
 </div>
 
+<!-- ══ PROMO MODAL ══ -->
+<div class="modal-overlay" id="promoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="promoModalTitle">add retailer promotion</span>
+      <button class="modal-close" onclick="closePromoModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="promoId">
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>retailer *</label>
+          <select id="promoRetailer"></select>
+        </div>
+        <div class="form-group"><label>status</label>
+          <select id="promoActive"><option value="true">active</option><option value="false">inactive</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>promotion name *</label><input type="text" id="promoName" placeholder="e.g. Green Week, Tech for Tomorrow"></div>
+      <div class="form-group"><label>description (shown on EPOS &amp; consumer app)</label><input type="text" id="promoDesc" placeholder="e.g. Sainsbury's commits to conservation — extra GS on eco range"></div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>start date</label><input type="date" id="promoStart"></div>
+        <div class="form-group"><label>end date</label><input type="date" id="promoEnd"></div>
+      </div>
+      <div class="form-group"><label>bonus GS per eligible product scanned</label><input type="number" id="promoGs" min="1" placeholder="e.g. 20"></div>
+      <div class="form-group"><label>eligible products (hold Ctrl/Cmd to select multiple)</label>
+        <select id="promoProducts" multiple style="height:120px;"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closePromoModal()" class="btn btn-secondary">cancel</button>
+      <button onclick="savePromo()" class="btn btn-primary">save promotion</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ RETAILER MODAL ══ -->
 <div class="modal-overlay" id="retailerModal">
   <div class="modal modal-sm">
@@ -773,9 +826,17 @@ var defaultRetailers = [
   { id:'RET008', name:'Tesco',       category:'grocery',    active:true  }
 ];
 
+var defaultRetailerPromos = [
+  { id:'PRM001', retailerName:"Sainsbury's", name:'Green Week',        desc:"Sainsbury's commits to conservation — bonus GS on our eco range this week", products:['PRD001','PRD005','PRD006'], gsPerUnit:20, startDate:'2026-03-15', endDate:'2026-03-28', active:true  },
+  { id:'PRM002', retailerName:'Currys',      name:'Tech for Tomorrow', desc:'Currys partners with MGS — extra GS on all Samsung products',               products:['PRD003','PRD004'],           gsPerUnit:50, startDate:'2026-03-01', endDate:'2026-04-30', active:true  },
+  { id:'PRM003', retailerName:'ASDA',        name:'ASDA Green Basket', desc:'Earn bonus GS on selected eco-friendly products every week',                 products:['PRD002','PRD005'],           gsPerUnit:15, startDate:'2026-03-10', endDate:'2026-03-31', active:true  },
+  { id:'PRM004', retailerName:'Sky',         name:'Sky Zero Pledge',   desc:'Sky pledges carbon neutrality — extra GS on all Sky subscriptions',          products:[],                            gsPerUnit:30, startDate:'2026-04-01', endDate:'2026-12-31', active:false },
+  { id:'PRM005', retailerName:'Thomas Cook', name:'Green Holidays',    desc:'Every holiday booking earns bonus GS for rainforest protection',              products:[],                            gsPerUnit:100,startDate:'2026-04-01', endDate:'2026-09-30', active:false }
+];
+
 // ── State ──────────────────────────────────────────────────────────────────
-var pins=[], campaigns=[], products=[], relationships=[], retailers=[], equiv={};
-var editingPinId=null, editingCamId=null, editingPrdId=null, editingRelId=null, editingRetId=null;
+var pins=[], campaigns=[], products=[], relationships=[], retailers=[], retailerPromos=[], equiv={};
+var editingPinId=null, editingCamId=null, editingPrdId=null, editingRelId=null, editingRetId=null, editingPromoId=null;
 var adminMap, tempMarker, mapInitialised=false;
 var simBasketProducts = [];
 
@@ -787,7 +848,8 @@ function loadData() {
   campaigns     = JSON.parse(localStorage.getItem('mgs_campaigns'))    || defaultCampaigns;
   products      = JSON.parse(localStorage.getItem('mgs_products'))     || defaultProducts;
   relationships = JSON.parse(localStorage.getItem('mgs_rels'))         || defaultRelationships;
-  retailers     = JSON.parse(localStorage.getItem('mgs_retailers'))    || defaultRetailers;
+  retailers     = JSON.parse(localStorage.getItem('mgs_retailers'))       || defaultRetailers;
+  retailerPromos= JSON.parse(localStorage.getItem('mgs_retailer_promos')) || defaultRetailerPromos;
   var stored    = localStorage.getItem('mgs_pins');
   if (stored) { pins = JSON.parse(stored); boot(); }
   else { fetch('assets/data/pins.json').then(function(r){return r.json();}).then(function(d){pins=d;persist('pins');boot();}).catch(function(){pins=[];boot();}); }
@@ -799,12 +861,13 @@ function persist(w) {
   if(w==='products') localStorage.setItem('mgs_products',  JSON.stringify(products));
   if(w==='rels')     localStorage.setItem('mgs_rels',      JSON.stringify(relationships));
   if(w==='retailers')localStorage.setItem('mgs_retailers', JSON.stringify(retailers));
+  if(w==='promos')   localStorage.setItem('mgs_retailer_promos', JSON.stringify(retailerPromos));
   if(w==='equiv')    localStorage.setItem('mgs_equiv',     JSON.stringify(equiv));
 }
 
 function boot() {
   renderOverview(); renderCampaigns(); renderAllPins(); renderProducts();
-  renderRelationships(); renderRetailers(); populateEquivForm(); buildSimDropdowns();
+  renderRelationships(); renderRetailers(); renderPromotions(); populateEquivForm(); buildSimDropdowns();
   tick(); setInterval(tick, 30000);
 }
 
@@ -1350,6 +1413,114 @@ function deleteRetailer(id){
   persist('retailers'); renderRetailers(); buildSimDropdowns();
 }
 function closeRetailerModal(){document.getElementById('retailerModal').classList.remove('open');editingRetId=null;}
+
+// ── Retailer Promotions ────────────────────────────────────────────────────
+function renderPromotions(){
+  var tbody = document.getElementById('promosBody');
+  if (!tbody) return;
+  if (!retailerPromos.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:20px;">no promotions yet — click + add promotion to create one</td></tr>';
+    return;
+  }
+  tbody.innerHTML = retailerPromos.map(function(p){
+    var prodNames = (p.products||[]).map(function(pid){
+      var pr = products.find(function(x){ return x.id===pid; });
+      return pr ? pr.productName : pid;
+    }).join(', ') || '<span style="color:#aaa;">all / basket-level</span>';
+    return '<tr>'+
+      '<td style="font-weight:bold;">'+p.retailerName+'</td>'+
+      '<td>'+p.name+'</td>'+
+      '<td style="font-size:10px;color:#666;max-width:200px;">'+p.desc+'</td>'+
+      '<td style="font-size:10px;">'+prodNames+'</td>'+
+      '<td style="font-weight:bold;color:#6ab023;text-align:center;">+'+p.gsPerUnit+'</td>'+
+      '<td style="font-size:10px;color:#888;">'+p.startDate+' → '+p.endDate+'</td>'+
+      '<td><span class="pill '+(p.active?'pill-active':'pill-draft')+'">'+(p.active?'active':'inactive')+'</span></td>'+
+      '<td>'+
+        '<button onclick="editPromo(\''+p.id+'\')" class="btn btn-secondary btn-xs">edit</button> '+
+        '<button onclick="deletePromo(\''+p.id+'\')" class="btn btn-danger btn-xs">del</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function openPromoModal(){
+  editingPromoId = null;
+  document.getElementById('promoModalTitle').textContent = 'add retailer promotion';
+  document.getElementById('promoId').value = '';
+  document.getElementById('promoName').value = '';
+  document.getElementById('promoDesc').value = '';
+  document.getElementById('promoGs').value = '';
+  document.getElementById('promoStart').value = '';
+  document.getElementById('promoEnd').value = '';
+  document.getElementById('promoActive').value = 'true';
+  // Populate retailer select
+  document.getElementById('promoRetailer').innerHTML =
+    retailers.filter(function(r){ return r.active; }).map(function(r){
+      return '<option value="'+r.name+'">'+r.name+'</option>';
+    }).join('');
+  // Populate products multi-select
+  document.getElementById('promoProducts').innerHTML =
+    products.filter(function(p){ return p.active; }).map(function(p){
+      return '<option value="'+p.id+'">'+p.productName+' ('+p.brand+')</option>';
+    }).join('');
+  document.getElementById('promoModal').classList.add('open');
+}
+
+function editPromo(id){
+  var p = retailerPromos.find(function(x){ return x.id===id; });
+  if (!p) return;
+  editingPromoId = id;
+  document.getElementById('promoModalTitle').textContent = 'edit promotion';
+  document.getElementById('promoId').value = id;
+  document.getElementById('promoName').value = p.name;
+  document.getElementById('promoDesc').value = p.desc;
+  document.getElementById('promoGs').value = p.gsPerUnit;
+  document.getElementById('promoStart').value = p.startDate;
+  document.getElementById('promoEnd').value = p.endDate;
+  document.getElementById('promoActive').value = String(p.active);
+  document.getElementById('promoRetailer').innerHTML =
+    retailers.filter(function(r){ return r.active; }).map(function(r){
+      return '<option value="'+r.name+'"'+(r.name===p.retailerName?' selected':'')+'>'+r.name+'</option>';
+    }).join('');
+  var sel = document.getElementById('promoProducts');
+  sel.innerHTML = products.filter(function(pr){ return pr.active; }).map(function(pr){
+    return '<option value="'+pr.id+'"'+((p.products||[]).indexOf(pr.id)!==-1?' selected':'')+'>'+pr.productName+' ('+pr.brand+')</option>';
+  }).join('');
+  document.getElementById('promoModal').classList.add('open');
+}
+
+function savePromo(){
+  var name = document.getElementById('promoName').value.trim();
+  if (!name) { alert('Promotion name is required.'); return; }
+  var sel = document.getElementById('promoProducts');
+  var selectedProducts = Array.from(sel.selectedOptions).map(function(o){ return o.value; });
+  var promo = {
+    id:           editingPromoId || genId(retailerPromos, 'PRM'),
+    retailerName: document.getElementById('promoRetailer').value,
+    name:         name,
+    desc:         document.getElementById('promoDesc').value.trim(),
+    products:     selectedProducts,
+    gsPerUnit:    parseInt(document.getElementById('promoGs').value)||0,
+    startDate:    document.getElementById('promoStart').value,
+    endDate:      document.getElementById('promoEnd').value,
+    active:       document.getElementById('promoActive').value === 'true'
+  };
+  if (editingPromoId) {
+    var i = retailerPromos.findIndex(function(x){ return x.id===editingPromoId; });
+    retailerPromos[i] = promo;
+  } else {
+    retailerPromos.push(promo);
+  }
+  persist('promos'); closePromoModal(); renderPromotions();
+}
+
+function deletePromo(id){
+  if (!confirm('Delete this promotion?')) return;
+  retailerPromos = retailerPromos.filter(function(p){ return p.id!==id; });
+  persist('promos'); renderPromotions();
+}
+
+function closePromoModal(){ document.getElementById('promoModal').classList.remove('open'); editingPromoId=null; }
 
 // ── Pins ───────────────────────────────────────────────────────────────────
 function renderAllPins(){

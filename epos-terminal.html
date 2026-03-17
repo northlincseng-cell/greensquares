@@ -88,13 +88,9 @@
     .cp-section { padding: 14px 18px; border-bottom: 1px solid #dde8d0; background: white; }
     .cp-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #aaa; margin-bottom: 10px; }
 
-    /* Member lookup */
-    .member-lookup { display: flex; gap: 8px; align-items: center; }
-    .member-lookup select { flex: 1; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 10px; font-size: 12px; font-family: inherit; background: white; }
-    .member-lookup select:focus { outline: none; border-color: #6ab023; }
     .member-linked-badge { font-size: 10px; background: #e4f0d0; color: #2d5518; padding: 3px 10px; border-radius: 10px; border: 1px solid #b8d898; font-weight: bold; white-space: nowrap; }
 
-    /* Basket */
+    /* Basket scan controls */
     .basket-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .basket-add-select { flex: 1; min-width: 200px; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 10px; font-size: 12px; font-family: inherit; background: white; }
     .basket-add-select:focus { outline: none; border-color: #6ab023; }
@@ -103,36 +99,68 @@
     .basket-value-input { width: 90px; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 9px; font-size: 12px; font-family: inherit; text-align: right; }
     .basket-value-input:focus { outline: none; border-color: #6ab023; }
 
-    /* Basket items */
-    .basket-items { flex: 1; overflow-y: auto; padding: 8px 18px; background: white; }
-    .basket-empty { padding: 28px; text-align: center; color: #bbb; font-size: 11px; }
-    .basket-item { border-bottom: 1px solid #f0f4e8; padding: 9px 0; display: flex; align-items: flex-start; gap: 10px; }
-    .basket-item:last-child { border-bottom: none; }
-    .bi-icon { width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; color: white; margin-top: 1px; }
-    .bi-name { font-size: 12px; color: #1b3410; font-weight: bold; }
-    .bi-brand { font-size: 9px; color: #aaa; margin-top: 1px; }
-    .bi-gs-badge { font-size: 9px; font-weight: bold; padding: 1px 6px; border-radius: 8px; margin-top: 2px; display: inline-block; }
-    .bi-gs-t1 { background: #e4f0d0; color: #2d5518; }
-    .bi-gs-t2 { background: #e0eaff; color: #1a3a88; }
-    .bi-remove { margin-left: auto; background: none; border: none; color: #cc6666; font-size: 16px; cursor: pointer; line-height: 1; padding: 0 2px; flex-shrink: 0; }
-    .bi-remove:hover { color: #cc3333; }
+    /* Promotions panel */
+    .promo-panel { background: linear-gradient(135deg, #1b3410 0%, #0e1e08 100%); border-bottom: 1px solid #2d5518; flex-shrink: 0; display: none; }
+    .promo-panel.show { display: block; }
+    .promo-panel-inner { padding: 10px 18px 12px; }
+    .promo-panel-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+    .promo-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(106,176,35,0.35); border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; display: flex; align-items: flex-start; gap: 12px; }
+    .promo-card:last-child { margin-bottom: 0; }
+    .promo-gs-big { font-size: 18px; font-weight: bold; color: #6ab023; flex-shrink: 0; line-height: 1.2; }
+    .promo-gs-label { font-size: 8px; color: rgba(106,176,35,0.7); text-transform: uppercase; }
+    .promo-name { font-size: 12px; color: white; font-weight: bold; line-height: 1.3; }
+    .promo-desc { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .promo-skus { font-size: 9px; color: rgba(106,176,35,0.75); margin-top: 3px; }
 
-    /* GS totals */
-    .gs-totals { background: #0e1e08; padding: 14px 18px; flex-shrink: 0; }
-    .gs-totals-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
-    .gs-totals-label { font-size: 11px; color: rgba(255,255,255,0.5); }
-    .gs-totals-val { font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.8); }
-    .gs-totals-row.grand { padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(106,176,35,0.3); }
-    .gs-totals-row.grand .gs-totals-label { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: bold; }
+    /* Live till receipt */
+    .live-receipt { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: white; }
+    .rcpt-head { padding: 10px 18px 8px; border-bottom: 1px dashed #dde8d0; background: #fafff6; flex-shrink: 0; }
+    .rcpt-head-store { font-size: 13px; font-weight: bold; color: #1b3410; text-transform: uppercase; letter-spacing: 0.5px; }
+    .rcpt-head-sub { font-size: 9px; color: #aaa; margin-top: 1px; font-family: monospace; }
+    .rcpt-body { flex: 1; overflow-y: auto; }
+    .rcpt-empty { padding: 28px 18px; text-align: center; color: #ccc; font-size: 11px; }
+    .rcpt-line { display: flex; align-items: flex-start; gap: 10px; padding: 9px 18px; border-bottom: 1px solid #f4f8f0; }
+    .rcpt-line.new-scan { animation: scanPulse 1.6s ease-out forwards; }
+    @keyframes scanPulse { 0%{ background:#c8f0a8; } 50%{ background:#e8f8d8; } 100%{ background:transparent; } }
+    .rcpt-icon { width: 28px; height: 28px; border-radius: 4px; font-size: 10px; font-weight: bold; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .rcpt-detail { flex: 1; }
+    .rcpt-prod-name { font-size: 12px; color: #1b3410; font-weight: 600; }
+    .rcpt-prod-sub { font-size: 9px; color: #aaa; margin-top: 1px; font-family: monospace; }
+    .rcpt-tags { margin-top: 5px; display: flex; gap: 4px; flex-wrap: wrap; }
+    .rcpt-tag { font-size: 9px; font-weight: bold; padding: 2px 7px; border-radius: 8px; }
+    .rcpt-tag-t1   { background: #e4f0d0; color: #2d5518; }
+    .rcpt-tag-t2   { background: #e0eaff; color: #1a3a88; }
+    .rcpt-tag-promo{ background: #d4f0b4; color: #1b5e08; border: 1px solid #8ed060; }
+    .rcpt-tag-scan { background: #6ab023; color: white; animation: tagFade 2.2s forwards; }
+    @keyframes tagFade { 0%,60%{ opacity:1; } 100%{ opacity:0; } }
+    .rcpt-remove { background: none; border: none; color: #ddd; font-size: 16px; cursor: pointer; padding: 0; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+    .rcpt-remove:hover { color: #cc3333; }
+    .rcpt-basket-right { text-align: right; flex-shrink: 0; }
+    .rcpt-basket-val { font-size: 12px; color: #555; font-weight: bold; }
+
+    /* GS totals bar */
+    .gs-totals { background: #0e1e08; padding: 12px 18px; flex-shrink: 0; }
+    .gs-totals-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+    .gs-totals-label { font-size: 10px; color: rgba(255,255,255,0.5); }
+    .gs-totals-val { font-size: 12px; font-weight: bold; color: rgba(255,255,255,0.8); }
+    .gs-totals-row.promo-row .gs-totals-label { color: rgba(130,210,80,0.8); }
+    .gs-totals-row.promo-row .gs-totals-val { color: #8ed060; }
+    .gs-totals-row.grand { padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(106,176,35,0.4); }
+    .gs-totals-row.grand .gs-totals-label { font-size: 12px; color: white; font-weight: bold; }
     .gs-totals-row.grand .gs-totals-val { font-size: 22px; color: #6ab023; font-weight: bold; }
 
-    /* Complete button */
-    .complete-wrap { padding: 14px 18px; background: white; border-top: 1px solid #dde8d0; display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
-    .btn-complete { flex: 1; background: #6ab023; color: white; border: none; border-radius: 6px; padding: 13px 20px; font-size: 14px; font-family: inherit; text-transform: lowercase; cursor: pointer; font-weight: bold; transition: background 0.12s; }
+    /* Payment section */
+    .payment-section { background: #f8fdf2; border-top: 2px solid #c8e0a8; padding: 13px 18px; flex-shrink: 0; }
+    .payment-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #6ab023; font-weight: bold; margin-bottom: 9px; }
+    .payment-member { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .payment-member select { flex: 1; min-width: 180px; border: 1.5px solid #ccd8b8; border-radius: 5px; padding: 8px 10px; font-size: 13px; font-family: inherit; background: white; cursor: pointer; }
+    .payment-member select:focus { outline: none; border-color: #6ab023; }
+    .payment-actions { display: flex; gap: 10px; }
+    .btn-complete { flex: 1; background: #6ab023; color: white; border: none; border-radius: 6px; padding: 13px 20px; font-size: 15px; font-family: inherit; text-transform: lowercase; cursor: pointer; font-weight: bold; transition: background 0.12s; }
     .btn-complete:hover { background: #5a9a1d; }
     .btn-complete:disabled { background: #aaa; cursor: not-allowed; }
-    .btn-clear { background: white; color: #cc5533; border: 1px solid #ffcccc; border-radius: 6px; padding: 13px 16px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; transition: all 0.12s; }
-    .btn-clear:hover { background: #fff5f0; }
+    .btn-void { background: white; color: #cc5533; border: 1px solid #ffcccc; border-radius: 6px; padding: 13px 16px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; transition: all 0.12s; }
+    .btn-void:hover { background: #fff5f0; }
 
     /* Dev panel */
     .dev-panel { background: #0a0e06; border-top: 1px solid #1a2a10; flex-shrink: 0; }
@@ -245,7 +273,7 @@
   <!-- ── Cashier pane ── -->
   <div class="cashier-pane">
 
-    <!-- Session setup header -->
+    <!-- Session setup: retailer only -->
     <div class="cp-session">
       <div class="cp-session-field">
         <div class="cp-session-label">retailer</div>
@@ -253,60 +281,75 @@
           <option value="">— select retailer —</option>
         </select>
       </div>
-      <div class="cp-session-field">
-        <div class="cp-session-label">member account</div>
-        <div class="cp-session-member-row">
-          <select class="cp-session-select" id="memberLookup" onchange="quickLinkMember(this.value)" style="flex:1;">
-            <option value="">— no member linked —</option>
-          </select>
-          <span class="member-linked-badge" id="memberBadge" style="display:none;">linked ✓</span>
-          <a href="account.html" id="viewAccountLink" class="btn btn-secondary btn-xs" style="display:none;" target="_blank">view account ↗</a>
-        </div>
-      </div>
       <div class="cp-session-status">
         <span class="session-status session-ready" id="sessionStatus">ready</span>
       </div>
     </div>
 
-    <!-- Basket builder -->
+    <!-- Active retailer promotions -->
+    <div class="promo-panel" id="promoPanel">
+      <div class="promo-panel-inner" id="promoPanelInner"></div>
+    </div>
+
+    <!-- Scan section -->
     <div class="cp-section">
-      <div class="cp-section-title">add to basket</div>
+      <div class="cp-section-title">scan items</div>
       <div class="basket-controls">
         <select class="basket-add-select" id="productPicker" onchange="addProduct(this.value)">
           <option value="">— scan / add GS product —</option>
         </select>
         <div class="basket-value-wrap">
-          <label>basket value £</label>
+          <label>basket total £</label>
           <input type="number" class="basket-value-input" id="basketValue" min="0" step="0.01" placeholder="0.00" oninput="recalc()">
         </div>
       </div>
     </div>
 
-    <!-- Basket items -->
-    <div class="basket-items" id="basketItems">
-      <div class="basket-empty" id="basketEmpty">no items yet — scan a product or enter basket value to begin</div>
+    <!-- Live till receipt -->
+    <div class="live-receipt">
+      <div class="rcpt-head" id="rcptHead" style="display:none;">
+        <div class="rcpt-head-store" id="rcptHeadStore">—</div>
+        <div class="rcpt-head-sub" id="rcptHeadSub">TILL RECEIPT</div>
+      </div>
+      <div class="rcpt-body" id="rcptBody">
+        <div class="rcpt-empty">select a retailer, then scan products or enter basket value</div>
+      </div>
     </div>
 
     <!-- GS totals -->
     <div class="gs-totals">
       <div class="gs-totals-row">
-        <span class="gs-totals-label">tier 1 — basket value (£<span id="totBasket">0.00</span> × <span id="totRate">—</span> GS/£)</span>
+        <span class="gs-totals-label">TIER 1 · basket £<span id="totBasket">0.00</span> × <span id="totRate">—</span> GS/£</span>
         <span class="gs-totals-val" id="totT1">0 GS</span>
       </div>
       <div class="gs-totals-row">
-        <span class="gs-totals-label">tier 2 — brand product GS</span>
+        <span class="gs-totals-label">TIER 2 · brand product GS</span>
         <span class="gs-totals-val" id="totT2">0 GS</span>
       </div>
+      <div class="gs-totals-row promo-row" id="totPromoRow" style="display:none;">
+        <span class="gs-totals-label">🌿 RETAILER PROMO · <span id="totPromoName">—</span></span>
+        <span class="gs-totals-val" id="totPromo">0 GS</span>
+      </div>
       <div class="gs-totals-row grand">
-        <span class="gs-totals-label">🌿 total green squares this transaction</span>
+        <span class="gs-totals-label">🌿 TOTAL GREEN SQUARES</span>
         <span class="gs-totals-val" id="totGrand">0</span>
       </div>
     </div>
 
-    <!-- Complete -->
-    <div class="complete-wrap">
-      <button class="btn-complete" id="btnComplete" onclick="completeTransaction()">✓ complete transaction</button>
-      <button class="btn-clear" onclick="clearBasket()">✕ clear</button>
+    <!-- Payment + loyalty card -->
+    <div class="payment-section">
+      <div class="payment-title">💳 payment — loyalty card</div>
+      <div class="payment-member">
+        <select id="memberLookup" onchange="quickLinkMember(this.value)">
+          <option value="">— does customer have a loyalty card? —</option>
+        </select>
+        <span class="member-linked-badge" id="memberBadge" style="display:none;">linked ✓</span>
+        <a href="account.html" id="viewAccountLink" class="btn btn-secondary btn-xs" style="display:none;" target="_blank">view account ↗</a>
+      </div>
+      <div class="payment-actions">
+        <button class="btn-complete" id="btnComplete" onclick="completeTransaction()">✓ sale complete</button>
+        <button class="btn-void" onclick="clearBasket()">✕ void</button>
+      </div>
     </div>
 
     <!-- Dev panel -->
@@ -359,16 +402,25 @@ var defaultMemberTxns = [
   { id:'TXN008', memberId:'MEM003', retailer:'Thomas Cook', date:'2026-03-01', time:'10:00', gsEarned:420, basketValue:1240.0,t1Gs:420, t2Gs:0,   products:[] }
 ];
 
+var defaultRetailerPromos = [
+  { id:'PRM001', retailerName:"Sainsbury's", name:'Green Week',        desc:"Sainsbury's commits to conservation — bonus GS on our eco range this week", products:['PRD001','PRD005','PRD006'], gsPerUnit:20, startDate:'2026-03-15', endDate:'2026-03-28', active:true },
+  { id:'PRM002', retailerName:'Currys',      name:'Tech for Tomorrow', desc:'Currys partners with MGS — extra GS on all Samsung products',               products:['PRD003','PRD004'],           gsPerUnit:50, startDate:'2026-03-01', endDate:'2026-04-30', active:true },
+  { id:'PRM003', retailerName:'ASDA',        name:'ASDA Green Basket', desc:'Earn bonus GS on selected eco-friendly products every week',                 products:['PRD002','PRD005'],           gsPerUnit:15, startDate:'2026-03-10', endDate:'2026-03-31', active:true },
+  { id:'PRM004', retailerName:'Sky',         name:'Sky Zero Pledge',   desc:'Sky pledges carbon neutrality — earn extra GS when you renew or upgrade',   products:[],                            gsPerUnit:0,  startDate:'2026-01-01', endDate:'2026-12-31', active:false },
+  { id:'PRM005', retailerName:'Thomas Cook', name:'Green Holidays',    desc:'Thomas Cook: every holiday booking earns bonus GS for rainforest protection',products:[],                            gsPerUnit:0,  startDate:'2026-04-01', endDate:'2026-09-30', active:false }
+];
+
 // ── State ─────────────────────────────────────────────────────────────────────
 function safeLoad(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e) { return fallback; }
 }
-var members     = safeLoad('mgs_members',     defaultMembers);
-var allProducts = safeLoad('mgs_products',    defaultProducts);
-var memberTxns  = safeLoad('mgs_member_txns', defaultMemberTxns);
+var members        = safeLoad('mgs_members',          defaultMembers);
+var allProducts    = safeLoad('mgs_products',         defaultProducts);
+var memberTxns     = safeLoad('mgs_member_txns',      defaultMemberTxns);
+var retailerPromos = safeLoad('mgs_retailer_promos',  defaultRetailerPromos);
 var currentRetailer = null;
 var currentMember   = null;
-var basketItems     = [];   // brand products scanned
+var basketItems     = [];
 var clockTimer;
 
 // ── Boot ─────────────────────────────────────────────────────────────────────
@@ -454,8 +506,47 @@ function onRetailerChange() {
     document.getElementById('cdTagline').textContent = 'select a retailer to begin';
     document.getElementById('cdMessage').textContent = 'earning green squares at every shop — helping protect the amazon rainforest';
     document.getElementById('totRate').textContent = '—';
+    document.getElementById('rcptHead').style.display = 'none';
   }
+  // Update receipt header
+  if (currentRetailer) {
+    document.getElementById('rcptHead').style.display = '';
+    document.getElementById('rcptHeadStore').textContent = name;
+    document.getElementById('rcptHeadSub').textContent =
+      new Date().toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) + '   TILL RECEIPT';
+  }
+  updatePromoPanel();
   recalc();
+}
+
+// ── Promotions panel ──────────────────────────────────────────────────────────
+function updatePromoPanel() {
+  var panel = document.getElementById('promoPanel');
+  var inner = document.getElementById('promoPanelInner');
+  if (!currentRetailer) { panel.classList.remove('show'); return; }
+  var activePromos = retailerPromos.filter(function(p){
+    return p.retailerName === currentRetailer.name && p.active && p.products.length > 0;
+  });
+  if (!activePromos.length) { panel.classList.remove('show'); return; }
+  panel.classList.add('show');
+  inner.innerHTML = '<div class="promo-panel-title">🌿 active promotions — '+currentRetailer.name+'</div>' +
+    activePromos.map(function(p){
+      var prodNames = p.products.map(function(pid){
+        var pr = allProducts.find(function(x){ return x.id===pid; });
+        return pr ? pr.productName : pid;
+      }).join(' · ');
+      return '<div class="promo-card">'+
+        '<div style="flex-shrink:0;text-align:center;">'+
+          '<div class="promo-gs-big">+'+p.gsPerUnit+'</div>'+
+          '<div class="promo-gs-label">GS / item</div>'+
+        '</div>'+
+        '<div>'+
+          '<div class="promo-name">'+p.name+'</div>'+
+          '<div class="promo-desc">'+p.desc+'</div>'+
+          '<div class="promo-skus">Eligible products: '+prodNames+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
 }
 
 function quickLinkMember(id) {
@@ -499,49 +590,70 @@ function addProduct(id) {
   if (!id) return;
   var prd = allProducts.find(function(p){ return p.id===id; });
   if (!prd) return;
-  // allow duplicates (same product scanned twice)
-  basketItems.push(JSON.parse(JSON.stringify(prd)));
+  prd = JSON.parse(JSON.stringify(prd));
+  // Check for active retailer promotion on this product
+  prd._promo = null;
+  if (currentRetailer) {
+    prd._promo = retailerPromos.find(function(p){
+      return p.retailerName === currentRetailer.name && p.active && p.products.indexOf(prd.id) !== -1;
+    }) || null;
+  }
+  var newIdx = basketItems.length;
+  basketItems.push(prd);
   document.getElementById('productPicker').value = '';
-  renderBasket();
+  renderReceipt(newIdx);
   recalc();
 }
 
 function removeBasketItem(idx) {
   basketItems.splice(idx, 1);
-  renderBasket();
+  renderReceipt();
   recalc();
 }
 
-function renderBasket() {
-  var el = document.getElementById('basketItems');
-  var empty = document.getElementById('basketEmpty');
-  if (!basketItems.length) {
-    empty.style.display = '';
-    el.innerHTML = '';
-    el.appendChild(empty);
+function renderReceipt(newIdx) {
+  var body = document.getElementById('rcptBody');
+  var basketVal = parseFloat(document.getElementById('basketValue').value)||0;
+  var t1 = currentRetailer ? Math.round(basketVal * currentRetailer.gsPerTxn) : 0;
+
+  if (!basketItems.length && !basketVal && !currentRetailer) {
+    body.innerHTML = '<div class="rcpt-empty">select a retailer, then scan products or enter basket value</div>';
     return;
   }
-  empty.style.display = 'none';
-  el.innerHTML = basketItems.map(function(p, i){
-    return '<div class="basket-item">'+
-      '<div class="bi-icon" style="background:'+(p.color||'#6ab023')+'">'+p.brand.slice(0,2).toUpperCase()+'</div>'+
-      '<div style="flex:1;">'+
-        '<div class="bi-name">'+p.productName+'</div>'+
-        '<div class="bi-brand">'+p.brand+' · '+p.sku+'</div>'+
-        '<span class="bi-gs-badge bi-gs-t2">🔵 +'+p.gsPerUnit+' GS (Tier 2)</span>'+
+
+  var html = '';
+
+  // Basket value / own-brand line (Tier 1)
+  if (currentRetailer) {
+    html += '<div class="rcpt-line">'+
+      '<div class="rcpt-icon" style="background:'+currentRetailer.bg+'">OB</div>'+
+      '<div class="rcpt-detail">'+
+        '<div class="rcpt-prod-name">Groceries &amp; own brands</div>'+
+        '<div class="rcpt-prod-sub">basket value: £'+basketVal.toFixed(2)+'</div>'+
+        '<div class="rcpt-tags"><span class="rcpt-tag rcpt-tag-t1" id="basketGsTag">🌿 +'+fmt(t1)+' GS (Tier 1 · '+currentRetailer.gsPerTxn+' GS/£)</span></div>'+
       '</div>'+
-      '<button class="bi-remove" onclick="removeBasketItem('+i+')">×</button>'+
+      '<div class="rcpt-basket-right"><div class="rcpt-basket-val">£'+basketVal.toFixed(2)+'</div></div>'+
+    '</div>';
+  }
+
+  // Scanned GS products
+  html += basketItems.map(function(p, i){
+    var isNew = (i === newIdx);
+    var tags = '<span class="rcpt-tag rcpt-tag-t2">🔵 +'+p.gsPerUnit+' GS ('+p.brand+')</span>';
+    if (p._promo) tags += ' <span class="rcpt-tag rcpt-tag-promo">🌿 +'+p._promo.gsPerUnit+' GS — '+p._promo.name+'</span>';
+    if (isNew) tags += ' <span class="rcpt-tag rcpt-tag-scan">SCANNED ✓</span>';
+    return '<div class="rcpt-line'+(isNew?' new-scan':'')+'">'+
+      '<div class="rcpt-icon" style="background:'+(p.color||'#6ab023')+'">'+p.brand.slice(0,2).toUpperCase()+'</div>'+
+      '<div class="rcpt-detail">'+
+        '<div class="rcpt-prod-name">'+p.productName+'</div>'+
+        '<div class="rcpt-prod-sub">'+p.sku+' · '+p.brand+'</div>'+
+        '<div class="rcpt-tags">'+tags+'</div>'+
+      '</div>'+
+      '<button class="rcpt-remove" onclick="removeBasketItem('+i+')">×</button>'+
     '</div>';
   }).join('');
-  // Add basket row placeholder
-  el.innerHTML += '<div class="basket-item" style="background:#fafdf7;">'+
-    '<div class="bi-icon" style="background:'+(currentRetailer?currentRetailer.bg:'#6ab023')+'">OB</div>'+
-    '<div style="flex:1;">'+
-      '<div class="bi-name">own brands &amp; other items</div>'+
-      '<div class="bi-brand">basket value entered above</div>'+
-      '<span class="bi-gs-badge bi-gs-t1" id="basketGsBadge">🌿 +0 GS (Tier 1)</span>'+
-    '</div>'+
-  '</div>';
+
+  body.innerHTML = html || '<div class="rcpt-empty">enter basket value or scan a GS product</div>';
 }
 
 function clearBasket() {
@@ -552,7 +664,7 @@ function clearBasket() {
   document.getElementById('memberBadge').style.display = 'none';
   document.getElementById('viewAccountLink').style.display = 'none';
   updateCustomerMember();
-  renderBasket();
+  renderReceipt();
   recalc();
   document.getElementById('sessionStatus').className = 'session-status session-ready';
   document.getElementById('sessionStatus').textContent = 'ready';
@@ -561,30 +673,43 @@ function clearBasket() {
 // ── GS calculation ────────────────────────────────────────────────────────────
 function recalc() {
   var basketVal = parseFloat(document.getElementById('basketValue').value)||0;
-  var rate = currentRetailer ? currentRetailer.gsPerTxn : 0;
-  var t1 = currentRetailer ? Math.round(basketVal * rate) : 0;
-  var t2 = basketItems.reduce(function(s,p){ return s+p.gsPerUnit; }, 0);
-  var grand = t1 + t2;
+  var rate  = currentRetailer ? currentRetailer.gsPerTxn : 0;
+  var t1    = currentRetailer ? Math.round(basketVal * rate) : 0;
+  var t2    = basketItems.reduce(function(s,p){ return s+p.gsPerUnit; }, 0);
+  var tPromo= basketItems.reduce(function(s,p){ return s+(p._promo?p._promo.gsPerUnit:0); }, 0);
+  var grand = t1 + t2 + tPromo;
 
   // Customer display
-  var liveEl = document.getElementById('cdGsLive');
-  liveEl.textContent = fmt(grand);
+  document.getElementById('cdGsLive').textContent = fmt(grand);
   document.getElementById('cdT1').textContent = fmt(t1)+' GS';
-  document.getElementById('cdT2').textContent = fmt(t2)+' GS';
+  document.getElementById('cdT2').textContent = fmt(t2+tPromo)+' GS';
   document.getElementById('cdTotal').textContent = fmt(grand)+' GS';
 
-  // Totals pane
+  // Totals bar
   document.getElementById('totBasket').textContent = basketVal.toFixed(2);
+  document.getElementById('totRate').textContent = rate||'—';
   document.getElementById('totT1').textContent = fmt(t1)+' GS';
   document.getElementById('totT2').textContent = fmt(t2)+' GS';
   document.getElementById('totGrand').textContent = fmt(grand);
 
-  // Badge on basket row
-  var badge = document.getElementById('basketGsBadge');
-  if (badge) badge.textContent = '🌿 +'+fmt(t1)+' GS (Tier 1)';
+  // Promo row
+  var promoRow = document.getElementById('totPromoRow');
+  if (tPromo > 0) {
+    var promoNames = basketItems.filter(function(p){ return p._promo; })
+      .map(function(p){ return p._promo.name; })
+      .filter(function(v,i,a){ return a.indexOf(v)===i; }).join(', ');
+    document.getElementById('totPromoName').textContent = promoNames;
+    document.getElementById('totPromo').textContent = fmt(tPromo)+' GS';
+    promoRow.style.display = '';
+  } else {
+    promoRow.style.display = 'none';
+  }
 
-  // Update dev panel if open
-  updateDevPanel(t1, t2, grand, basketVal);
+  // Update basket GS tag in receipt without re-rendering
+  var tag = document.getElementById('basketGsTag');
+  if (tag) tag.textContent = '🌿 +'+fmt(t1)+' GS (Tier 1 · '+rate+' GS/£)';
+
+  updateDevPanel(t1, t2+tPromo, grand, basketVal);
 }
 
 // ── Complete transaction ──────────────────────────────────────────────────────
@@ -593,10 +718,11 @@ function completeTransaction() {
   if (!currentRetailer) { alert('Select a retailer first.'); return; }
   if (basketVal <= 0 && basketItems.length === 0) { alert('Enter a basket value or scan a product first.'); return; }
 
-  var rate = currentRetailer.gsPerTxn;
-  var t1   = Math.round(basketVal * rate);
-  var t2   = basketItems.reduce(function(s,p){ return s+p.gsPerUnit; }, 0);
-  var grand= t1 + t2;
+  var rate   = currentRetailer.gsPerTxn;
+  var t1     = Math.round(basketVal * rate);
+  var t2     = basketItems.reduce(function(s,p){ return s+p.gsPerUnit; }, 0);
+  var tPromo = basketItems.reduce(function(s,p){ return s+(p._promo?p._promo.gsPerUnit:0); }, 0);
+  var grand  = t1 + t2 + tPromo;
   var now  = new Date();
   var txnId = 'TXN'+Date.now();
 
@@ -613,7 +739,8 @@ function completeTransaction() {
     basketValue: basketVal,
     t1Gs:        t1,
     t2Gs:        t2,
-    products:    basketItems.map(function(p){ return {name:p.productName, sku:p.sku, gs:p.gsPerUnit, brand:p.brand}; }),
+    promoGs:     tPromo,
+    products:    basketItems.map(function(p){ return {name:p.productName, sku:p.sku, gs:p.gsPerUnit, brand:p.brand, promoGs:p._promo?p._promo.gsPerUnit:0, promo:p._promo?p._promo.name:null}; }),
     timestamp:   now.toISOString(),
     campaignId:  currentRetailer.camId
   };
