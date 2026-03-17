@@ -16,10 +16,10 @@
     .topbar-divider { width: 1px; height: 22px; background: #333; margin: 0 4px; }
     .topbar-select { background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: white; font-size: 12px; padding: 5px 10px; font-family: inherit; cursor: pointer; }
     .topbar-select option { background: #1a1a1a; }
-    .topbar-field-label { font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
+    .topbar-field-label { font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.65); letter-spacing: 0.5px; }
     .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-    .topbar-clock { font-size: 11px; color: rgba(255,255,255,0.3); font-family: monospace; }
-    .topbar-links a { color: rgba(255,255,255,0.35); font-size: 10px; text-decoration: none; padding: 3px 7px; border-radius: 3px; transition: all 0.12s; }
+    .topbar-clock { font-size: 11px; color: rgba(255,255,255,0.6); font-family: monospace; }
+    .topbar-links a { color: rgba(255,255,255,0.6); font-size: 10px; text-decoration: none; padding: 3px 7px; border-radius: 3px; transition: all 0.12s; }
     .topbar-links a:hover { color: white; background: rgba(255,255,255,0.08); }
     .session-status { font-size: 9px; padding: 3px 9px; border-radius: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
     .session-ready    { background: rgba(106,176,35,0.2); color: #6ab023; border: 1px solid rgba(106,176,35,0.3); }
@@ -357,9 +357,12 @@ var defaultMemberTxns = [
 ];
 
 // ── State ─────────────────────────────────────────────────────────────────────
-var members     = JSON.parse(localStorage.getItem('mgs_members'))      || defaultMembers;
-var allProducts = JSON.parse(localStorage.getItem('mgs_products'))     || defaultProducts;
-var memberTxns  = JSON.parse(localStorage.getItem('mgs_member_txns'))  || defaultMemberTxns;
+function safeLoad(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e) { return fallback; }
+}
+var members     = safeLoad('mgs_members',     defaultMembers);
+var allProducts = safeLoad('mgs_products',    defaultProducts);
+var memberTxns  = safeLoad('mgs_member_txns', defaultMemberTxns);
 var currentRetailer = null;
 var currentMember   = null;
 var basketItems     = [];   // brand products scanned

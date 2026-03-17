@@ -345,9 +345,12 @@ var defaultProjects = [
 
 var DOTS = { "Sainsbury's":'#f06c00', 'ASDA':'#78be20', 'Currys':'#002d62', 'Thomas Cook':'#003087', 'Sky':'#0072c9', 'H&M':'#e4003a' };
 
-var members = JSON.parse(localStorage.getItem('mgs_members'))      || defaultMembers;
-var memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
-var redeemHistory = JSON.parse(localStorage.getItem('mgs_redeems')) || [];
+function safeLoad(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e) { return fallback; }
+}
+var members = safeLoad('mgs_members', defaultMembers);
+var memberTxns = safeLoad('mgs_member_txns', defaultMemberTxns);
+var redeemHistory = safeLoad('mgs_redeems', []);
 var currentMem = null;
 var toastTimer = null;
 
