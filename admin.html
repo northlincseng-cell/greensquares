@@ -262,7 +262,7 @@
               <span class="panel-title">tier 1 — retailer campaigns</span>
               <span class="tier-badge tier-retailer">retailer</span>
             </div>
-            <table class="data-table"><thead><tr><th>client</th><th>contracted</th><th>issued</th><th>progress</th><th>status</th></tr></thead>
+            <table class="data-table"><thead><tr><th>client</th><th>contracted</th><th>issued</th><th>progress</th><th>status</th><th></th></tr></thead>
             <tbody id="ovRetailerBody"></tbody></table>
           </div>
           <div class="panel">
@@ -851,9 +851,11 @@ function renderOverview() {
   // Tier 1 table
   document.getElementById('ovRetailerBody').innerHTML = t1.map(function(c){
     var p=pct(c.gsIssued,c.contractedGs);
+    var ret=retailers.find(function(x){return x.name===c.clientName;}); var rid=ret?ret.id:'';
     return '<tr><td><strong>'+c.clientName+'</strong></td><td>'+fmt(c.contractedGs)+'</td><td>'+fmt(c.gsIssued)+'</td>'+
       '<td><div class="prog-bar" style="width:80px;display:inline-block;vertical-align:middle"><div class="prog-fill" style="width:'+p+'%"></div></div> <span style="font-size:10px;color:#aaa">'+p+'%</span></td>'+
-      '<td><span class="pill pill-'+c.status+'">'+c.status+'</span></td></tr>';
+      '<td><span class="pill pill-'+c.status+'">'+c.status+'</span></td>'+
+      '<td>'+(rid?'<a href="retailer-analytics.html?id='+rid+'" class="btn btn-secondary btn-xs">📊</a>':'')+'</td></tr>';
   }).join('');
 
   // Tier 2 table
@@ -1301,7 +1303,8 @@ function renderRetailers(){
       '</div>'+
       (cams?'<div style="font-size:10px;color:#6ab023;">'+cams+' active own campaign'+(cams>1?'s':'')+'</div>':'<div style="font-size:10px;color:#aaa;">no own campaign</div>')+
       (brandRels?'<div style="font-size:10px;color:#1a3a88;">🔗 '+brandRels+' brand relationship'+(brandRels>1?'s':'')+'</div>':'')+
-      '<div style="display:flex;gap:4px;">'+
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;">'+
+        '<a href="retailer-analytics.html?id='+r.id+'" class="btn btn-primary btn-xs">📊 analytics</a>'+
         '<button onclick="editRetailer(\''+r.id+'\')" class="btn btn-secondary btn-xs">edit</button>'+
         '<button onclick="deleteRetailer(\''+r.id+'\')" class="btn btn-danger btn-xs">del</button>'+
       '</div></div>';

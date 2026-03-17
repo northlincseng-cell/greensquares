@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MGS — Retailer Analytics</title>
+  <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-primary,'Helvetica Neue',Arial,sans-serif); font-size: 13px; color: #333; background: #eef2e8; height: 100vh; overflow: hidden; }
+    .shell { display: flex; height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 200px; flex-shrink: 0; background: #1b3410; display: flex; flex-direction: column; }
+    .sidebar-logo { padding: 14px 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px; }
+    .sidebar-logo img { height: 30px; }
+    .sidebar-logo-text { color: rgba(255,255,255,0.55); font-size: 9px; line-height: 1.4; text-transform: lowercase; }
+    .sidebar-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.28); padding: 12px 14px 4px; }
+    .retailer-list { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .ret-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; color: rgba(255,255,255,0.58); font-size: 11px; text-transform: lowercase; cursor: pointer; border-left: 3px solid transparent; transition: all 0.12s; }
+    .ret-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
+    .ret-item.active { background: rgba(106,176,35,0.22); color: white; border-left-color: #6ab023; }
+    .ret-item .ret-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .ret-item .ret-cat { font-size: 9px; color: rgba(255,255,255,0.28); margin-top: 1px; }
+    .ret-dot-active   { background: #6ab023; }
+    .ret-dot-inactive { background: #666; }
+    .ret-dot-nocam    { background: #f0a500; }
+    .sidebar-footer { padding: 10px 14px 12px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: block; color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none; padding: 4px 0; cursor: pointer; }
+    .sidebar-footer a:hover { color: rgba(255,255,255,0.85); }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    .topbar { background: white; border-bottom: 1px solid #dde8d0; padding: 0 22px; height: 50px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-retailer { font-size: 16px; color: #1b3410; text-transform: lowercase; font-weight: normal; }
+    .topbar-period { font-size: 10px; color: #999; background: #f0f6e8; padding: 2px 8px; border-radius: 10px; border: 1px solid #ccd8b8; }
+    .content { flex: 1; overflow-y: auto; padding: 18px 22px 40px; }
+
+    /* ── Category badge ── */
+    .cat-badge { font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 10px; }
+    .cat-grocery    { background: #e4f0d0; color: #2d5518; }
+    .cat-electrical { background: #ede0ff; color: #6600cc; }
+    .cat-telecoms   { background: #e0eaff; color: #2244aa; }
+    .cat-travel     { background: #fff3e0; color: #885500; }
+    .cat-fashion    { background: #ffe0ec; color: #881144; }
+    .cat-other      { background: #f0f0f0; color: #555; }
+
+    /* ── Summary banner ── */
+    .summary-banner { background: linear-gradient(135deg, #1b3410 60%, #2d5518); border-radius: 8px; padding: 16px 20px; color: white; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .sb-left { }
+    .sb-retailer { font-size: 22px; margin-bottom: 4px; }
+    .sb-tagline { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.5; max-width: 540px; }
+    .sb-right { text-align: right; flex-shrink: 0; }
+    .sb-big { font-size: 28px; font-weight: bold; color: #6ab023; line-height: 1; }
+    .sb-big-lbl { font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.5); letter-spacing: 0.5px; }
+    .tier-badges { display: flex; gap: 5px; margin-top: 6px; }
+    .tier-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: bold; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; }
+    .tier-retailer { background: rgba(106,176,35,0.25); color: #b8f068; border: 1px solid rgba(106,176,35,0.4); }
+    .tier-brand    { background: rgba(80,140,255,0.2); color: #90b8ff; border: 1px solid rgba(80,140,255,0.35); }
+
+    /* ── KPI ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 11px; margin-bottom: 16px; }
+    .kpi-card { background: white; border-radius: 7px; padding: 13px 14px; border: 1px solid #dde8d0; }
+    .kpi-card.hi  { background: #6ab023; border-color: #5a9a1d; }
+    .kpi-card.mid { background: #2d5518; border-color: #1b3410; }
+    .kpi-card.amb { background: #c87800; border-color: #a06000; }
+    .kpi-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; color: #999; margin-bottom: 4px; }
+    .kpi-card.hi .kpi-label, .kpi-card.mid .kpi-label, .kpi-card.amb .kpi-label { color: rgba(255,255,255,0.65); }
+    .kpi-value { font-size: 22px; font-weight: bold; color: #1b3410; line-height: 1; margin-bottom: 3px; }
+    .kpi-card.hi .kpi-value, .kpi-card.mid .kpi-value, .kpi-card.amb .kpi-value { color: white; }
+    .kpi-sub { font-size: 10px; color: #bbb; }
+    .kpi-card.hi .kpi-sub, .kpi-card.mid .kpi-sub, .kpi-card.amb .kpi-sub { color: rgba(255,255,255,0.55); }
+    .kpi-prog { margin-top: 6px; }
+    .kpi-prog-bar { background: rgba(0,0,0,0.12); border-radius: 3px; height: 4px; overflow: hidden; }
+    .kpi-prog-fill { background: rgba(255,255,255,0.8); height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+    /* ── Panel ── */
+    .panel { background: white; border-radius: 7px; border: 1px solid #dde8d0; overflow: hidden; margin-bottom: 14px; }
+    .panel-header { padding: 10px 14px; border-bottom: 1px solid #eef2e8; display: flex; align-items: center; justify-content: space-between; background: #fafcf7; }
+    .panel-title { font-size: 12px; font-weight: bold; color: #1b3410; text-transform: lowercase; }
+    .panel-subtitle { font-size: 10px; color: #aaa; }
+    .panel-body { padding: 14px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 14px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; margin-bottom: 14px; }
+
+    /* ── Funnel chart ── */
+    .funnel { display: flex; flex-direction: column; gap: 8px; }
+    .funnel-row { display: flex; align-items: center; gap: 10px; }
+    .funnel-label { font-size: 10px; color: #555; text-transform: lowercase; width: 180px; flex-shrink: 0; text-align: right; }
+    .funnel-bar-wrap { flex: 1; background: #eef2e8; border-radius: 4px; height: 22px; overflow: hidden; position: relative; }
+    .funnel-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; transition: width 0.7s ease; }
+    .funnel-bar-val { font-size: 10px; font-weight: bold; color: white; white-space: nowrap; }
+    .funnel-pct { font-size: 10px; color: #888; width: 42px; flex-shrink: 0; text-align: right; }
+    .funnel-arrow { font-size: 9px; color: #ccc; text-align: center; margin-left: 190px; }
+    .fb-total   { background: #1b3410; }
+    .fb-eligible{ background: #4a8820; }
+    .fb-issued  { background: #6ab023; }
+    .fb-redeemed{ background: #94cc46; }
+
+    /* ── Redemption breakdown ── */
+    .redeem-bars { display: flex; flex-direction: column; gap: 12px; margin-top: 4px; }
+    .rb-row { }
+    .rb-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .rb-label { font-size: 11px; color: #333; }
+    .rb-pct { font-size: 14px; font-weight: bold; }
+    .rb-count { font-size: 10px; color: #aaa; }
+    .rb-bar { height: 10px; border-radius: 5px; background: #eef2e8; overflow: hidden; }
+    .rb-fill { height: 100%; border-radius: 5px; transition: width 0.7s ease; }
+    .rb-epos  { color: #2d5518; }
+    .rb-out   { color: #1a3a88; }
+    .rb-pend  { color: #c87800; }
+    .fill-epos { background: #6ab023; }
+    .fill-out  { background: #3a6acc; }
+    .fill-pend { background: #f0a500; }
+    .rb-detail { font-size: 9px; color: #aaa; margin-top: 2px; line-height: 1.45; }
+
+    /* ── Stat row ── */
+    .stat-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .stat-box { flex: 1; background: #f6faf0; border: 1px solid #e0ecd0; border-radius: 6px; padding: 10px 12px; }
+    .stat-box.blue { background: #f0f4ff; border-color: #c8d4f0; }
+    .stat-box.amber { background: #fff8ed; border-color: #f0d8a0; }
+    .stat-icon { font-size: 14px; margin-bottom: 4px; }
+    .stat-val { font-size: 18px; font-weight: bold; color: #1b3410; line-height: 1; }
+    .stat-lbl { font-size: 9px; text-transform: uppercase; color: #aaa; margin-top: 2px; letter-spacing: 0.4px; }
+    .stat-box.blue .stat-val { color: #1a3a88; }
+    .stat-box.amber .stat-val { color: #8a5000; }
+
+    /* ── Data table ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .data-table th { text-align: left; padding: 7px 11px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; border-bottom: 2px solid #eef2e8; background: #fafcf7; font-weight: normal; white-space: nowrap; }
+    .data-table td { padding: 8px 11px; border-bottom: 1px solid #f5f7f2; vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #fafdf7; }
+    .prog-bar { background: #e4f0d0; border-radius: 3px; height: 6px; overflow: hidden; display: inline-block; vertical-align: middle; }
+    .prog-fill { background: #6ab023; height: 100%; border-radius: 3px; }
+
+    /* ── Pills / badges ── */
+    .pill { font-size: 9px; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; font-weight: bold; }
+    .pill-active   { background: #6ab023; color: white; }
+    .pill-complete { background: #3c3c28; color: rgba(255,255,255,0.7); }
+    .pill-paused   { background: #f0a500; color: white; }
+    .pill-draft    { background: #aaa; color: white; }
+    .pill-approved { background: #6ab023; color: white; }
+    .pill-pending  { background: #f0a500; color: white; }
+
+    /* ── ROI panel ── */
+    .roi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 11px; margin-bottom: 14px; }
+    .roi-card { background: #1b3410; border-radius: 7px; padding: 14px 15px; color: white; }
+    .roi-card.blue { background: #1a2d5a; }
+    .roi-card.amber { background: #7a4500; }
+    .roi-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
+    .roi-val { font-size: 26px; font-weight: bold; color: #6ab023; line-height: 1; margin-bottom: 3px; }
+    .roi-card.blue .roi-val { color: #7faeff; }
+    .roi-card.amber .roi-val { color: #ffcc66; }
+    .roi-sub { font-size: 10px; color: rgba(255,255,255,0.45); }
+    .roi-formula { font-size: 9px; font-family: monospace; color: rgba(255,255,255,0.3); margin-top: 5px; background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 3px; }
+
+    /* ── Marketing comparison ── */
+    .mkt-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .mkt-bar-chart { }
+    .mbc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+    .mbc-label { font-size: 10px; color: #555; width: 140px; flex-shrink: 0; }
+    .mbc-bar-wrap { flex: 1; background: #eef2e8; border-radius: 3px; height: 16px; overflow: hidden; }
+    .mbc-bar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding: 0 6px; min-width: 30px; }
+    .mbc-val { font-size: 9px; font-weight: bold; color: white; }
+    .mbc-contract { background: #6ab023; }
+    .mbc-spend    { background: #1a2d5a; }
+    .mbc-cpc      { background: #c87800; }
+
+    /* ── Methodology accordion ── */
+    .method-section { background: white; border-radius: 7px; border: 1px solid #dde8d0; overflow: hidden; margin-bottom: 14px; }
+    .method-header { padding: 13px 16px; background: #1b3410; color: white; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .method-header-text { font-size: 13px; text-transform: lowercase; }
+    .method-version { font-size: 10px; color: rgba(255,255,255,0.4); }
+    .method-toggle { font-size: 18px; color: rgba(255,255,255,0.6); transition: transform 0.2s; }
+    .method-header.open .method-toggle { transform: rotate(45deg); }
+    .method-body { display: none; padding: 0; }
+    .method-body.open { display: block; }
+    .method-item { border-bottom: 1px solid #eef2e8; }
+    .method-item:last-child { border-bottom: none; }
+    .method-item-header { padding: 11px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: #fafcf7; }
+    .method-item-header:hover { background: #f0f6e8; }
+    .method-num { font-size: 10px; font-weight: bold; color: white; background: #6ab023; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .method-item-title { font-size: 12px; font-weight: bold; color: #1b3410; text-transform: lowercase; flex: 1; }
+    .method-item-formula { font-size: 10px; color: #aaa; font-family: monospace; }
+    .method-item-body { padding: 12px 16px 14px 46px; background: white; display: none; }
+    .method-item-body.open { display: block; }
+    .method-def { font-size: 11px; color: #555; line-height: 1.65; margin-bottom: 6px; }
+    .method-formula-box { background: #f6faf0; border: 1px solid #d8ecca; border-radius: 4px; padding: 8px 12px; font-family: monospace; font-size: 11px; color: #2d5518; margin-bottom: 6px; }
+    .method-note { font-size: 10px; color: #888; font-style: italic; line-height: 1.55; padding: 6px 10px; background: #fafcf7; border-left: 3px solid #ccd8b8; border-radius: 0 3px 3px 0; }
+
+    /* ── No campaign state ── */
+    .no-campaign { text-align: center; padding: 50px 30px; color: #aaa; }
+    .no-campaign-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+    .no-campaign h3 { font-size: 16px; color: #888; font-weight: normal; margin-bottom: 6px; text-transform: lowercase; }
+    .no-campaign p { font-size: 12px; max-width: 360px; margin: 0 auto; line-height: 1.6; }
+
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 13px; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.12s; }
+    .btn-primary   { background: #6ab023; color: white; border-color: #5a9a1d; }
+    .btn-primary:hover { background: #5a9a1d; }
+    .btn-secondary { background: white; color: #555; border-color: #ccd8b8; }
+    .btn-secondary:hover { background: #f5f8f0; }
+    .btn-xs { padding: 2px 8px; font-size: 10px; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #b8ccaa; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="assets/images/logo.png" alt="MGS">
+      <div class="sidebar-logo-text">my green squares<br>retailer analytics</div>
+    </div>
+    <div class="sidebar-label">retailers</div>
+    <div class="retailer-list" id="retailerList"></div>
+    <div class="sidebar-footer">
+      <a href="admin.html">← back to admin dashboard</a>
+      <a href="map.html">🗺 view live map</a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-retailer" id="topRetailerName">—</span>
+        <span class="topbar-period" id="topPeriod">Last 90 days</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="topClock" style="font-size:11px;color:#bbb;"></span>
+        <a href="admin.html" class="btn btn-secondary btn-xs">← admin</a>
+      </div>
+    </header>
+
+    <main class="content" id="analyticsContent">
+      <div class="no-campaign">
+        <div class="no-campaign-icon">🏪</div>
+        <h3>select a retailer</h3>
+        <p>Choose a retailer from the sidebar to view their conversion analytics and campaign performance.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// ── Simulated EPOS analytics per retailer ───────────────────────────────────
+// These represent 90-day reporting period figures for the demonstrator.
+// In production these would be sourced from the EPOS integration via MGS API.
+var statsDefaults = {
+  'RET001': { // Sainsbury's
+    period: '90 days',
+    totalTxns: 2847000,       // total EPOS transactions in period
+    gsTxns: 412000,           // transactions that generated ≥1 GS award (14.5%)
+    skuCount: 28000,          // total active product SKUs
+    gsSkuCount: 3380,         // SKUs linked to an active GS campaign (12.1%)
+    redeemedEposFrac: 0.67,   // fraction of issued GS redeemed in-store
+    redeemedOutStoreFrac: 0.21, // fraction redeemed via app/online
+    avgBasket: 32.40,         // average basket value £
+    marketingSpend: 180000,   // £ marketing spend associated with GS campaign
+    gsPerQualTxn: 345,        // average GS per qualifying transaction
+    avgDaysToRedeem: 8.4,     // mean days from award to redemption
+    startDate: '2025-09-01',
+    endDate: '2026-02-28'
+  },
+  'RET005': { // ASDA
+    period: '90 days',
+    totalTxns: 1920000,
+    gsTxns: 248000,           // 12.9%
+    skuCount: 22000,
+    gsSkuCount: 2200,         // 10.0%
+    redeemedEposFrac: 0.61,
+    redeemedOutStoreFrac: 0.24,
+    avgBasket: 28.80,
+    marketingSpend: 120000,
+    gsPerQualTxn: 360,
+    avgDaysToRedeem: 11.2,
+    startDate: '2025-10-01',
+    endDate: '2026-02-28'
+  },
+  'RET003': { // Currys
+    period: '90 days',
+    totalTxns: 184000,
+    gsTxns: 67800,            // 36.8% — customers seeking GS products specifically
+    skuCount: 4200,
+    gsSkuCount: 820,          // 19.5%
+    redeemedEposFrac: 0.58,
+    redeemedOutStoreFrac: 0.31,
+    avgBasket: 284.00,
+    marketingSpend: 85000,
+    gsPerQualTxn: 1000,       // higher per transaction (expensive items)
+    avgDaysToRedeem: 14.8,
+    startDate: '2025-11-01',
+    endDate: '2026-02-28'
+  },
+  'RET002': { // Sky
+    period: '90 days',
+    totalTxns: 142000,        // sign-ups, renewals, upgrades
+    gsTxns: 44200,            // 31.1%
+    skuCount: 45,             // subscription packages
+    gsSkuCount: 12,           // 26.7%
+    redeemedEposFrac: 0.44,   // lower in-store — mostly digital
+    redeemedOutStoreFrac: 0.43,
+    avgBasket: 52.00,         // avg monthly subscription value
+    marketingSpend: 72000,
+    gsPerQualTxn: 280,
+    avgDaysToRedeem: 19.3,
+    startDate: '2025-10-01',
+    endDate: '2026-02-28'
+  },
+  'RET004': { // Thomas Cook
+    period: '90 days',
+    totalTxns: 38000,         // holiday bookings
+    gsTxns: 12100,            // 31.8%
+    skuCount: 320,            // holiday packages
+    gsSkuCount: 89,           // 27.8%
+    redeemedEposFrac: 0.38,   // lower — many redeem in-resort digitally
+    redeemedOutStoreFrac: 0.49,
+    avgBasket: 1240.00,       // avg booking value
+    marketingSpend: 45000,
+    gsPerQualTxn: 420,
+    avgDaysToRedeem: 24.6,
+    startDate: '2025-12-01',
+    endDate: '2026-02-28'
+  }
+};
+
+// Default campaign/retailer data (mirrors admin.html defaults)
+var defaultCampaigns = [
+  { id:'CAM001', clientName:"Sainsbury's", participantType:'retailer', campaignType:'retailer-basket', contractedGs:500000, gsIssued:142300, gsPerTxn:10, rate:1, status:'active', startDate:'2025-09-01', endDate:'2026-02-28', consumerMsg:"Shop at Sainsbury's and earn Green Squares towards Amazon rainforest conservation." },
+  { id:'CAM002', clientName:'ASDA',        participantType:'retailer', campaignType:'retailer-basket', contractedGs:380000, gsIssued:89400,  gsPerTxn:8,  rate:1, status:'active', startDate:'2025-10-01', endDate:'2026-02-28', consumerMsg:"Every ASDA shop earns Green Squares helping protect our planet's forests." },
+  { id:'CAM003', clientName:'Currys',      participantType:'retailer', campaignType:'retailer-basket', contractedGs:220000, gsIssued:67800,  gsPerTxn:12, rate:1, status:'active', startDate:'2025-11-01', endDate:'2026-02-28', consumerMsg:"Buy technology that cares — earn Green Squares with every Currys purchase." },
+  { id:'CAM004', clientName:'Sky',         participantType:'retailer', campaignType:'product-purchase', contractedGs:180000, gsIssued:44200, gsPerTxn:6,  rate:1, status:'active', startDate:'2025-10-01', endDate:'2026-02-28', consumerMsg:"Your Sky subscription helps save the Amazon — earn Green Squares every month." },
+  { id:'CAM005', clientName:'Thomas Cook', participantType:'retailer', campaignType:'product-purchase', contractedGs:95000,  gsIssued:12100, gsPerTxn:15, rate:1, status:'active', startDate:'2025-12-01', endDate:'2026-02-28', consumerMsg:"Book your dream holiday and earn Green Squares that protect our forests." },
+  { id:'CAM006', clientName:'Nestlé',      participantType:'brand',    campaignType:'product-purchase', contractedGs:150000, gsIssued:28400, gsPerUnit:null, rate:1, status:'active', approvedRetailers:["Sainsbury's","ASDA","Tesco"], startDate:'2025-09-15', endDate:'2026-03-15' },
+  { id:'CAM007', clientName:'Samsung',     participantType:'brand',    campaignType:'product-purchase', contractedGs:80000,  gsIssued:19200, gsPerUnit:null, rate:1, status:'active', approvedRetailers:['Currys','PC World'], startDate:'2025-11-01', endDate:'2026-04-30' },
+  { id:'CAM008', clientName:'Unilever',    participantType:'brand',    campaignType:'product-purchase', contractedGs:120000, gsIssued:34600, gsPerUnit:null, rate:1, status:'active', approvedRetailers:["Sainsbury's","ASDA"], startDate:'2025-10-01', endDate:'2026-03-31' }
+];
+
+var defaultRelationships = [
+  { id:'REL001', brandCampaignId:'CAM006', retailerName:"Sainsbury's", status:'approved', approvedDate:'2025-09-10', mgsRef:'MGS-REL-001' },
+  { id:'REL002', brandCampaignId:'CAM006', retailerName:'ASDA',        status:'approved', approvedDate:'2025-10-05', mgsRef:'MGS-REL-002' },
+  { id:'REL003', brandCampaignId:'CAM006', retailerName:'Tesco',       status:'approved', approvedDate:'2025-09-12', mgsRef:'MGS-REL-003' },
+  { id:'REL004', brandCampaignId:'CAM007', retailerName:'Currys',      status:'approved', approvedDate:'2025-11-03', mgsRef:'MGS-REL-004' },
+  { id:'REL005', brandCampaignId:'CAM007', retailerName:'PC World',    status:'approved', approvedDate:'2025-11-03', mgsRef:'MGS-REL-005' },
+  { id:'REL006', brandCampaignId:'CAM008', retailerName:"Sainsbury's", status:'approved', approvedDate:'2025-10-08', mgsRef:'MGS-REL-006' },
+  { id:'REL007', brandCampaignId:'CAM008', retailerName:'ASDA',        status:'approved', approvedDate:'2025-10-09', mgsRef:'MGS-REL-007' },
+  { id:'REL008', brandCampaignId:'CAM008', retailerName:'Tesco',       status:'pending',  approvedDate:null,          mgsRef:'MGS-REL-008' }
+];
+
+var defaultRetailers = [
+  { id:'RET001', name:"Sainsbury's", category:'grocery',    active:true  },
+  { id:'RET002', name:'Sky',         category:'telecoms',   active:true  },
+  { id:'RET003', name:'Currys',      category:'electrical', active:true  },
+  { id:'RET004', name:'Thomas Cook', category:'travel',     active:true  },
+  { id:'RET005', name:'ASDA',        category:'grocery',    active:true  },
+  { id:'RET006', name:'H&M',         category:'fashion',    active:true  },
+  { id:'RET007', name:'PC World',    category:'electrical', active:false },
+  { id:'RET008', name:'Tesco',       category:'grocery',    active:true  }
+];
+
+var defaultProducts = [
+  { id:'PRD001', productName:'Nescafe Gold 200g',    brand:'Nestlé',   sku:'NES-GLD-200', gsPerUnit:25, campaignId:'CAM006', active:true },
+  { id:'PRD002', productName:'Nescafe Original 300g',brand:'Nestlé',   sku:'NES-ORG-300', gsPerUnit:18, campaignId:'CAM006', active:true },
+  { id:'PRD003', productName:"Samsung 55\" QLED TV", brand:'Samsung',  sku:'SAM-QLED-55', gsPerUnit:250,campaignId:'CAM007', active:true },
+  { id:'PRD004', productName:'Samsung Galaxy S25',   brand:'Samsung',  sku:'SAM-S25-256', gsPerUnit:85, campaignId:'CAM007', active:true },
+  { id:'PRD005', productName:'Persil Bio 2.5kg',     brand:'Unilever', sku:'UNI-PER-2500',gsPerUnit:12, campaignId:'CAM008', active:true },
+  { id:'PRD006', productName:'Dove Body Wash 500ml', brand:'Unilever', sku:'UNI-DOV-500',  gsPerUnit:8,  campaignId:'CAM008', active:true }
+];
+
+// ── State ────────────────────────────────────────────────────────────────────
+var campaigns     = JSON.parse(localStorage.getItem('mgs_campaigns'))    || defaultCampaigns;
+var relationships = JSON.parse(localStorage.getItem('mgs_rels'))         || defaultRelationships;
+var retailers     = JSON.parse(localStorage.getItem('mgs_retailers'))    || defaultRetailers;
+var products      = JSON.parse(localStorage.getItem('mgs_products'))     || defaultProducts;
+var currentRetId  = null;
+
+// ── Boot ────────────────────────────────────────────────────────────────────
+function boot() {
+  buildRetailerList();
+  tick(); setInterval(tick, 30000);
+  var params = new URLSearchParams(location.search);
+  var id = params.get('id');
+  if (id) {
+    showRetailer(id);
+  } else {
+    // default to first active retailer with campaign
+    var first = retailers.find(function(r) {
+      return r.active && campaigns.some(function(c){ return c.clientName === r.name && c.participantType === 'retailer'; });
+    });
+    if (first) showRetailer(first.id);
+  }
+}
+
+function tick() {
+  var d = new Date();
+  document.getElementById('topClock').textContent =
+    d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) + '  ' +
+    d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
+
+function buildRetailerList() {
+  var html = retailers.map(function(r) {
+    var hasCam = campaigns.some(function(c){ return c.clientName === r.name && c.participantType === 'retailer'; });
+    var dotClass = !r.active ? 'ret-dot-inactive' : hasCam ? 'ret-dot-active' : 'ret-dot-nocam';
+    var title = hasCam ? '' : ' title="no active campaign"';
+    return '<div class="ret-item" id="retItem_'+r.id+'" onclick="showRetailer(\''+r.id+'\')"'+title+'>'+
+      '<span class="ret-dot '+dotClass+'"></span>'+
+      '<div><div>'+r.name+'</div><div class="ret-cat">'+r.category+'</div></div>'+
+    '</div>';
+  }).join('');
+  document.getElementById('retailerList').innerHTML = html;
+}
+
+function showRetailer(id) {
+  currentRetId = id;
+  // update URL without reload
+  history.replaceState(null,'','?id='+id);
+  // highlight sidebar
+  document.querySelectorAll('.ret-item').forEach(function(el){ el.classList.remove('active'); });
+  var item = document.getElementById('retItem_'+id);
+  if (item) item.classList.add('active');
+  // find retailer
+  var ret = retailers.find(function(r){ return r.id === id; });
+  if (!ret) return;
+  document.getElementById('topRetailerName').textContent = ret.name;
+  // render
+  renderRetailerAnalytics(ret);
+}
+
+function renderRetailerAnalytics(ret) {
+  var content = document.getElementById('analyticsContent');
+  var ownCams  = campaigns.filter(function(c){ return c.clientName === ret.name && c.participantType === 'retailer'; });
+  var brandRels = relationships.filter(function(r){ return r.retailerName === ret.name && r.status === 'approved'; });
+  var brandCams = brandRels.map(function(r){ return campaigns.find(function(c){ return c.id === r.brandCampaignId; }); }).filter(Boolean);
+
+  if (ownCams.length === 0) {
+    content.innerHTML = buildNoCampaignState(ret);
+    return;
+  }
+
+  var s = statsDefaults[ret.id] || buildDefaultStats(ownCams);
+  var totalContracted  = ownCams.reduce(function(a,c){ return a+c.contractedGs; }, 0);
+  var totalIssued      = ownCams.reduce(function(a,c){ return a+c.gsIssued; }, 0);
+  var brandIssued      = brandRels.reduce(function(sum, r){
+    var cam = campaigns.find(function(c){ return c.id === r.brandCampaignId; });
+    return sum + (cam ? Math.round(cam.gsIssued * 0.35) : 0); // ~35% issued at this retailer (demo)
+  }, 0);
+
+  var completionPct    = pct(totalIssued, totalContracted);
+  var eposPct          = pct(s.gsTxns, s.totalTxns);
+  var skuPct           = pct(s.gsSkuCount, s.skuCount);
+  var redeemedTotal    = Math.round(totalIssued * (s.redeemedEposFrac + s.redeemedOutStoreFrac));
+  var redeemedEpos     = Math.round(totalIssued * s.redeemedEposFrac);
+  var redeemedOut      = Math.round(totalIssued * s.redeemedOutStoreFrac);
+  var redeemedPend     = totalIssued - redeemedEpos - redeemedOut;
+  var redeemRate       = pct(redeemedTotal, totalIssued);
+  var contractValue    = totalContracted * 1; // £1 per GS
+  var roi              = s.marketingSpend > 0 ? (contractValue / s.marketingSpend).toFixed(2) : '—';
+  var cpi              = s.marketingSpend > 0 && totalIssued > 0 ? '£'+(s.marketingSpend/totalIssued).toFixed(3) : '—';
+  var cpr              = s.marketingSpend > 0 && redeemedTotal > 0 ? '£'+(s.marketingSpend/redeemedTotal).toFixed(3) : '—';
+
+  // Days remaining
+  var daysLeft = '—';
+  var cam0 = ownCams[0];
+  if (cam0 && cam0.endDate) {
+    var end = new Date(cam0.endDate);
+    var now = new Date();
+    var diff = Math.round((end - now) / 86400000);
+    daysLeft = diff > 0 ? diff + ' days' : 'ended';
+  }
+
+  var catClass = 'cat-' + ret.category;
+
+  var html = '';
+
+  // ── Summary banner ──────────────────────────────────────────────────────
+  html += '<div class="summary-banner">'+
+    '<div class="sb-left">'+
+      '<div class="sb-retailer">'+ret.name+'  <span class="cat-badge '+catClass+'">'+ret.category+'</span></div>'+
+      '<div class="sb-tagline">'+
+        fmt(s.gsTxns)+' qualifying transactions in the last '+s.period+' · '+
+        fmt(totalIssued)+' Green Squares issued · '+
+        eposPct+'% EPOS penetration rate · '+redeemRate+'% redemption rate'+
+      '</div>'+
+      '<div class="tier-badges">'+
+        '<span class="tier-badge tier-retailer">⬛ tier 1 — basket value</span>'+
+        (brandCams.length ? '<span class="tier-badge tier-brand">🔗 '+brandCams.length+' brand partner'+(brandCams.length>1?'s':'')+'</span>' : '')+
+      '</div>'+
+    '</div>'+
+    '<div class="sb-right">'+
+      '<div class="sb-big">'+fmt(totalIssued)+'</div>'+
+      '<div class="sb-big-lbl">GS issued</div>'+
+      '<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px;">'+completionPct+'% of campaign committed</div>'+
+    '</div>'+
+  '</div>';
+
+  // ── KPI grid ─────────────────────────────────────────────────────────────
+  html += '<div class="kpi-grid">'+
+    kpi('GS Contracted',    fmt(totalContracted),       ownCams.length+' campaign'+(ownCams.length>1?'s':''), 'hi')+
+    kpi('GS Issued',        fmt(totalIssued),            daysLeft+' remaining', 'mid')+
+    kpi2('Campaign Complete', completionPct+'%',         fmt(totalContracted-totalIssued)+' GS remaining', completionPct, '')+
+    kpi2('EPOS Penetration',  eposPct+'%',               fmt(s.gsTxns)+' of '+fmt(s.totalTxns)+' txns', eposPct, '')+
+    kpi2('Redemption Rate',   redeemRate+'%',             fmt(redeemedTotal)+' GS redeemed', redeemRate, '')+
+    kpi('ROI Multiple',     roi+'×',                    '£'+fmt(s.marketingSpend)+' marketing spend', 'amb')+
+  '</div>';
+
+  // ── Two col: Funnel + Redemption ─────────────────────────────────────────
+  html += '<div class="two-col">';
+
+  // Conversion funnel
+  var maxTxns = s.totalTxns;
+  html += '<div class="panel">'+
+    '<div class="panel-header"><span class="panel-title">conversion funnel</span><span class="panel-subtitle">'+s.period+'</span></div>'+
+    '<div class="panel-body">'+
+    '<div class="funnel">'+
+    funnelRow('All EPOS Transactions', s.totalTxns, maxTxns, 'fb-total')+
+    '<div class="funnel-arrow">▼ '+eposPct+'% generate GS</div>'+
+    funnelRow('GS-Generating Transactions', s.gsTxns, maxTxns, 'fb-eligible')+
+    '<div class="funnel-arrow">▼ avg '+fmt(s.gsPerQualTxn)+' GS each</div>'+
+    funnelRow('GS Issued (Total)', totalIssued, maxTxns, 'fb-issued', true)+
+    '<div class="funnel-arrow">▼ '+redeemRate+'% redeemed</div>'+
+    funnelRow('GS Redeemed', redeemedTotal, maxTxns, 'fb-redeemed', true)+
+    '</div>'+
+    '<div style="margin-top:12px;font-size:10px;color:#aaa;background:#f6faf0;padding:8px 10px;border-radius:4px;line-height:1.55;">'+
+    '<strong>SKU coverage:</strong> '+fmt(s.gsSkuCount)+' of '+fmt(s.skuCount)+' active SKUs linked to GS ('+skuPct+'%) · '+
+    'avg basket value £'+s.avgBasket.toFixed(2)+' · avg '+fmt(s.gsPerQualTxn)+' GS per qualifying transaction'+
+    '</div>'+
+    '</div></div>';
+
+  // Redemption breakdown
+  var eposPctR = Math.round(s.redeemedEposFrac*100);
+  var outPctR  = Math.round(s.redeemedOutStoreFrac*100);
+  var pendPctR = 100 - eposPctR - outPctR;
+  html += '<div class="panel">'+
+    '<div class="panel-header"><span class="panel-title">redemption breakdown</span><span class="panel-subtitle">'+s.period+'</span></div>'+
+    '<div class="panel-body">'+
+    '<div style="margin-bottom:12px;font-size:11px;color:#555;line-height:1.6;">'+
+    'Of <strong>'+fmt(redeemedTotal)+'</strong> Green Squares redeemed, the split between in-store EPOS, out-of-store digital, and pending consumer choice is shown below. Avg. time to redemption: <strong>'+s.avgDaysToRedeem+' days</strong>.'+
+    '</div>'+
+    '<div class="redeem-bars">'+
+    redeemBar('In-Store EPOS', eposPctR, redeemedEpos, 'rb-epos', 'fill-epos',
+      'GS redeemed at next qualifying EPOS transaction using in-store account lookup (loyalty card, app QR, or email).')+
+    redeemBar('Out-of-Store / App', outPctR, redeemedOut, 'rb-out', 'fill-out',
+      'GS redeemed via MGS app, website portal, or partner API outside of a physical store transaction.')+
+    redeemBar('In Customer Accounts', pendPctR, redeemedPend, 'rb-pend', 'fill-pend',
+      'GS awarded but not yet directed to a conservation project. Committed to CIC fund — consumer choice pending.')+
+    '</div>'+
+    '<div style="margin-top:14px;font-size:10px;color:#aaa;background:#f6faf0;padding:8px 10px;border-radius:4px;line-height:1.55;">'+
+    '🔒 All issued GS is already committed to the MGS CIC conservation fund at point of award. '+
+    'Unredeemed GS represents consumer conservation <em>choice</em> not yet exercised — not a financial liability to '+ret.name+'.'+
+    '</div>'+
+    '</div></div>';
+
+  html += '</div>'; // end two-col
+
+  // ── Quick stats row ──────────────────────────────────────────────────────
+  html += '<div class="stat-row">'+
+    statBox('', skuPct+'%',    'SKU Coverage',           '')+
+    statBox('', fmt(s.gsPerQualTxn), 'Avg GS / Qualifying Txn', '')+
+    statBox('', s.avgDaysToRedeem+' days', 'Avg Days to Redemption', 'blue')+
+    statBox('', cpi,           'Cost per GS Issued',     'blue')+
+    statBox('', cpr,           'Cost per GS Redeemed',   'amber')+
+    statBox('', '£'+fmt(contractValue), 'Campaign Contract Value', '')+
+  '</div>';
+
+  // ── Campaign Performance ─────────────────────────────────────────────────
+  html += '<div class="panel">'+
+    '<div class="panel-header">'+
+      '<span class="panel-title">campaign performance — own campaigns</span>'+
+      '<span class="tier-badge tier-retailer" style="font-size:9px;">tier 1</span>'+
+    '</div>'+
+    '<table class="data-table"><thead><tr>'+
+      '<th>campaign id</th><th>type</th><th>contracted</th><th>issued</th>'+
+      '<th>progress</th><th>GS / txn</th><th>rate</th><th>start</th><th>end</th><th>status</th>'+
+    '</tr></thead><tbody>';
+  ownCams.forEach(function(c) {
+    var p = pct(c.gsIssued, c.contractedGs);
+    html += '<tr>'+
+      '<td><code style="font-size:10px;color:#6ab023;">'+c.id+'</code></td>'+
+      '<td><span style="font-size:10px;color:#555;">'+c.campaignType.replace('-',' ')+'</span></td>'+
+      '<td><strong>'+fmt(c.contractedGs)+'</strong></td>'+
+      '<td>'+fmt(c.gsIssued)+'</td>'+
+      '<td>'+
+        '<div class="prog-bar" style="width:90px"><div class="prog-fill" style="width:'+p+'%"></div></div>'+
+        ' <span style="font-size:10px;color:#aaa">'+p+'%</span>'+
+      '</td>'+
+      '<td style="font-size:11px;font-weight:bold;">'+c.gsPerTxn+'</td>'+
+      '<td style="font-size:10px;color:#555;">£'+(c.rate||1)+'/GS</td>'+
+      '<td style="font-size:10px;color:#aaa;">'+(c.startDate||'—')+'</td>'+
+      '<td style="font-size:10px;color:#aaa;">'+(c.endDate||'—')+'</td>'+
+      '<td><span class="pill pill-'+c.status+'">'+c.status+'</span></td>'+
+    '</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  // ── Brand Contributions ──────────────────────────────────────────────────
+  if (brandCams.length > 0) {
+    html += '<div class="panel">'+
+      '<div class="panel-header">'+
+        '<span class="panel-title">brand campaign contributions at '+ret.name+'</span>'+
+        '<span class="tier-badge tier-brand" style="font-size:9px;">tier 2</span>'+
+      '</div>'+
+      '<table class="data-table"><thead><tr>'+
+        '<th>brand</th><th>campaign</th><th>products at this store</th>'+
+        '<th>total contracted</th><th>total issued</th><th>est. issued here</th><th>MGS approval</th><th>status</th>'+
+      '</tr></thead><tbody>';
+    brandRels.forEach(function(rel) {
+      var bc = campaigns.find(function(c){ return c.id === rel.brandCampaignId; });
+      if (!bc) return;
+      var prods = products.filter(function(p){ return p.campaignId === bc.id && p.active; });
+      var estHere = Math.round(bc.gsIssued * 0.35);
+      html += '<tr>'+
+        '<td><strong>'+bc.clientName+'</strong></td>'+
+        '<td><code style="font-size:10px;color:#3a6acc;">'+bc.id+'</code></td>'+
+        '<td>'+prods.map(function(p){
+          return '<span style="font-size:10px;background:#f0f4ff;border:1px solid #c8d4f0;border-radius:3px;padding:1px 5px;margin-right:3px;">'+
+            p.productName+' <strong style="color:#1a3a88">+'+p.gsPerUnit+'</strong></span>';
+        }).join('')+'</td>'+
+        '<td>'+fmt(bc.contractedGs)+'</td>'+
+        '<td>'+fmt(bc.gsIssued)+'</td>'+
+        '<td style="color:#1a3a88;font-weight:bold;">~'+fmt(estHere)+'</td>'+
+        '<td><span class="pill pill-'+rel.status+'">'+rel.status+'</span><span style="font-size:9px;color:#aaa;margin-left:5px;">'+rel.mgsRef+'</span></td>'+
+        '<td><span class="pill pill-'+bc.status+'">'+bc.status+'</span></td>'+
+      '</tr>';
+    });
+    html += '</tbody></table>'+
+      '<div style="padding:10px 14px;font-size:10px;color:#888;background:#fafcf7;border-top:1px solid #eef2e8;line-height:1.55;">'+
+      '🔒 <strong>CPRD compliance:</strong> MGS acts as independent intermediary validating all dual-award arrangements. '+
+      'Brand GS at '+ret.name+' is independently calculated and separately contracted. '+
+      'Dual awards are pre-approved by MGS to ensure all GS represents genuinely additional conservation value.'+
+      '</div>'+
+    '</div>';
+
+    // Brand vs Own contribution visual
+    var totalAll = totalIssued + brandIssued;
+    var ownPct2  = totalAll > 0 ? Math.round(totalIssued/totalAll*100) : 0;
+    var brdPct2  = 100 - ownPct2;
+    html += '<div class="panel">'+
+      '<div class="panel-header"><span class="panel-title">GS contribution split — own vs brand</span></div>'+
+      '<div class="panel-body">'+
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">'+
+        '<div style="flex:1;background:#eef2e8;border-radius:6px;height:28px;overflow:hidden;display:flex;">'+
+          '<div style="width:'+ownPct2+'%;background:#6ab023;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:bold;">'+
+            (ownPct2>15?ownPct2+'% own':'')+'</div>'+
+          '<div style="width:'+brdPct2+'%;background:#3a6acc;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:bold;">'+
+            (brdPct2>10?brdPct2+'% brand':'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:16px;font-size:11px;">'+
+        '<div><span style="display:inline-block;width:10px;height:10px;background:#6ab023;border-radius:2px;margin-right:4px;"></span>Own campaigns: '+fmt(totalIssued)+' GS ('+ownPct2+'%)</div>'+
+        '<div><span style="display:inline-block;width:10px;height:10px;background:#3a6acc;border-radius:2px;margin-right:4px;"></span>Brand partner contributions: ~'+fmt(brandIssued)+' GS ('+brdPct2+'%)</div>'+
+        '<div style="color:#aaa;">Combined: '+fmt(totalAll)+' GS</div>'+
+      '</div>'+
+      '</div></div>';
+  }
+
+  // ── Marketing ROI ────────────────────────────────────────────────────────
+  html += '<div class="roi-grid">'+
+    roiCard('Campaign Contract Value', '£'+fmt(contractValue), 'total GS × £1/GS standard rate', 'contractValue = contractedGS × rate', '')+
+    roiCard('Marketing Spend', '£'+fmt(s.marketingSpend), 'associated promotional spend', 'as reported by retailer', 'blue')+
+    roiCard('ROI Multiple', roi+'×', 'contract value vs marketing spend', 'contractValue ÷ marketingSpend', 'amber')+
+  '</div>';
+
+  var maxBar = Math.max(contractValue, s.marketingSpend);
+  html += '<div class="panel">'+
+    '<div class="panel-header"><span class="panel-title">commercial analysis — campaign value vs spend</span></div>'+
+    '<div class="panel-body">'+
+    '<div class="mkt-bar-chart">'+
+    mktBar('Campaign Contract Value', contractValue, maxBar, '£', 'mbc-contract')+
+    mktBar('Marketing Spend', s.marketingSpend, maxBar, '£', 'mbc-spend')+
+    mktBar('Cost per GS Issued (×1000)', s.marketingSpend>0&&totalIssued>0?(s.marketingSpend/totalIssued*1000):0, maxBar, '£', 'mbc-cpc', true)+
+    '</div>'+
+    '<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">'+
+    miniStat('GS Issued', fmt(totalIssued))+
+    miniStat('Cost per GS', cpi)+
+    miniStat('Cost per Redeemed GS', cpr)+
+    miniStat('Avg Days to Redeem', s.avgDaysToRedeem+' days')+
+    '</div>'+
+    '</div></div>';
+
+  // ── Methodology ──────────────────────────────────────────────────────────
+  html += buildMethodology();
+
+  content.innerHTML = html;
+}
+
+// ── HTML helpers ─────────────────────────────────────────────────────────────
+function kpi(label,value,sub,cls) {
+  return '<div class="kpi-card'+(cls?' '+cls:'')+'">'+
+    '<div class="kpi-label">'+label+'</div>'+
+    '<div class="kpi-value">'+value+'</div>'+
+    '<div class="kpi-sub">'+sub+'</div>'+
+  '</div>';
+}
+function kpi2(label,value,sub,pctVal,cls) {
+  return '<div class="kpi-card'+(cls?' '+cls:'')+'">'+
+    '<div class="kpi-label">'+label+'</div>'+
+    '<div class="kpi-value">'+value+'</div>'+
+    '<div class="kpi-sub">'+sub+'</div>'+
+    '<div class="kpi-prog">'+
+      '<div class="kpi-prog-bar"><div class="kpi-prog-fill" style="width:'+Math.min(pctVal,100)+'%"></div></div>'+
+    '</div>'+
+  '</div>';
+}
+function funnelRow(label, val, maxVal, cls, isGS) {
+  var w = maxVal > 0 ? Math.max(Math.round(val/maxVal*100), 3) : 0;
+  var disp = isGS ? '🌿 '+fmt(val) : fmt(val);
+  return '<div class="funnel-row">'+
+    '<div class="funnel-label">'+label+'</div>'+
+    '<div class="funnel-bar-wrap">'+
+      '<div class="funnel-bar '+cls+'" style="width:'+w+'%">'+
+        '<span class="funnel-bar-val">'+disp+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<div class="funnel-pct">'+(maxVal>0?Math.round(val/maxVal*100)+'%':'—')+'</div>'+
+  '</div>';
+}
+function redeemBar(label, pctVal, count, pctClass, fillClass, detail) {
+  return '<div class="rb-row">'+
+    '<div class="rb-header">'+
+      '<span class="rb-label">'+label+'</span>'+
+      '<div>'+
+        '<span class="rb-pct '+pctClass+'">'+pctVal+'%</span>'+
+        ' <span class="rb-count">'+fmt(count)+' GS</span>'+
+      '</div>'+
+    '</div>'+
+    '<div class="rb-bar"><div class="rb-fill '+fillClass+'" style="width:'+pctVal+'%"></div></div>'+
+    '<div class="rb-detail">'+detail+'</div>'+
+  '</div>';
+}
+function statBox(icon, val, lbl, type) {
+  return '<div class="stat-box'+(type?' '+type:'')+'">'+
+    (icon?'<div class="stat-icon">'+icon+'</div>':'')+
+    '<div class="stat-val">'+val+'</div>'+
+    '<div class="stat-lbl">'+lbl+'</div>'+
+  '</div>';
+}
+function roiCard(label, val, sub, formula, type) {
+  return '<div class="roi-card'+(type?' '+type:'')+'">'+
+    '<div class="roi-label">'+label+'</div>'+
+    '<div class="roi-val">'+val+'</div>'+
+    '<div class="roi-sub">'+sub+'</div>'+
+    '<div class="roi-formula">'+formula+'</div>'+
+  '</div>';
+}
+function mktBar(label, val, maxVal, prefix, cls, scale) {
+  var w = maxVal > 0 ? Math.max(Math.round(val/maxVal*100),2) : 0;
+  var disp = prefix + (val>=1000 ? fmt(Math.round(val)) : val.toFixed(2));
+  return '<div class="mbc-row">'+
+    '<div class="mbc-label">'+label+'</div>'+
+    '<div class="mbc-bar-wrap">'+
+      '<div class="mbc-bar '+cls+'" style="width:'+w+'%">'+
+        '<span class="mbc-val">'+disp+'</span>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function miniStat(label, val) {
+  return '<div style="background:#f6faf0;border:1px solid #e0ecd0;border-radius:5px;padding:9px 12px;">'+
+    '<div style="font-size:14px;font-weight:bold;color:#1b3410;">'+val+'</div>'+
+    '<div style="font-size:9px;text-transform:uppercase;color:#aaa;letter-spacing:0.4px;margin-top:2px;">'+label+'</div>'+
+  '</div>';
+}
+
+function buildNoCampaignState(ret) {
+  return '<div class="no-campaign">'+
+    '<div class="no-campaign-icon">📋</div>'+
+    '<h3>no active campaign — '+ret.name+'</h3>'+
+    '<p>'+ret.name+' does not currently have an active MGS retailer campaign. '+
+    'Once a campaign is set up in the admin dashboard, analytics will appear here.</p>'+
+    '<br><a href="admin.html" class="btn btn-primary">+ set up campaign in admin</a>'+
+  '</div>';
+}
+
+function buildDefaultStats(cams) {
+  // Fallback for retailers without seeded stats
+  var issued = cams.reduce(function(s,c){ return s+c.gsIssued; }, 0);
+  return {
+    period: '90 days', totalTxns: Math.round(issued*6.9), gsTxns: Math.round(issued*2.9),
+    skuCount: 5000, gsSkuCount: 400, redeemedEposFrac: 0.55, redeemedOutStoreFrac: 0.25,
+    avgBasket: 45.00, marketingSpend: 60000, gsPerQualTxn: 300, avgDaysToRedeem: 12.0
+  };
+}
+
+// ── Methodology section ──────────────────────────────────────────────────────
+function buildMethodology() {
+  var items = [
+    {
+      num:1, title:'EPOS Penetration Rate',
+      formula:'(GS-generating transactions ÷ total EPOS transactions) × 100',
+      def:'The percentage of all EPOS transactions in the reporting period that generated at least one Green Square award.',
+      fbox:'eposPenetration = (gsTxns ÷ totalTxns) × 100',
+      note:'A transaction qualifies if it meets the basket value threshold (Tier 1 retailer) or contains ≥1 GS-linked SKU (Tier 2 brand product). In a stacking scenario, both can apply to the same transaction.'
+    },
+    {
+      num:2, title:'SKU Coverage Rate',
+      formula:'(GS-linked SKUs ÷ total active SKUs) × 100',
+      def:'The percentage of the retailer\'s total product range that is actively linked to an MGS campaign — including own-brand Tier 1 lines and approved Tier 2 brand partner products.',
+      fbox:'skuCoverage = (gsSkuCount ÷ totalSkuCount) × 100',
+      note:'SKU count is based on active product listings at point of reporting. SKUs that have been delisted or are temporarily out of stock are excluded from the denominator.'
+    },
+    {
+      num:3, title:'Redemption via EPOS (In-Store)',
+      formula:'(GS redeemed in-store ÷ total GS issued) × 100',
+      def:'GS redeemed at the next qualifying EPOS transaction using in-store account lookup.',
+      fbox:'eposRedemption = (gsRedeemedInStore ÷ gsIssued) × 100',
+      note:'Consumer\'s MGS account is identified at EPOS by loyalty card, app QR code, or registered email lookup. The GS balance is applied and a conservation contribution notification is shown on the customer receipt.'
+    },
+    {
+      num:4, title:'Out-of-Store Redemption',
+      formula:'(GS redeemed out-of-store ÷ total GS issued) × 100',
+      def:'GS redeemed via the MGS app, website portal, or partner API integration outside of a physical store transaction.',
+      fbox:'outStoreRedemption = (gsRedeemedOutStore ÷ gsIssued) × 100',
+      note:'Includes: MGS app-initiated conservation choices, website redemption, email-triggered auto-redemption, and partner API calls. In-resort or in-branch digital redemption (e.g. Thomas Cook resort kiosk) is classified as out-of-store.'
+    },
+    {
+      num:5, title:'Unredeemed GS (In Customer Account)',
+      formula:'100% − EPOS redemption % − out-of-store redemption %',
+      def:'GS awarded but not yet directed by the consumer to a specific conservation project. The GS is held in the consumer\'s MGS account.',
+      fbox:'pendingRedemption = 100 − eposRedemption − outStoreRedemption',
+      note:'🔒 Important: All issued GS is immediately committed to the MGS CIC conservation fund at point of award. Unredeemed GS represents consumer conservation choice not yet exercised — it is not a financial liability to the retailer. The CIC fund receives the full contribution regardless of redemption timing.'
+    },
+    {
+      num:6, title:'GS per Qualifying Transaction',
+      formula:'Total GS issued ÷ count of GS-generating transactions',
+      def:'The average number of Green Squares earned per qualifying EPOS transaction in the reporting period.',
+      fbox:'gsPerQualTxn = totalGsIssued ÷ gsTxns',
+      note:'Retailer Tier 1: driven by basket value × GS rate (e.g. 10 GS per £1 of basket above threshold). Brand Tier 2: fixed per-unit award regardless of basket value. In stacking transactions, both tiers contribute to this average.'
+    },
+    {
+      num:7, title:'Campaign Completion Rate',
+      formula:'(GS issued ÷ GS contracted) × 100',
+      def:'The percentage of the total contracted Green Square volume that has been issued to consumers to date.',
+      fbox:'completionRate = (gsIssued ÷ contractedGs) × 100',
+      note:'Issuance occurs at point of qualifying transaction. MGS settlement runs daily. The contracted volume represents the retailer\'s maximum commitment; actual issuance depends on consumer transaction volumes. Campaigns may be extended or topped up subject to MGS agreement.'
+    },
+    {
+      num:8, title:'Campaign Contract Value vs Marketing Spend ROI',
+      formula:'Campaign contract value (£) ÷ associated marketing spend (£)',
+      def:'The ratio of the total MGS campaign contract value to the retailer\'s associated promotional marketing expenditure for the GS campaign.',
+      fbox:'roi = contractValue ÷ marketingSpend\ncontractValue = contractedGs × £1/GS',
+      note:'Campaign contract value = contracted GS × standard MGS rate (£1/GS); 70p per GS flows directly to the CIC conservation fund. Marketing spend is reported by the retailer and represents their own promotional investment (advertising, in-store, digital) attributed to the GS campaign.'
+    },
+    {
+      num:9, title:'Cost per GS Issued',
+      formula:'Marketing spend (£) ÷ GS issued in period',
+      def:'The marketing investment required to generate each issued Green Square in the reporting period.',
+      fbox:'costPerGsIssued = marketingSpend ÷ gsIssued',
+      note:'This is the retailer\'s promotional cost per GS earned by a consumer. It is separate from the MGS contract cost (£1/GS) which flows to the CIC fund. Lower cost per GS issued indicates more efficient consumer GS engagement relative to promotional spend.'
+    },
+    {
+      num:10, title:'Cost per GS Redeemed',
+      formula:'Marketing spend (£) ÷ total GS redeemed (in-store + out-of-store)',
+      def:'The total marketing investment per Green Square that a consumer actively redeems — directing their GS to a specific conservation project.',
+      fbox:'costPerGsRedeemed = marketingSpend ÷ (gsRedeemedInStore + gsRedeemedOutStore)',
+      note:'Lower cost per redemption indicates higher consumer engagement with the GS programme. Significant gap between cost-per-issued and cost-per-redeemed suggests an awareness opportunity: consumers are earning GS but not yet completing their conservation journey.'
+    },
+    {
+      num:11, title:'Average Days to Redemption',
+      formula:'Mean of (redemption timestamp − award timestamp) for all redeemed GS in period',
+      def:'The mean number of days between a Green Square being awarded at EPOS and the consumer directing it to a conservation project.',
+      fbox:'avgDaysToRedeem = mean(redemptionDate − awardDate)',
+      note:'Tracked via MGS platform event timestamps. Award timestamp = EPOS transaction time. Redemption timestamp = in-store next-purchase lookup or app/web redemption event. Shorter redemption cycles indicate higher consumer engagement. Longer cycles (>30 days) may suggest awareness gaps — consider push notification triggers via MGS app.'
+    },
+    {
+      num:12, title:'Campaign Size and Contracted Volume',
+      formula:'Defined at contract execution — retailer or brand commits to a fixed GS volume',
+      def:'The total number of Green Squares contracted by the retailer or brand for the campaign period. Campaigns can be Tier 1 (retailer basket-value) or Tier 2 (brand per-unit purchase).',
+      fbox:'campaignSize = contractedGs\n// Tier 1: totalSpend × gsPerPound\n// Tier 2: unitsSold × gsPerUnit',
+      note:'Campaign sizes are negotiated with MGS based on the retailer\'s or brand\'s expected transaction volume and desired consumer engagement level. The CIC fund commitment (70p per GS) is reserved at contract execution. No lower-grade carbon credits than Verra VCS are accepted.'
+    }
+  ];
+
+  var html = '<div class="method-section">'+
+    '<div class="method-header" onclick="toggleMethod(this)">'+
+      '<div>'+
+        '<div class="method-header-text">📐 mgs conversion analysis methodology</div>'+
+        '<div class="method-version">Version 1.0 · MGS Analytics Framework · '+new Date().getFullYear()+'</div>'+
+      '</div>'+
+      '<span class="method-toggle">+</span>'+
+    '</div>'+
+    '<div class="method-body">'+
+    items.map(function(item){
+      return '<div class="method-item">'+
+        '<div class="method-item-header" onclick="toggleMethodItem(this)">'+
+          '<span class="method-num">'+item.num+'</span>'+
+          '<span class="method-item-title">'+item.title+'</span>'+
+          '<span class="method-item-formula">'+item.formula+'</span>'+
+        '</div>'+
+        '<div class="method-item-body">'+
+          '<p class="method-def">'+item.def+'</p>'+
+          '<div class="method-formula-box">'+item.fbox.replace(/\n/g,'<br>')+'</div>'+
+          '<div class="method-note">'+item.note+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('')+
+    '</div></div>';
+  return html;
+}
+
+function toggleMethod(header) {
+  header.classList.toggle('open');
+  var body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function toggleMethodItem(header) {
+  var body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+function fmt(n) { return parseInt(n||0).toLocaleString(); }
+function pct(a,b) { return b>0 ? Math.round(a/b*100) : 0; }
+
+boot();
+</script>
+</body>
+</html>
