@@ -25,6 +25,16 @@
     .session-ready    { background: rgba(106,176,35,0.2); color: #6ab023; border: 1px solid rgba(106,176,35,0.3); }
     .session-complete { background: rgba(80,200,80,0.2); color: #50c850; border: 1px solid rgba(80,200,80,0.3); }
 
+    /* ── Session header (top of cashier pane) ── */
+    .cp-session { background: white; border-bottom: 2px solid #dde8d0; padding: 16px 20px; display: flex; gap: 20px; align-items: flex-end; flex-shrink: 0; flex-wrap: wrap; }
+    .cp-session-field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 200px; }
+    .cp-session-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; font-weight: bold; }
+    .cp-session-select { border: 1.5px solid #ccd8b8; border-radius: 6px; padding: 9px 12px; font-size: 14px; font-family: inherit; background: white; cursor: pointer; width: 100%; }
+    .cp-session-select:focus { outline: none; border-color: #6ab023; box-shadow: 0 0 0 3px rgba(106,176,35,0.12); }
+    .cp-session-select.active { border-color: #6ab023; background: #f8fdf2; }
+    .cp-session-member-row { display: flex; gap: 8px; align-items: center; }
+    .cp-session-status { display: flex; align-items: center; padding-bottom: 2px; flex-shrink: 0; }
+
     /* ── Main split ── */
     .terminal { flex: 1; display: flex; overflow: hidden; }
 
@@ -156,24 +166,6 @@
     <img src="assets/images/logo.png" alt="MGS">
     <span class="topbar-label">EPOS Terminal</span>
   </div>
-  <div class="topbar-divider"></div>
-
-  <div>
-    <div class="topbar-field-label">retailer</div>
-    <select class="topbar-select" id="retailerSel" onchange="onRetailerChange()">
-      <option value="">— select retailer —</option>
-    </select>
-  </div>
-
-  <div>
-    <div class="topbar-field-label">member account</div>
-    <select class="topbar-select" id="memberSel" onchange="onMemberChange()">
-      <option value="">— no member linked —</option>
-    </select>
-  </div>
-
-  <span class="session-status session-ready" id="sessionStatus">ready</span>
-
   <div class="topbar-right">
     <span class="topbar-clock" id="clock"></span>
     <div class="topbar-links">
@@ -253,15 +245,26 @@
   <!-- ── Cashier pane ── -->
   <div class="cashier-pane">
 
-    <!-- Member lookup -->
-    <div class="cp-section">
-      <div class="cp-section-title">member lookup</div>
-      <div class="member-lookup">
-        <select class="basket-add-select" id="memberLookup" style="max-width:280px;" onchange="quickLinkMember(this.value)">
-          <option value="">— search member by name or email —</option>
+    <!-- Session setup header -->
+    <div class="cp-session">
+      <div class="cp-session-field">
+        <div class="cp-session-label">retailer</div>
+        <select class="cp-session-select" id="retailerSel" onchange="onRetailerChange()">
+          <option value="">— select retailer —</option>
         </select>
-        <span class="member-linked-badge" id="memberBadge" style="display:none;">linked ✓</span>
-        <a href="account.html" id="viewAccountLink" class="btn btn-secondary btn-xs" style="display:none;" target="_blank">view account ↗</a>
+      </div>
+      <div class="cp-session-field">
+        <div class="cp-session-label">member account</div>
+        <div class="cp-session-member-row">
+          <select class="cp-session-select" id="memberLookup" onchange="quickLinkMember(this.value)" style="flex:1;">
+            <option value="">— no member linked —</option>
+          </select>
+          <span class="member-linked-badge" id="memberBadge" style="display:none;">linked ✓</span>
+          <a href="account.html" id="viewAccountLink" class="btn btn-secondary btn-xs" style="display:none;" target="_blank">view account ↗</a>
+        </div>
+      </div>
+      <div class="cp-session-status">
+        <span class="session-status session-ready" id="sessionStatus">ready</span>
       </div>
     </div>
 
@@ -393,11 +396,8 @@ function boot() {
 }
 
 function buildMemberSelectors() {
-  var opts = '<option value="">— no member linked —</option>' +
-    members.map(function(m){ return '<option value="'+m.id+'">'+m.name+' ('+m.id+')</option>'; }).join('');
-  document.getElementById('memberSel').innerHTML = opts;
   document.getElementById('memberLookup').innerHTML =
-    '<option value="">— search member —</option>' +
+    '<option value="">— no member linked —</option>' +
     members.map(function(m){ return '<option value="'+m.id+'">'+m.name+' · '+m.email+'</option>'; }).join('');
 }
 
@@ -455,19 +455,10 @@ function onRetailerChange() {
     document.getElementById('cdMessage').textContent = 'earning green squares at every shop — helping protect the amazon rainforest';
     document.getElementById('totRate').textContent = '—';
   }
-  // sync top selector
-  document.getElementById('memberSel').value = currentMember ? currentMember.id : '';
   recalc();
 }
 
-// ── Member change ─────────────────────────────────────────────────────────────
-function onMemberChange() {
-  var id = document.getElementById('memberSel').value;
-  setMember(id);
-}
-
 function quickLinkMember(id) {
-  document.getElementById('memberSel').value = id;
   setMember(id);
 }
 
@@ -556,7 +547,6 @@ function renderBasket() {
 function clearBasket() {
   basketItems = [];
   document.getElementById('basketValue').value = '';
-  document.getElementById('memberSel').value = '';
   document.getElementById('memberLookup').value = '';
   currentMember = null;
   document.getElementById('memberBadge').style.display = 'none';
