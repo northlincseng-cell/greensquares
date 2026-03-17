@@ -287,14 +287,16 @@
         <div class="receipt-row gs" id="rcpT2Row"><span>🔵 tier 2 (brands)</span><span id="rcpT2">—</span></div>
         <div class="receipt-row total"><span>total green squares</span><span id="rcpTotal">—</span></div>
         <div class="receipt-message" id="rcpMessage"></div>
-        <hr class="receipt-divider">
-        <div class="receipt-qr-row">
-          <div id="rcpQrGrid"></div>
-          <div class="receipt-qr-info">
-            <div class="receipt-qr-label">one-time redemption code</div>
-            <div class="receipt-qr-code" id="rcpQrCode">MGS-----------</div>
-            <div class="receipt-qr-exp">valid 24 hours · single use</div>
-            <div class="receipt-qr-hint">→ scan in my green squares app</div>
+        <div id="rcpQrSection">
+          <hr class="receipt-divider">
+          <div class="receipt-qr-row">
+            <div id="rcpQrGrid"></div>
+            <div class="receipt-qr-info">
+              <div class="receipt-qr-label">claim your green squares — one-time code</div>
+              <div class="receipt-qr-code" id="rcpQrCode">MGS-----------</div>
+              <div class="receipt-qr-exp">valid 24 hours · single use · server-verified</div>
+              <div class="receipt-qr-hint">→ scan in my green squares app to claim</div>
+            </div>
           </div>
         </div>
         <button class="receipt-close" onclick="closeReceipt()">close receipt / new transaction</button>
@@ -854,16 +856,28 @@ function showReceipt(txn, t1, t2, grand, basketVal, now) {
     return '<div class="receipt-row"><span>'+p.productName+'</span><span style="color:#3a6acc;">+'+p.gsPerUnit+' GS</span></div>';
   }).join('');
 
-  document.getElementById('rcpMessage').textContent =
-    (currentMember ? currentMember.name+' — ' : '')+
-    'you have earned 🌿 '+fmt(grand)+' green squares at '+currentRetailer.name+
-    '. your contribution is helping protect the amazon rainforest. thank you.';
+  var qrSection = document.getElementById('rcpQrSection');
 
-  // One-time QR redemption code
-  var qrSeed = txn.id + now.getTime();
-  var qrCode = 'MGS-'+txn.id.slice(-8).toUpperCase()+'-'+(now.getTime()%10000).toString(16).toUpperCase();
-  buildReceiptQr(qrSeed);
-  document.getElementById('rcpQrCode').textContent = qrCode;
+  if (currentMember) {
+    // Loyalty card was present — GS credited directly, no QR needed
+    qrSection.style.display = 'none';
+    document.getElementById('rcpMessage').textContent =
+      currentMember.name + ' — 🌿 ' + fmt(grand) + ' green squares have been credited to your account at ' +
+      currentRetailer.name + '. thank you for helping protect the amazon rainforest.';
+  } else {
+    // Guest transaction — generate one-time claim QR
+    qrSection.style.display = '';
+    var qrSeed = txn.id + now.getTime();
+    var qrCode = 'MGS-' + txn.id.slice(-8).toUpperCase() + '-' + (now.getTime() % 65536).toString(16).toUpperCase().padStart(4,'0');
+    buildReceiptQr(qrSeed);
+    document.getElementById('rcpQrCode').textContent = qrCode;
+    // Store as pending token in localStorage (server would verify in production)
+    var pending = JSON.parse(localStorage.getItem('mgs_pending_qr') || '[]');
+    pending.push({ code: qrCode, gs: grand, retailer: currentRetailer.name, expires: now.getTime() + 86400000, used: false });
+    localStorage.setItem('mgs_pending_qr', JSON.stringify(pending));
+    document.getElementById('rcpMessage').textContent =
+      '🌿 ' + fmt(grand) + ' green squares are waiting for you — scan the code below in the MGS app within 24 hours to credit them to your account.';
+  }
 
   document.getElementById('receiptOverlay').classList.add('show');
 }
