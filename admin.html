@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mygreensquares.com — pin management</title>
+  <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    body { background-color: var(--color-green-pale); margin: 0; }
+    .page-wrapper { max-width: 960px; margin: 0 auto; background: white; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
+
+    /* Header (shared) */
+    .utility-bar { background: var(--color-green-pale); display: flex; justify-content: flex-end; align-items: center; padding: 5px 12px; gap: 5px; }
+    .utility-bar input { width: 170px; padding: 4px 10px; font-size: 11px; border: 1px solid #c8c8b8; border-radius: 3px; background: rgba(255,255,255,0.8); font-family: var(--font-primary); }
+    .utility-bar button { background: var(--color-green-primary); color: white; border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
+    .site-header { background: var(--color-green-primary); display: flex; align-items: center; justify-content: space-between; padding: 38px 16px; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .site-nav { display: flex; align-items: stretch; }
+    .site-nav a { color: white; font-size: 13px; text-transform: lowercase; text-decoration: none; padding: 0 14px; display: flex; align-items: center; transition: background 0.15s; }
+    .site-nav a:hover { background: rgba(0,0,0,0.15); }
+    .site-nav .nav-acct { background: rgba(0,0,0,0.18); border-left: 1px solid rgba(255,255,255,0.2); font-size: 12px; }
+    .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
+
+    /* Footer */
+    footer { background: var(--color-green-olive); margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
+    .footer-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .footer-label { font-size: 11px; color: rgba(255,255,255,0.55); }
+    .footer-label strong { color: rgba(255,255,255,0.8); }
+    .soc-btn { width: 26px; height: 26px; background: rgba(255,255,255,0.12); border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 11px; text-decoration: none; }
+    .footer-right { text-align: right; }
+    .fnav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; margin-bottom: 4px; }
+    .fnav a { font-size: 10px; color: rgba(255,255,255,0.55); text-decoration: none; padding: 0 6px; border-right: 1px solid rgba(255,255,255,0.2); }
+    .fnav a:last-child { border-right: none; }
+    .fnav a:hover { color: white; }
+    .footer-copy { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+    /* Admin layout */
+    .admin-wrapper { padding: 20px; }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--color-green-mid);
+    }
+    .admin-title { font-size: 22px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0; }
+    .admin-header-actions { display: flex; gap: 8px; align-items: center; }
+
+    .admin-main { display: flex; gap: 18px; align-items: flex-start; }
+
+    /* Left: form + mini-map */
+    .admin-form-col { width: 370px; flex-shrink: 0; }
+    .admin-form-panel { background: #f9faf5; border: 1px solid var(--color-green-mid); border-radius: 8px; padding: 16px; }
+    .form-title { font-size: 15px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0 0 12px 0; }
+
+    .mini-map-wrap { position: relative; margin-bottom: 12px; border-radius: 4px; overflow: hidden; border: 1px solid var(--color-green-mid); }
+    #adminMap { height: 220px; }
+    .mini-map-hint { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.55); color: white; font-size: 10px; padding: 4px 8px; text-align: center; pointer-events: none; z-index: 1000; }
+
+    .form-group { margin-bottom: 9px; }
+    .form-group label { display: block; font-size: 10px; color: #888; text-transform: lowercase; margin-bottom: 3px; letter-spacing: 0.3px; }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d0d8c0;
+      border-radius: 3px;
+      padding: 6px 8px;
+      font-size: 12px;
+      font-family: var(--font-primary);
+      color: var(--color-grey-dark);
+      background: white;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { outline: none; border-color: var(--color-green-primary); }
+    .form-row { display: grid; gap: 8px; }
+    .form-row-2 { grid-template-columns: 1fr 1fr; }
+    .form-group textarea { resize: vertical; min-height: 56px; }
+    .form-buttons { display: flex; gap: 8px; margin-top: 14px; }
+
+    /* Right: pins list */
+    .admin-list-col { flex: 1; min-width: 0; }
+    .admin-list-panel { border: 1px solid var(--color-green-mid); border-radius: 8px; overflow: hidden; }
+    .list-header { background: var(--color-green-pale); padding: 11px 14px; border-bottom: 1px solid var(--color-green-mid); display: flex; align-items: center; justify-content: space-between; }
+    .list-header h3 { font-size: 15px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0; }
+    .pin-badge { background: var(--color-green-primary); color: white; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 6px; }
+
+    .pin-row { padding: 9px 14px; border-bottom: 1px solid #f0f0e8; }
+    .pin-row:last-child { border-bottom: none; }
+    .pin-row:hover { background: #fbfcf8; }
+    .pin-row-main { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; flex-wrap: wrap; }
+    .pin-id-badge { background: var(--color-green-category); color: white; font-size: 9px; padding: 1px 5px; border-radius: 2px; font-family: monospace; flex-shrink: 0; }
+    .pin-retailer { font-size: 11px; font-weight: bold; color: var(--color-green-primary); }
+    .pin-user { font-size: 11px; color: #666; }
+    .pin-squares { font-size: 11px; color: var(--color-green-tile); font-weight: bold; }
+    .pin-date { font-size: 10px; color: #aaa; margin-left: auto; }
+    .pin-row-title { font-size: 11px; color: #333; margin-bottom: 2px; }
+    .pin-row-coords { font-size: 10px; color: #bbb; margin-bottom: 5px; font-family: monospace; }
+    .pin-row-actions { display: flex; gap: 5px; }
+
+    .empty-state { padding: 30px; text-align: center; color: #aaa; font-size: 13px; }
+
+    /* Buttons */
+    .btn-gs { display: inline-block; background: var(--color-green-primary); color: white; border: 1px solid var(--color-green-dark); border-radius: 3px; padding: 6px 14px; font-size: 12px; font-family: var(--font-primary); text-transform: lowercase; cursor: pointer; transition: background 0.15s; text-decoration: none; }
+    .btn-gs:hover { background: var(--color-green-dark); color: white; }
+    .btn-admin { background: white; color: var(--color-grey-dark); border: 1px solid #d0d8c0; border-radius: 3px; padding: 6px 12px; font-size: 12px; font-family: var(--font-primary); text-transform: lowercase; cursor: pointer; }
+    .btn-admin:hover { background: #f5f5f0; }
+    .btn-danger { color: #cc3333; border-color: #cc3333; }
+    .btn-danger:hover { background: #fff5f5; }
+    .btn-edit { background: var(--color-green-pale); color: var(--color-green-primary); border: 1px solid var(--color-green-mid); border-radius: 2px; padding: 3px 8px; font-size: 10px; cursor: pointer; font-family: var(--font-primary); }
+    .btn-edit:hover { background: var(--color-green-mid); }
+    .btn-delete { background: #fff5f5; color: #cc3333; border: 1px solid #ffcccc; border-radius: 2px; padding: 3px 8px; font-size: 10px; cursor: pointer; font-family: var(--font-primary); }
+    .btn-delete:hover { background: #ffe5e5; }
+
+    /* Map pin (same as map.html) */
+    .mgs-pin { width: 22px; height: 22px; background: var(--color-green-primary); border-radius: 4px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
+    .mgs-pin-new { background: #cc7700; }
+
+    .dupe-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; padding: 8px 12px; font-size: 11px; color: #856404; margin-top: 8px; display: none; }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <div class="utility-bar">
+    <input type="text" placeholder="type to search site">
+    <button>&#9906;</button>
+  </div>
+
+  <header class="site-header">
+    <a href="index.html" class="logo">
+      <img src="assets/images/logo.png" alt="My Green Squares" height="52">
+    </a>
+    <nav class="site-nav">
+      <a href="index.html">about</a>
+      <a href="map.html">projects</a>
+      <a href="index.html">contact</a>
+      <a href="index.html">news</a>
+      <a href="account.html" class="nav-acct">my account</a>
+      <span class="nav-pipe">|</span>
+      <a href="index.html" class="nav-acct">logout</a>
+    </nav>
+  </header>
+
+  <div class="admin-wrapper">
+
+    <div class="admin-header">
+      <h2 class="admin-title">📍 pin management</h2>
+      <div class="admin-header-actions">
+        <button onclick="exportPins()" class="btn-admin">export json</button>
+        <button onclick="resetToDefaults()" class="btn-admin btn-danger">reset to defaults</button>
+        <a href="map.html" class="btn-gs">view map</a>
+      </div>
+    </div>
+
+    <div class="admin-main">
+
+      <!-- Left: form + mini-map -->
+      <div class="admin-form-col">
+        <div class="admin-form-panel">
+          <div class="form-title" id="formTitle">add new pin</div>
+
+          <!-- Mini map — click to place pin -->
+          <div class="mini-map-wrap">
+            <div id="adminMap"></div>
+            <div class="mini-map-hint">click the map to set pin location</div>
+          </div>
+
+          <form id="pinForm" onsubmit="savePin(event)">
+            <input type="hidden" id="pinId">
+
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label>latitude *</label>
+                <input type="number" id="pinLat" step="0.000001" placeholder="-5.300000" required>
+              </div>
+              <div class="form-group">
+                <label>longitude *</label>
+                <input type="number" id="pinLng" step="0.000001" placeholder="-60.050000" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>title *</label>
+              <input type="text" id="pinTitle" placeholder="e.g. Weekly Shop — Sainsbury's" required>
+            </div>
+
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label>retailer *</label>
+                <input type="text" id="pinRetailer" placeholder="e.g. Sainsbury's" required>
+              </div>
+              <div class="form-group">
+                <label>product id</label>
+                <input type="text" id="pinProductId" placeholder="e.g. SAI-001">
+              </div>
+            </div>
+
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label>user id</label>
+                <input type="text" id="pinUserId" placeholder="e.g. james001">
+              </div>
+              <div class="form-group">
+                <label>user name *</label>
+                <input type="text" id="pinUserName" placeholder="e.g. James T." required>
+              </div>
+            </div>
+
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label>squares *</label>
+                <input type="number" id="pinSquares" placeholder="120" min="1" required>
+              </div>
+              <div class="form-group">
+                <label>date *</label>
+                <input type="date" id="pinDate" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>category</label>
+              <select id="pinCategory">
+                <option value="food">food &amp; drink</option>
+                <option value="leisure">leisure &amp; lifestyle</option>
+                <option value="hi-tech">hi-tech &amp; electrical</option>
+                <option value="travel">travel</option>
+                <option value="home">home</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>description</label>
+              <textarea id="pinDescription" rows="3" placeholder="Describe the purchase and its contribution to the project..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>image url (optional)</label>
+              <input type="text" id="pinImage" placeholder="assets/images/amazon.png">
+            </div>
+
+            <div class="dupe-warning" id="dupeWarning"></div>
+
+            <div class="form-buttons">
+              <button type="submit" class="btn-gs" id="saveBtn">add pin</button>
+              <button type="button" class="btn-admin" onclick="resetForm()">cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right: pins list -->
+      <div class="admin-list-col">
+        <div class="admin-list-panel">
+          <div class="list-header">
+            <h3>all pins <span id="pinCountBadge" class="pin-badge">0</span></h3>
+          </div>
+          <div id="pinsList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <span class="footer-label">mygreensquares.com &mdash; <strong>admin</strong></span>
+    </div>
+    <div class="footer-right">
+      <nav class="fnav">
+        <a href="index.html">home</a>
+        <a href="map.html">projects map</a>
+        <a href="account.html">account</a>
+      </nav>
+      <div class="footer-copy">a PROFOCO company &nbsp;|&nbsp; © copyright 2026 mygreensquares</div>
+    </div>
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var pins = [];
+  var editingId = null;
+  var adminMap, tempMarker;
+
+  // ── Boundary (same as map.html) ───────────────────────────────────────────
+  var boundary = [
+    [-5.1,-59.3],[-4.6,-59.9],[-4.7,-60.8],
+    [-5.2,-61.3],[-6.0,-61.5],[-7.0,-61.0],
+    [-7.3,-60.0],[-6.8,-59.2],[-6.0,-59.1]
+  ];
+
+  // ── Load pins ─────────────────────────────────────────────────────────────
+  function loadPins() {
+    var stored = localStorage.getItem('mgs_pins');
+    if (stored) {
+      pins = JSON.parse(stored);
+      init();
+    } else {
+      fetch('assets/data/pins.json')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          pins = data;
+          localStorage.setItem('mgs_pins', JSON.stringify(pins));
+          init();
+        });
+    }
+  }
+
+  function init() {
+    initMap();
+    renderList();
+    document.getElementById('pinDate').value = new Date().toISOString().split('T')[0];
+  }
+
+  // ── Admin mini-map ────────────────────────────────────────────────────────
+  function initMap() {
+    adminMap = L.map('adminMap', { center: [-5.8, -60.2], zoom: 6 });
+
+    L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { attribution: '&copy; Esri', maxZoom: 18 }
+    ).addTo(adminMap);
+
+    L.polygon(boundary, { color: '#6ab023', weight: 2, fillOpacity: 0.12 }).addTo(adminMap);
+
+    // Show existing pins as small dots with tooltips
+    pins.forEach(function(pin) {
+      L.circleMarker([pin.lat, pin.lng], {
+        radius: 5, color: '#6ab023', fillColor: '#6ab023', fillOpacity: 0.7, weight: 1
+      }).bindTooltip(pin.id + ' — ' + pin.userName).addTo(adminMap);
+    });
+
+    // Click to place new pin
+    adminMap.on('click', function(e) {
+      var lat = parseFloat(e.latlng.lat.toFixed(6));
+      var lng = parseFloat(e.latlng.lng.toFixed(6));
+      document.getElementById('pinLat').value = lat;
+      document.getElementById('pinLng').value = lng;
+      checkDupe(lat, lng);
+      placeTempMarker(lat, lng);
+    });
+  }
+
+  function placeTempMarker(lat, lng) {
+    if (tempMarker) adminMap.removeLayer(tempMarker);
+    tempMarker = L.marker([lat, lng], {
+      icon: L.divIcon({
+        className: '',
+        html: '<div class="mgs-pin mgs-pin-new"></div>',
+        iconSize: [22, 22], iconAnchor: [11, 11]
+      })
+    }).addTo(adminMap);
+  }
+
+  // ── Duplicate location check ──────────────────────────────────────────────
+  function checkDupe(lat, lng) {
+    var warn = document.getElementById('dupeWarning');
+    var dupe = pins.find(function(p) {
+      return p.id !== editingId &&
+             Math.abs(p.lat - lat) < 0.005 &&
+             Math.abs(p.lng - lng) < 0.005;
+    });
+    if (dupe) {
+      warn.style.display = 'block';
+      warn.textContent = '⚠ ' + dupe.id + ' (' + dupe.userName + ') is very close to this location. Move pin slightly.';
+    } else {
+      warn.style.display = 'none';
+    }
+  }
+
+  // ── Render pins list ──────────────────────────────────────────────────────
+  function renderList() {
+    var container = document.getElementById('pinsList');
+    document.getElementById('pinCountBadge').textContent = pins.length;
+
+    if (pins.length === 0) {
+      container.innerHTML = '<div class="empty-state">no pins yet — add one using the form on the left</div>';
+      return;
+    }
+
+    container.innerHTML = pins.map(function(pin) {
+      return (
+        '<div class="pin-row" id="row-' + pin.id + '">' +
+          '<div class="pin-row-main">' +
+            '<span class="pin-id-badge">' + pin.id + '</span>' +
+            '<span class="pin-retailer">' + pin.retailer + '</span>' +
+            '<span class="pin-user">' + pin.userName + '</span>' +
+            '<span class="pin-squares">🌿 ' + pin.squares + '</span>' +
+            '<span class="pin-date">' + pin.date + '</span>' +
+          '</div>' +
+          '<div class="pin-row-title">' + pin.title + '</div>' +
+          '<div class="pin-row-coords">📍 ' + pin.lat + ', ' + pin.lng + '</div>' +
+          '<div class="pin-row-actions">' +
+            '<button onclick="editPin(\'' + pin.id + '\')" class="btn-edit">edit</button>' +
+            '<button onclick="deletePin(\'' + pin.id + '\')" class="btn-delete">delete</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+  }
+
+  // ── Save pin (add or update) ──────────────────────────────────────────────
+  function savePin(e) {
+    e.preventDefault();
+
+    var lat = parseFloat(document.getElementById('pinLat').value);
+    var lng = parseFloat(document.getElementById('pinLng').value);
+
+    // Block exact duplicate locations
+    var dupe = pins.find(function(p) {
+      return p.id !== editingId &&
+             Math.abs(p.lat - lat) < 0.005 &&
+             Math.abs(p.lng - lng) < 0.005;
+    });
+    if (dupe) {
+      alert('Pin ' + dupe.id + ' (' + dupe.userName + ') is too close to this location. Each pin must have a unique position.');
+      return;
+    }
+
+    var pin = {
+      id:          editingId || generateId(),
+      lat:         lat,
+      lng:         lng,
+      title:       document.getElementById('pinTitle').value,
+      description: document.getElementById('pinDescription').value,
+      image:       document.getElementById('pinImage').value || 'assets/images/amazon.png',
+      retailer:    document.getElementById('pinRetailer').value,
+      productId:   document.getElementById('pinProductId').value,
+      userId:      document.getElementById('pinUserId').value,
+      userName:    document.getElementById('pinUserName').value,
+      squares:     parseInt(document.getElementById('pinSquares').value),
+      date:        document.getElementById('pinDate').value,
+      category:    document.getElementById('pinCategory').value
+    };
+
+    if (editingId) {
+      var idx = pins.findIndex(function(p) { return p.id === editingId; });
+      pins[idx] = pin;
+    } else {
+      pins.push(pin);
+    }
+
+    localStorage.setItem('mgs_pins', JSON.stringify(pins));
+    resetForm();
+    renderList();
+  }
+
+  // ── Edit pin ──────────────────────────────────────────────────────────────
+  function editPin(id) {
+    var pin = pins.find(function(p) { return p.id === id; });
+    if (!pin) return;
+
+    editingId = id;
+    document.getElementById('formTitle').textContent = 'edit pin — ' + id;
+    document.getElementById('saveBtn').textContent = 'save changes';
+    document.getElementById('pinId').value        = pin.id;
+    document.getElementById('pinLat').value       = pin.lat;
+    document.getElementById('pinLng').value       = pin.lng;
+    document.getElementById('pinTitle').value     = pin.title;
+    document.getElementById('pinDescription').value = pin.description || '';
+    document.getElementById('pinImage').value     = pin.image || '';
+    document.getElementById('pinRetailer').value  = pin.retailer;
+    document.getElementById('pinProductId').value = pin.productId || '';
+    document.getElementById('pinUserId').value    = pin.userId || '';
+    document.getElementById('pinUserName').value  = pin.userName;
+    document.getElementById('pinSquares').value   = pin.squares;
+    document.getElementById('pinDate').value      = pin.date;
+    document.getElementById('pinCategory').value  = pin.category || 'food';
+
+    adminMap.setView([pin.lat, pin.lng], 9);
+    placeTempMarker(pin.lat, pin.lng);
+
+    document.querySelector('.admin-form-col').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ── Delete pin ────────────────────────────────────────────────────────────
+  function deletePin(id) {
+    if (!confirm('Delete pin ' + id + '? This cannot be undone.')) return;
+    pins = pins.filter(function(p) { return p.id !== id; });
+    localStorage.setItem('mgs_pins', JSON.stringify(pins));
+    renderList();
+  }
+
+  // ── Reset form ────────────────────────────────────────────────────────────
+  function resetForm() {
+    editingId = null;
+    document.getElementById('formTitle').textContent = 'add new pin';
+    document.getElementById('saveBtn').textContent   = 'add pin';
+    document.getElementById('pinForm').reset();
+    document.getElementById('pinDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('dupeWarning').style.display = 'none';
+    if (tempMarker) { adminMap.removeLayer(tempMarker); tempMarker = null; }
+  }
+
+  // ── Generate next ID ──────────────────────────────────────────────────────
+  function generateId() {
+    var max = pins.reduce(function(m, p) {
+      var n = parseInt(p.id.replace('PIN', '')) || 0;
+      return Math.max(m, n);
+    }, 0);
+    return 'PIN' + String(max + 1).padStart(3, '0');
+  }
+
+  // ── Export JSON ───────────────────────────────────────────────────────────
+  function exportPins() {
+    var blob = new Blob([JSON.stringify(pins, null, 2)], { type: 'application/json' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = 'pins.json'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Reset to seed data ────────────────────────────────────────────────────
+  function resetToDefaults() {
+    if (!confirm('Reset all pins to the default seed data? All changes will be lost.')) return;
+    localStorage.removeItem('mgs_pins');
+    location.reload();
+  }
+
+  loadPins();
+</script>
+</body>
+</html>

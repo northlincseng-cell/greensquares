@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mygreensquares.com — Amazon rainforest projects</title>
   <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     body { background-color: var(--color-green-pale); margin: 0; }
     .page-wrapper { max-width: 960px; margin: 0 auto; background: var(--color-white); box-shadow: 0 0 20px rgba(0,0,0,0.15); }
 
-    /* Utility / header (shared) */
+    /* Utility / header */
     .utility-bar { background: var(--color-green-pale); display: flex; justify-content: flex-end; align-items: center; padding: 5px 12px; gap: 5px; }
     .utility-bar input { width: 170px; padding: 4px 10px; font-size: 11px; border: 1px solid #c8c8b8; border-radius: 3px; background: rgba(255,255,255,0.8); font-family: var(--font-primary); color: var(--color-grey-text); }
     .utility-bar input::placeholder { color: var(--color-grey-meta); }
@@ -22,7 +23,7 @@
     .site-nav .nav-acct { background: rgba(0,0,0,0.18); border-left: 1px solid rgba(255,255,255,0.2); font-size: 12px; }
     .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
 
-    /* Footer (shared) */
+    /* Footer */
     footer { background: var(--color-green-olive); margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
     .footer-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .footer-label { font-size: 11px; color: rgba(255,255,255,0.55); }
@@ -36,25 +37,25 @@
     .fnav a:hover { color: white; }
     .footer-copy { font-size: 10px; color: rgba(255,255,255,0.35); }
 
-    /* Squares area wrapper */
+    /* Squares layout */
     .squares-area { background: var(--color-green-pale); padding: 4px; display: flex; flex-direction: column; gap: 4px; }
     .main-area { display: flex; align-items: flex-start; gap: 4px; }
     .main-content { flex: 1; min-width: 0; }
     .main-sidebar { width: 315px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
     .bottom-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
 
-    /* ---- Map main square ---- */
+    /* Map square */
     .map-frame-wrap {
       position: relative;
       width: 100%;
       height: 633px;
       overflow: hidden;
-      background: #0d1a0a;
       border-radius: 8px;
+      background: #0d1a0a;
     }
-    .map-frame-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+    #projectMap { width: 100%; height: 100%; }
 
-    /* Project overlay badge */
+    /* Project badge overlay — sits above Leaflet layers */
     .map-project-badge {
       position: absolute;
       top: 14px; left: 14px;
@@ -62,34 +63,83 @@
       color: white;
       padding: 14px 18px;
       border-radius: 4px;
-      max-width: 240px;
+      max-width: 220px;
       backdrop-filter: blur(2px);
+      z-index: 1000;
+      pointer-events: none;
     }
-    .badge-title { font-size: 22px; font-weight: normal; text-transform: lowercase; line-height: 1.2; margin-bottom: 8px; }
-    .badge-body { font-size: 12px; color: rgba(255,255,255,0.82); line-height: 1.45; }
+    .badge-title { font-size: 20px; font-weight: normal; text-transform: lowercase; line-height: 1.2; margin-bottom: 8px; }
+    .badge-body { font-size: 11px; color: rgba(255,255,255,0.82); line-height: 1.45; }
 
-    /* Project popup */
-    .map-popup {
-      position: absolute;
-      bottom: 80px; left: 50%;
-      transform: translateX(-20%);
-      background: white;
+    /* Custom map pins */
+    .mgs-pin {
+      width: 22px; height: 22px;
+      background: var(--color-green-primary);
       border-radius: 4px;
-      padding: 14px;
-      max-width: 300px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-      z-index: 10;
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.12s, background 0.12s;
     }
-    .popup-title { font-size: 14px; font-weight: bold; color: var(--color-green-primary); margin-bottom: 8px; }
-    .popup-body { font-size: 11px; color: #555; line-height: 1.5; margin: 0; }
-    .popup-sponsor { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .popup-sponsor-logo { font-size: 11px; font-weight: bold; color: var(--color-green-primary); border: 1px solid var(--color-green-mid); border-radius: 2px; padding: 3px 7px; }
-    .popup-rate { font-size: 11px; color: var(--color-green-primary); margin: 8px 0 6px; font-weight: bold; }
-    .popup-link { font-size: 11px; color: var(--color-green-primary); text-decoration: underline; }
-    .popup-tail { position: absolute; bottom: -10px; left: 40px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid white; }
-    .popup-img { float: right; width: 80px; height: 70px; object-fit: cover; border-radius: 2px; margin-left: 10px; margin-bottom: 4px; }
+    .mgs-pin:hover { transform: scale(1.3); background: var(--color-green-dark); }
 
-    /* ---- Sidebar: action tiles 2×2 ---- */
+    /* Leaflet popup overrides */
+    .mgs-popup-wrap .leaflet-popup-content-wrapper {
+      padding: 0;
+      border-radius: 4px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+    .mgs-popup-wrap .leaflet-popup-content { margin: 0; width: 300px !important; }
+    .mgs-popup-wrap .leaflet-popup-tip { background: white; }
+    .mgs-popup-wrap .leaflet-popup-close-button {
+      top: 6px; right: 8px;
+      color: var(--color-green-primary);
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Balloon content */
+    .mgs-balloon-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--color-green-primary);
+      padding: 10px 30px 8px 12px;
+      border-bottom: 1px solid #f0f0e8;
+      line-height: 1.3;
+    }
+    .mgs-balloon-row { display: flex; gap: 10px; padding: 10px 12px; }
+    .mgs-balloon-img {
+      width: 74px; height: 66px;
+      object-fit: cover;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .mgs-balloon-info { flex: 1; min-width: 0; }
+    .mgs-balloon-tag {
+      display: inline-block;
+      background: var(--color-green-tile);
+      color: white;
+      border-radius: 2px;
+      padding: 1px 6px;
+      font-size: 9px;
+      text-transform: lowercase;
+      margin-bottom: 5px;
+    }
+    .mgs-balloon-desc { font-size: 10px; color: #555; line-height: 1.4; margin-bottom: 6px; }
+    .mgs-balloon-rate { font-size: 12px; font-weight: bold; color: var(--color-green-primary); margin-bottom: 3px; }
+    .mgs-balloon-meta { font-size: 10px; color: #999; }
+    .mgs-balloon-link {
+      display: block;
+      font-size: 11px;
+      color: var(--color-green-primary);
+      text-decoration: underline;
+      padding: 6px 12px 8px;
+      border-top: 1px solid #f0f0e8;
+    }
+    .mgs-balloon-link:hover { color: var(--color-green-dark); text-decoration: underline; }
+
+    /* Sidebar action tiles 2×2 */
     .action-tiles {
       height: 315px;
       border-radius: 8px;
@@ -108,18 +158,18 @@
       justify-content: center;
       text-align: center;
       text-decoration: none;
-      padding: 12px;
+      padding: 10px;
       transition: background 0.15s;
-      gap: 6px;
+      gap: 5px;
     }
     .act-tile:hover { background: var(--color-green-dark); text-decoration: none; color: white; }
-    .act-tile-count { font-size: 36px; font-weight: bold; line-height: 1; }
-    .act-tile-leaf { font-size: 28px; opacity: 0.85; }
+    .act-tile-count { font-size: 34px; font-weight: bold; line-height: 1; }
+    .act-tile-leaf { font-size: 26px; opacity: 0.85; }
     .act-tile-label { font-size: 12px; text-transform: lowercase; opacity: 0.9; }
-    .act-tile-icons { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 2px; }
-    .act-icon-sq { width: 30px; height: 30px; background: rgba(255,255,255,0.18); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; }
+    .act-tile-icons { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .act-icon-sq { width: 28px; height: 28px; background: rgba(255,255,255,0.18); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
 
-    /* ---- Sidebar: deforestation video tile ---- */
+    /* Deforestation video tile */
     .defo-tile {
       position: relative;
       height: 315px;
@@ -130,108 +180,38 @@
     }
     .defo-tile img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0.75; transition: opacity 0.2s; }
     .defo-tile:hover img { opacity: 0.9; }
-    .defo-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-    }
-    .defo-play {
-      width: 58px; height: 58px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.9);
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.15s, background 0.15s;
-    }
+    .defo-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .defo-play { width: 58px; height: 58px; border-radius: 50%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
     .defo-tile:hover .defo-play { transform: scale(1.08); background: white; }
     .defo-play-arrow { width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 18px solid var(--color-green-primary); margin-left: 4px; }
-    .defo-caption {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.7));
-      color: white;
-      font-size: 17px;
-      font-weight: normal;
-      text-transform: lowercase;
-      padding: 30px 16px 16px;
-      line-height: 1.25;
-    }
+    .defo-caption { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: white; font-size: 17px; font-weight: normal; text-transform: lowercase; padding: 30px 16px 16px; line-height: 1.25; }
 
-    /* ---- Bottom strip panels ---- */
-    .bottom-panel {
-      height: 315px;
-      border-radius: 8px;
-      box-sizing: border-box;
-      overflow: hidden;
-    }
+    /* Bottom panels */
+    .bottom-panel { height: 315px; border-radius: 8px; box-sizing: border-box; overflow: hidden; }
 
-    /* your project map */
-    .proj-map-panel {
-      background: #f2f5ec;
-      border: 1px solid var(--color-green-mid);
-      padding: 20px 20px 16px;
-      display: flex;
-      flex-direction: column;
-    }
-    .proj-map-panel h3 { font-size: 20px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0 0 8px 0; }
-    .proj-map-desc { font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 14px; }
-    .members-say-label { font-size: 11px; font-weight: bold; color: var(--color-grey-dark); text-transform: lowercase; margin-bottom: 8px; }
-    .member-quote {
-      display: flex;
-      gap: 8px;
-      padding: 6px 0;
-      border-top: 1px solid #e0e0d8;
-      font-size: 11px;
-      color: #555;
-      line-height: 1.4;
-    }
-    .member-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .proj-map-panel { background: #f2f5ec; border: 1px solid var(--color-green-mid); padding: 18px 18px 14px; display: flex; flex-direction: column; }
+    .proj-map-panel h3 { font-size: 20px; font-weight: normal; color: var(--color-green-primary); text-transform: lowercase; margin: 0 0 6px 0; }
+    .proj-map-desc { font-size: 12px; color: #555; line-height: 1.55; margin-bottom: 12px; }
+    .members-say-label { font-size: 10px; font-weight: bold; color: #888; text-transform: lowercase; letter-spacing: 0.3px; margin-bottom: 6px; }
+    .member-quote { display: flex; gap: 8px; padding: 6px 0; border-top: 1px solid #e0e0d8; font-size: 11px; color: #555; line-height: 1.4; }
+    .member-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
     .member-name { font-weight: bold; color: var(--color-green-primary); display: block; font-size: 10px; margin-bottom: 2px; }
 
-    /* members say */
-    .members-panel {
-      background: var(--color-green-olive);
-      padding: 18px 16px;
-      color: white;
-    }
-    .members-panel h3 { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; margin: 0 0 14px 0; }
-    .tweet-item {
-      display: flex;
-      gap: 8px;
-      padding: 7px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      font-size: 11px;
-      color: rgba(255,255,255,0.82);
-      line-height: 1.4;
-    }
+    .members-panel { background: var(--color-green-olive); padding: 16px; color: white; }
+    .members-panel h3 { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; margin: 0 0 12px 0; }
+    .tweet-item { display: flex; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(255,255,255,0.82); line-height: 1.4; }
     .tweet-item:last-child { border-bottom: none; }
     .tweet-bird { font-size: 13px; color: var(--color-green-bright); flex-shrink: 0; }
     .tweet-time { color: var(--color-green-bright); font-size: 10px; margin-left: 4px; }
 
-    /* shop & collect */
-    .shop-panel {
-      position: relative;
-      background: var(--color-green-tile);
-      border: 3px dashed rgba(255,255,255,0.5);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 24px;
-      gap: 12px;
-    }
-    .shop-heading { font-size: 28px; font-weight: bold; color: white; text-transform: lowercase; line-height: 1.2; }
-    .shop-sub { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+    .shop-panel { position: relative; background: var(--color-green-tile); border: 3px dashed rgba(255,255,255,0.45); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 12px; }
+    .shop-heading { font-size: 26px; font-weight: bold; color: white; text-transform: lowercase; line-height: 1.2; }
+    .shop-sub { font-size: 12px; color: rgba(255,255,255,0.85); line-height: 1.5; }
     .btn-gs { display: inline-block; background: var(--color-green-primary); color: white; border: 1px solid var(--color-green-dark); border-radius: 3px; padding: 8px 20px; font-size: 13px; font-family: var(--font-primary); text-transform: lowercase; text-decoration: none; cursor: pointer; transition: background 0.15s; }
     .btn-gs:hover { background: var(--color-green-dark); text-decoration: none; color: white; }
-    .shop-sq-count { font-size: 48px; font-weight: bold; color: white; opacity: 0.15; position: absolute; bottom: 10px; right: 16px; line-height: 1; }
 
-    /* Video lightbox modal */
-    .video-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 1000; align-items: center; justify-content: center; }
+    /* Video lightbox */
+    .video-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 2000; align-items: center; justify-content: center; }
     .video-modal.open { display: flex; }
     .video-modal-inner { position: relative; width: 90%; max-width: 820px; }
     .video-modal video { width: 100%; display: block; border-radius: 4px; background: #000; }
@@ -242,13 +222,11 @@
 <body>
 <div class="page-wrapper">
 
-  <!-- Utility bar -->
   <div class="utility-bar">
     <input type="text" placeholder="type to search site">
     <button>&#9906;</button>
   </div>
 
-  <!-- Header -->
   <header class="site-header">
     <a href="index.html" class="logo">
       <img src="assets/images/logo.png" alt="My Green Squares" height="52">
@@ -264,49 +242,27 @@
     </nav>
   </header>
 
-  <!-- Squares area -->
   <div class="squares-area">
 
-    <!-- Main two-column row -->
     <div class="main-area">
 
-      <!-- Main square: satellite map (633px) -->
+      <!-- Main square: interactive Leaflet map -->
       <div class="main-content">
         <div class="map-frame-wrap">
 
-          <iframe
-            src="https://maps.google.com/maps?ll=-4.5,-58.5&t=k&z=7&output=embed"
-            title="Amazon Rainforest Conservation Projects"
-            allowfullscreen
-            loading="lazy">
-          </iframe>
+          <div id="projectMap"></div>
 
-          <!-- Project overlay badge -->
+          <!-- Static project label — floats above the map -->
           <div class="map-project-badge">
             <div class="badge-title">Amazon<br>rainforest<br>projects</div>
             <div class="badge-body">
-              Green Squares has a number of active conservation projects in the Amazon basin,
-              protecting threatened rainforest and supporting local communities.
+              Active conservation projects in the Amazon basin, protecting threatened
+              rainforest. Every green square you earn places a pin on this map.
             </div>
           </div>
 
-          <!-- Project popup -->
-          <div class="map-popup">
-            <div class="popup-title">Save 100,000 Sq Ft of Rainforest with SouthcoFest 2014</div>
-            <img class="popup-img"
-                 src="https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=80&h=70&fit=crop&q=70"
-                 alt="Rainforest project">
-            <div class="popup-sponsor">
-              <span class="popup-sponsor-logo">BHSF</span>
-              <span style="font-size:11px;color:#555;">BHSF is proud to support Southco in saving over 100,000 square feet of endangered Brazilian rainforest from destruction.</span>
-            </div>
-            <div class="popup-rate">100 green squares/s</div>
-            <a href="#" class="popup-link">click for more information</a>
-            <div class="popup-tail"></div>
-          </div>
-
-        </div><!-- /map-frame-wrap -->
-      </div><!-- /main-content -->
+        </div>
+      </div>
 
       <!-- Sidebar -->
       <div class="main-sidebar">
@@ -332,15 +288,14 @@
             <div class="act-tile-label">redeem squares</div>
           </a>
           <a href="account.html" class="act-tile">
-            <div style="font-size:36px;opacity:0.8;">👤</div>
+            <div style="font-size:34px;opacity:0.8;">👤</div>
             <div class="act-tile-label">edit your profile</div>
           </a>
         </div>
 
         <!-- Deforestation video tile -->
         <div class="defo-tile" onclick="openVideo()">
-          <img src="assets/images/deforestation.jpg"
-               alt="the rate of deforestation">
+          <img src="assets/images/deforestation.jpg" alt="the rate of deforestation">
           <div class="defo-overlay">
             <div class="defo-play">
               <div class="defo-play-arrow"></div>
@@ -349,72 +304,45 @@
           <div class="defo-caption">the rate of<br>deforestation</div>
         </div>
 
-      </div><!-- /main-sidebar -->
+      </div>
 
-    </div><!-- /main-area -->
+    </div>
 
     <!-- Bottom strip -->
     <div class="bottom-strip">
 
-      <!-- Your project map -->
       <div class="bottom-panel proj-map-panel">
         <h3>your project map</h3>
-        <p class="proj-map-desc">Your very own Green Squares project map. Every Green Square that you collect is automatically added to it, building your personal conservation footprint in real time.</p>
+        <p class="proj-map-desc">Your very own Green Squares project map. Every square you earn places a unique pin in the project area, building your personal conservation footprint in real time.</p>
         <div class="members-say-label">members say</div>
         <div class="member-quote">
-          <img class="member-avatar"
-               src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=28&h=28&fit=crop&crop=face&q=80"
-               alt="Sarah">
-          <div>
-            <span class="member-name">sarah_m</span>
-            I had no idea my weekly shop could protect the rainforest. Green Squares makes it so easy!
-          </div>
+          <img class="member-avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=28&h=28&fit=crop&crop=face&q=80" alt="Sarah">
+          <div><span class="member-name">sarah_m</span>I had no idea my weekly shop could protect the rainforest. Green Squares makes it so easy!</div>
         </div>
         <div class="member-quote">
-          <img class="member-avatar"
-               src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=28&h=28&fit=crop&crop=face&q=80"
-               alt="Tom">
-          <div>
-            <span class="member-name">tom_eco</span>
-            Brilliant concept — every purchase I make now means something real.
-          </div>
+          <img class="member-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=28&h=28&fit=crop&crop=face&q=80" alt="Tom">
+          <div><span class="member-name">tom_eco</span>Brilliant concept — every purchase I make now means something real.</div>
         </div>
       </div>
 
-      <!-- Members say (social) -->
       <div class="bottom-panel members-panel">
         <h3>members say</h3>
-        <div class="tweet-item">
-          <span class="tweet-bird">🐦</span>
-          <span>Just hit 500 green squares! Feeling good about my Amazon contribution 🌿 <span class="tweet-time">2h ago</span></span>
-        </div>
-        <div class="tweet-item">
-          <span class="tweet-bird">🐦</span>
-          <span>Told all my friends about @greensquares — this is how loyalty schemes should work. <span class="tweet-time">5h ago</span></span>
-        </div>
-        <div class="tweet-item">
-          <span class="tweet-bird">🐦</span>
-          <span>Switched to Sky and got 255 squares instantly. The rainforest thanks you! <span class="tweet-time">yesterday</span></span>
-        </div>
-        <div class="tweet-item">
-          <span class="tweet-bird">🐦</span>
-          <span>Every Green Square protects 1 sq ft of Amazon rainforest. Find out more at <a href="#" style="color:var(--color-green-bright)">mygreensquares.com</a> <span class="tweet-time">2 days ago</span></span>
-        </div>
+        <div class="tweet-item"><span class="tweet-bird">🐦</span><span>Just hit 500 green squares! Feeling good about my Amazon contribution 🌿 <span class="tweet-time">2h ago</span></span></div>
+        <div class="tweet-item"><span class="tweet-bird">🐦</span><span>Told all my friends about @greensquares — this is how loyalty schemes should work. <span class="tweet-time">5h ago</span></span></div>
+        <div class="tweet-item"><span class="tweet-bird">🐦</span><span>Switched to Sky and got 255 squares instantly. The rainforest thanks you! <span class="tweet-time">yesterday</span></span></div>
+        <div class="tweet-item"><span class="tweet-bird">🐦</span><span>Every Green Square protects 1 sq ft of Amazon rainforest. Find out more at <a href="#" style="color:var(--color-green-bright)">mygreensquares.com</a> <span class="tweet-time">2 days ago</span></span></div>
       </div>
 
-      <!-- Shop & collect -->
       <div class="bottom-panel shop-panel">
         <div class="shop-heading">shop &amp; collect<br>green squares</div>
         <p class="shop-sub">Hundreds of ways to collect green squares from the brands you already use every day.</p>
         <a href="account.html" class="btn-gs">start collecting</a>
-        <div class="shop-sq-count">■</div>
       </div>
 
-    </div><!-- /bottom-strip -->
+    </div>
 
-  </div><!-- /squares-area -->
+  </div>
 
-  <!-- Footer -->
   <footer>
     <div class="footer-left">
       <span class="footer-label">socialise with us — it's <strong>free</strong> and it <strong>helps!</strong></span>
@@ -434,6 +362,7 @@
         <a href="#">terms &amp; conditions</a>
         <a href="#">legal</a>
         <a href="#">privacy</a>
+        <a href="admin.html">admin</a>
       </nav>
       <div class="footer-copy">a PROFOCO company &nbsp;|&nbsp; © copyright 2026 mygreensquares</div>
     </div>
@@ -449,23 +378,103 @@
     </div>
   </div>
 
-</div><!-- /page-wrapper -->
+</div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+  // ── Map initialisation ────────────────────────────────────────────────────
+  var projectMap = L.map('projectMap', {
+    center: [-5.8, -60.2],
+    zoom: 8,
+    zoomControl: true
+  });
+
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution: '&copy; Esri &mdash; Esri, DigitalGlobe', maxZoom: 18 }
+  ).addTo(projectMap);
+
+  // ── Project area polygon ──────────────────────────────────────────────────
+  // Approximate boundary of the Juma Sustainable Development Reserve, Amazonas
+  var boundary = [
+    [-5.1, -59.3], [-4.6, -59.9], [-4.7, -60.8],
+    [-5.2, -61.3], [-6.0, -61.5], [-7.0, -61.0],
+    [-7.3, -60.0], [-6.8, -59.2], [-6.0, -59.1]
+  ];
+
+  L.polygon(boundary, {
+    color: '#6ab023',
+    weight: 2,
+    opacity: 0.85,
+    fillColor: '#6ab023',
+    fillOpacity: 0.14
+  }).addTo(projectMap);
+
+  // ── Custom square pin icon ────────────────────────────────────────────────
+  function makePinIcon() {
+    return L.divIcon({
+      className: '',
+      html: '<div class="mgs-pin"></div>',
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+      popupAnchor: [0, -14]
+    });
+  }
+
+  // ── Balloon popup HTML ────────────────────────────────────────────────────
+  function buildBalloon(pin) {
+    var img = pin.image || 'assets/images/amazon.png';
+    return (
+      '<div class="mgs-balloon-title">' + pin.title + '</div>' +
+      '<div class="mgs-balloon-row">' +
+        '<img class="mgs-balloon-img" src="' + img + '" onerror="this.src=\'assets/images/amazon.png\'" alt="">' +
+        '<div class="mgs-balloon-info">' +
+          '<span class="mgs-balloon-tag">' + pin.retailer + '</span>' +
+          '<div class="mgs-balloon-desc">' + pin.description + '</div>' +
+          '<div class="mgs-balloon-rate">🌿 ' + pin.squares + ' green squares</div>' +
+          '<div class="mgs-balloon-meta">collected by <strong>' + pin.userName + '</strong> &nbsp;·&nbsp; ' + pin.date + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<a href="#" class="mgs-balloon-link">click for more information</a>'
+    );
+  }
+
+  // ── Render pins ───────────────────────────────────────────────────────────
+  function renderPins(pins) {
+    pins.forEach(function(pin) {
+      var marker = L.marker([pin.lat, pin.lng], { icon: makePinIcon() });
+      marker.bindPopup(buildBalloon(pin), {
+        maxWidth: 300,
+        className: 'mgs-popup-wrap'
+      });
+      marker.addTo(projectMap);
+    });
+  }
+
+  // ── Load pins: localStorage → pins.json ──────────────────────────────────
+  var cached = localStorage.getItem('mgs_pins');
+  if (cached) {
+    renderPins(JSON.parse(cached));
+  } else {
+    fetch('assets/data/pins.json')
+      .then(function(r) { return r.json(); })
+      .then(function(pins) {
+        localStorage.setItem('mgs_pins', JSON.stringify(pins));
+        renderPins(pins);
+      })
+      .catch(function(e) { console.warn('Could not load pins:', e); });
+  }
+
+  // ── Video lightbox ────────────────────────────────────────────────────────
   var modal = document.getElementById('videoModal');
   var vid   = document.getElementById('gsVideo');
 
-  function openVideo() {
-    modal.classList.add('open');
-    vid.play();
-  }
-
+  function openVideo() { modal.classList.add('open'); vid.play(); }
   function closeVideo(e) {
     if (e && e.target !== modal) return;
     modal.classList.remove('open');
     vid.pause();
   }
-
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { modal.classList.remove('open'); vid.pause(); }
   });
