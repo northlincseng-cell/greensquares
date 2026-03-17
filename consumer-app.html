@@ -47,7 +47,8 @@
     .screen.active { display: flex; }
 
     /* ── Screen 1: Home ── */
-    .home-header { background: linear-gradient(160deg, #1b3410 0%, #2d5518 60%, #4a8820 100%); padding: 60px 24px 24px; flex-shrink: 0; }
+    .home-header { background: linear-gradient(160deg, #1b3410 0%, #2d5518 60%, #4a8820 100%); padding: 60px 24px 24px; flex-shrink: 0; position: relative; }
+    .home-header-logo { position: absolute; top: 16px; left: 20px; height: 28px; width: auto; opacity: 0.85; }
     .home-greeting { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
     .home-name { font-size: 18px; font-weight: bold; color: white; margin-bottom: 20px; }
     .home-balance-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
@@ -235,6 +236,7 @@
         <!-- Screen 1: Home -->
         <div class="screen active" id="screen-home">
           <div class="home-header">
+            <img src="assets/images/gs-icon-white.png" alt="MGS" class="home-header-logo">
             <div class="home-greeting" id="homeGreeting">good morning,</div>
             <div class="home-name" id="homeName">—</div>
             <div class="home-balance-label">green squares</div>
