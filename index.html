@@ -157,6 +157,7 @@
       width: 33.333%;
       height: 100%;
       flex-shrink: 0;
+      position: relative;
     }
     .carousel-slide img {
       width: 100%;
@@ -164,33 +165,49 @@
       object-fit: cover;
       display: block;
     }
-    .hero-overlay {
+    /* Per-slide fade-in overlays */
+    .slide-overlay {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      padding: 24px 28px 28px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.55));
+      padding: 28px 32px 70px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.62));
+      opacity: 0;
+      transition: opacity 0.9s ease;
     }
-    .hero-title {
-      font-size: 36px;
+    .carousel-slide.active .slide-overlay { opacity: 1; }
+
+    .slide-title {
       color: white;
       text-transform: lowercase;
       font-weight: normal;
       line-height: 1.1;
-      margin-bottom: 12px;
-      max-width: 320px;
+      margin: 0 0 10px 0;
     }
-    .hero-body {
+    .slide-title-xl { font-size: 58px; }
+    .slide-title-lg { font-size: 38px; max-width: 420px; }
+    .slide-sub {
+      font-size: 20px;
+      color: rgba(255,255,255,0.9);
+      font-weight: normal;
+      text-transform: lowercase;
+      margin: 0;
+    }
+    .slide-body {
       font-size: 12px;
       color: rgba(255,255,255,0.88);
       margin-bottom: 14px;
       max-width: 300px;
       line-height: 1.5;
     }
-    .hero-body a { color: var(--color-green-bright); }
-    .carousel-dots {
+    .slide-body a { color: var(--color-green-bright); }
+
+    /* Dots — pinned to bottom-left of hero-wrap */
+    .hero-dots {
+      position: absolute;
+      bottom: 26px; left: 32px;
       display: flex;
       gap: 5px;
-      margin-top: 10px;
+      z-index: 10;
     }
     .dot {
       width: 11px; height: 11px;
@@ -472,28 +489,44 @@
     <div class="main-content">
       <div class="hero-wrap" id="heroWrap">
         <div class="carousel-track" id="carouselTrack">
-          <div class="carousel-slide">
+
+          <!-- Slide 1: frog -->
+          <div class="carousel-slide active" id="slide-0">
             <img src="assets/images/frog.png" alt="Green Squares — frog">
+            <div class="slide-overlay">
+              <h1 class="slide-title slide-title-xl">welcome to<br>green squares</h1>
+              <p class="slide-sub">your environmental currency for the future</p>
+            </div>
           </div>
-          <div class="carousel-slide">
+
+          <!-- Slide 2: yoga -->
+          <div class="carousel-slide" id="slide-1">
             <img src="assets/images/yoga.png" alt="Green Squares — lifestyle">
+            <div class="slide-overlay">
+              <h1 class="slide-title slide-title-lg">balancing what you take out<br>with what you give back</h1>
+              <p class="slide-body">
+                We all take from the environment but through Green Squares, you can now put something back,
+                creating your very own protection fund. <a href="#">see more</a>
+              </p>
+              <a href="account.html" class="btn-gs">how we work</a>
+            </div>
           </div>
-          <div class="carousel-slide">
+
+          <!-- Slide 3: amazon -->
+          <div class="carousel-slide" id="slide-2">
             <img src="assets/images/amazon.png" alt="Green Squares — Amazon rainforest">
+            <div class="slide-overlay">
+              <h1 class="slide-title slide-title-lg">saving the rainforest<br>1 square at a time</h1>
+            </div>
           </div>
+
         </div>
-        <div class="hero-overlay">
-          <h1 class="hero-title">balancing what you take out with what you give back</h1>
-          <p class="hero-body">
-            We all take from the environment but through Green Squares, you can now put something back,
-            creating your very own protection fund. <a href="#">see more</a>
-          </p>
-          <a href="account.html" class="btn-gs">how we work</a>
-          <div class="carousel-dots">
-            <button class="dot on" aria-label="slide 1" onclick="goTo(0)"></button>
-            <button class="dot" aria-label="slide 2" onclick="goTo(1)"></button>
-            <button class="dot" aria-label="slide 3" onclick="goTo(2)"></button>
-          </div>
+
+        <!-- Navigation dots -->
+        <div class="hero-dots">
+          <button class="dot on" aria-label="slide 1" onclick="goTo(0)"></button>
+          <button class="dot" aria-label="slide 2" onclick="goTo(1)"></button>
+          <button class="dot" aria-label="slide 3" onclick="goTo(2)"></button>
         </div>
       </div>
     </div>
@@ -620,14 +653,18 @@
   var total = 3;
   var track = document.getElementById('carouselTrack');
   var dots = document.querySelectorAll('.dot');
+  var slides = document.querySelectorAll('.carousel-slide');
 
   function goTo(n) {
+    slides[current].classList.remove('active');
     current = n;
     track.style.transform = 'translateX(-' + (100 / total * n) + '%)';
     dots.forEach(function(d, i) { d.classList.toggle('on', i === n); });
+    // Fade text in after the slide has mostly arrived (slide transition is 0.6s)
+    setTimeout(function() { slides[current].classList.add('active'); }, 400);
   }
 
-  setInterval(function() { goTo((current + 1) % total); }, 4000);
+  setInterval(function() { goTo((current + 1) % total); }, 6000);
 </script>
 </body>
 </html>
