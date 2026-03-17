@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MGS — EPOS Terminal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #333; background: #0e0e0e; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+    /* ── Top bar ── */
+    .topbar { background: #1a1a1a; border-bottom: 1px solid #333; padding: 0 18px; height: 48px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .topbar-logo { display: flex; align-items: center; gap: 8px; }
+    .topbar-logo img { height: 26px; }
+    .topbar-label { color: rgba(255,255,255,0.35); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; }
+    .topbar-divider { width: 1px; height: 22px; background: #333; margin: 0 4px; }
+    .topbar-select { background: #2a2a2a; border: 1px solid #444; border-radius: 4px; color: white; font-size: 12px; padding: 5px 10px; font-family: inherit; cursor: pointer; }
+    .topbar-select option { background: #1a1a1a; }
+    .topbar-field-label { font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .topbar-clock { font-size: 11px; color: rgba(255,255,255,0.3); font-family: monospace; }
+    .topbar-links a { color: rgba(255,255,255,0.35); font-size: 10px; text-decoration: none; padding: 3px 7px; border-radius: 3px; transition: all 0.12s; }
+    .topbar-links a:hover { color: white; background: rgba(255,255,255,0.08); }
+    .session-status { font-size: 9px; padding: 3px 9px; border-radius: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+    .session-ready    { background: rgba(106,176,35,0.2); color: #6ab023; border: 1px solid rgba(106,176,35,0.3); }
+    .session-complete { background: rgba(80,200,80,0.2); color: #50c850; border: 1px solid rgba(80,200,80,0.3); }
+
+    /* ── Main split ── */
+    .terminal { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── Customer display (left) ── */
+    .customer-display { width: 42%; flex-shrink: 0; display: flex; flex-direction: column; transition: background 0.5s; position: relative; overflow: hidden; }
+    .cd-header { padding: 22px 24px 16px; }
+    .cd-retailer { font-size: 28px; font-weight: bold; color: white; text-transform: uppercase; letter-spacing: 1px; line-height: 1; margin-bottom: 4px; }
+    .cd-tagline { font-size: 11px; color: rgba(255,255,255,0.55); text-transform: lowercase; }
+    .cd-divider { height: 1px; background: rgba(255,255,255,0.15); margin: 0 24px; }
+    .cd-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+    .cd-earning-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
+    .cd-gs-live { font-size: 62px; font-weight: bold; color: white; line-height: 1; margin-bottom: 4px; transition: all 0.3s; }
+    .cd-gs-live.bump { transform: scale(1.08); }
+    .cd-gs-label { font-size: 13px; color: rgba(255,255,255,0.6); text-transform: lowercase; margin-bottom: 24px; }
+    .cd-breakdown { background: rgba(0,0,0,0.2); border-radius: 6px; padding: 12px 14px; margin-bottom: 20px; }
+    .cd-breakdown-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .cd-breakdown-row:last-child { border-bottom: none; }
+    .cd-breakdown-label { color: rgba(255,255,255,0.5); }
+    .cd-breakdown-val { color: white; font-weight: bold; }
+    .cd-member { background: rgba(255,255,255,0.1); border-radius: 6px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .cd-member-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; color: white; flex-shrink: 0; }
+    .cd-member-name { font-size: 13px; color: white; font-weight: bold; }
+    .cd-member-balance { font-size: 10px; color: rgba(255,255,255,0.55); }
+    .cd-no-member { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .cd-message { font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1.6; font-style: italic; padding: 10px 14px; background: rgba(0,0,0,0.15); border-radius: 6px; border-left: 3px solid rgba(255,255,255,0.3); margin-bottom: 16px; }
+    .cd-qr { display: flex; align-items: center; gap: 14px; }
+    .cd-qr-box { width: 68px; height: 68px; background: white; border-radius: 5px; padding: 5px; flex-shrink: 0; display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; }
+    .cd-qr-px { border-radius: 1px; }
+    .cd-qr-text { font-size: 10px; color: rgba(255,255,255,0.45); line-height: 1.55; }
+    .cd-footer { padding: 14px 24px; background: rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: space-between; }
+    .cd-footer-logo { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: lowercase; letter-spacing: 0.5px; }
+    .cd-footer-std { font-size: 9px; color: rgba(255,255,255,0.25); }
+
+    /* Receipt overlay */
+    .receipt-overlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.88); z-index: 50; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .receipt-overlay.show { display: flex; }
+    .receipt { background: white; border-radius: 8px; padding: 22px; width: 100%; max-width: 320px; }
+    .receipt-header { text-align: center; margin-bottom: 16px; }
+    .receipt-retailer { font-size: 15px; font-weight: bold; color: #1b3410; }
+    .receipt-date { font-size: 10px; color: #aaa; margin-top: 2px; }
+    .receipt-divider { border: none; border-top: 1px dashed #ccc; margin: 10px 0; }
+    .receipt-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+    .receipt-row.gs { color: #6ab023; font-weight: bold; font-size: 13px; }
+    .receipt-row.total { border-top: 2px solid #1b3410; margin-top: 6px; padding-top: 8px; font-weight: bold; font-size: 14px; color: #6ab023; }
+    .receipt-message { margin-top: 12px; background: #f0f6e8; border-left: 3px solid #6ab023; padding: 8px 10px; font-size: 10px; color: #555; font-style: italic; line-height: 1.5; border-radius: 0 4px 4px 0; }
+    .receipt-close { margin-top: 14px; width: 100%; padding: 9px; background: #1b3410; color: white; border: none; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; }
+    .receipt-close:hover { background: #2d5518; }
+
+    /* ── Cashier pane (right) ── */
+    .cashier-pane { flex: 1; background: #f4f7ef; display: flex; flex-direction: column; overflow: hidden; }
+    .cp-section { padding: 14px 18px; border-bottom: 1px solid #dde8d0; background: white; }
+    .cp-section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #aaa; margin-bottom: 10px; }
+
+    /* Member lookup */
+    .member-lookup { display: flex; gap: 8px; align-items: center; }
+    .member-lookup select { flex: 1; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 10px; font-size: 12px; font-family: inherit; background: white; }
+    .member-lookup select:focus { outline: none; border-color: #6ab023; }
+    .member-linked-badge { font-size: 10px; background: #e4f0d0; color: #2d5518; padding: 3px 10px; border-radius: 10px; border: 1px solid #b8d898; font-weight: bold; white-space: nowrap; }
+
+    /* Basket */
+    .basket-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .basket-add-select { flex: 1; min-width: 200px; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 10px; font-size: 12px; font-family: inherit; background: white; }
+    .basket-add-select:focus { outline: none; border-color: #6ab023; }
+    .basket-value-wrap { display: flex; align-items: center; gap: 6px; }
+    .basket-value-wrap label { font-size: 11px; color: #888; white-space: nowrap; }
+    .basket-value-input { width: 90px; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 9px; font-size: 12px; font-family: inherit; text-align: right; }
+    .basket-value-input:focus { outline: none; border-color: #6ab023; }
+
+    /* Basket items */
+    .basket-items { flex: 1; overflow-y: auto; padding: 8px 18px; background: white; }
+    .basket-empty { padding: 28px; text-align: center; color: #bbb; font-size: 11px; }
+    .basket-item { border-bottom: 1px solid #f0f4e8; padding: 9px 0; display: flex; align-items: flex-start; gap: 10px; }
+    .basket-item:last-child { border-bottom: none; }
+    .bi-icon { width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0; color: white; margin-top: 1px; }
+    .bi-name { font-size: 12px; color: #1b3410; font-weight: bold; }
+    .bi-brand { font-size: 9px; color: #aaa; margin-top: 1px; }
+    .bi-gs-badge { font-size: 9px; font-weight: bold; padding: 1px 6px; border-radius: 8px; margin-top: 2px; display: inline-block; }
+    .bi-gs-t1 { background: #e4f0d0; color: #2d5518; }
+    .bi-gs-t2 { background: #e0eaff; color: #1a3a88; }
+    .bi-remove { margin-left: auto; background: none; border: none; color: #cc6666; font-size: 16px; cursor: pointer; line-height: 1; padding: 0 2px; flex-shrink: 0; }
+    .bi-remove:hover { color: #cc3333; }
+
+    /* GS totals */
+    .gs-totals { background: #0e1e08; padding: 14px 18px; flex-shrink: 0; }
+    .gs-totals-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+    .gs-totals-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .gs-totals-val { font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.8); }
+    .gs-totals-row.grand { padding-top: 8px; margin-top: 4px; border-top: 1px solid rgba(106,176,35,0.3); }
+    .gs-totals-row.grand .gs-totals-label { font-size: 12px; color: rgba(255,255,255,0.75); font-weight: bold; }
+    .gs-totals-row.grand .gs-totals-val { font-size: 22px; color: #6ab023; font-weight: bold; }
+
+    /* Complete button */
+    .complete-wrap { padding: 14px 18px; background: white; border-top: 1px solid #dde8d0; display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+    .btn-complete { flex: 1; background: #6ab023; color: white; border: none; border-radius: 6px; padding: 13px 20px; font-size: 14px; font-family: inherit; text-transform: lowercase; cursor: pointer; font-weight: bold; transition: background 0.12s; }
+    .btn-complete:hover { background: #5a9a1d; }
+    .btn-complete:disabled { background: #aaa; cursor: not-allowed; }
+    .btn-clear { background: white; color: #cc5533; border: 1px solid #ffcccc; border-radius: 6px; padding: 13px 16px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; transition: all 0.12s; }
+    .btn-clear:hover { background: #fff5f0; }
+
+    /* Dev panel */
+    .dev-panel { background: #0a0e06; border-top: 1px solid #1a2a10; flex-shrink: 0; }
+    .dev-toggle { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px; cursor: pointer; }
+    .dev-toggle-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.3); }
+    .dev-toggle-icon { font-size: 10px; color: rgba(255,255,255,0.25); transition: transform 0.2s; }
+    .dev-toggle.open .dev-toggle-icon { transform: rotate(180deg); }
+    .dev-body { display: none; padding: 0 18px 12px; }
+    .dev-body.open { display: block; }
+    .dev-code { font-family: 'Courier New', monospace; font-size: 10px; color: #6ab023; background: #050a02; border-radius: 4px; padding: 10px 12px; line-height: 1.6; white-space: pre; overflow-x: auto; }
+    .dev-key { color: #7faeff; }
+    .dev-str { color: #f0c080; }
+    .dev-num { color: #c0f080; }
+
+    /* Buttons generic */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 13px; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.12s; }
+    .btn-secondary { background: white; color: #555; border-color: #ccd8b8; }
+    .btn-secondary:hover { background: #f5f8f0; }
+    .btn-xs { padding: 3px 9px; font-size: 10px; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ── -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <img src="assets/images/logo.png" alt="MGS">
+    <span class="topbar-label">EPOS Terminal</span>
+  </div>
+  <div class="topbar-divider"></div>
+
+  <div>
+    <div class="topbar-field-label">retailer</div>
+    <select class="topbar-select" id="retailerSel" onchange="onRetailerChange()">
+      <option value="">— select retailer —</option>
+    </select>
+  </div>
+
+  <div>
+    <div class="topbar-field-label">member account</div>
+    <select class="topbar-select" id="memberSel" onchange="onMemberChange()">
+      <option value="">— no member linked —</option>
+    </select>
+  </div>
+
+  <span class="session-status session-ready" id="sessionStatus">ready</span>
+
+  <div class="topbar-right">
+    <span class="topbar-clock" id="clock"></span>
+    <div class="topbar-links">
+      <a href="account.html">👤 account</a>
+      <a href="consumer-app.html">📱 app</a>
+      <a href="admin.html">admin →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Terminal ── -->
+<div class="terminal">
+
+  <!-- ── Customer display ── -->
+  <div class="customer-display" id="customerDisplay">
+    <div class="cd-header">
+      <div class="cd-retailer" id="cdRetailer">my green squares</div>
+      <div class="cd-tagline" id="cdTagline">select a retailer to begin</div>
+    </div>
+    <div class="cd-divider"></div>
+    <div class="cd-body">
+      <div class="cd-earning-label">🌿 green squares this transaction</div>
+      <div class="cd-gs-live" id="cdGsLive">0</div>
+      <div class="cd-gs-label">green squares earned</div>
+
+      <div class="cd-breakdown" id="cdBreakdown">
+        <div class="cd-breakdown-row">
+          <span class="cd-breakdown-label">tier 1 — basket</span>
+          <span class="cd-breakdown-val" id="cdT1">0 GS</span>
+        </div>
+        <div class="cd-breakdown-row">
+          <span class="cd-breakdown-label">tier 2 — brand products</span>
+          <span class="cd-breakdown-val" id="cdT2">0 GS</span>
+        </div>
+        <div class="cd-breakdown-row" style="margin-top:4px;">
+          <span class="cd-breakdown-label" style="color:rgba(255,255,255,0.7);">total this transaction</span>
+          <span class="cd-breakdown-val" id="cdTotal" style="color:#6ab023;">0 GS</span>
+        </div>
+      </div>
+
+      <div id="cdMemberBox">
+        <div class="cd-no-member">🔗 link your account at checkout to earn GS</div>
+      </div>
+
+      <div class="cd-message" id="cdMessage">earning green squares at every shop — helping protect the amazon rainforest</div>
+
+      <div class="cd-qr">
+        <div class="cd-qr-box" id="qrBox"></div>
+        <div class="cd-qr-text">scan to link your<br>my green squares account<br><span style="color:rgba(255,255,255,0.6);font-size:9px;">or select member above</span></div>
+      </div>
+    </div>
+    <div class="cd-footer">
+      <span class="cd-footer-logo">my green squares</span>
+      <span class="cd-footer-std">Verra VCS · CIC Conservation Fund</span>
+    </div>
+
+    <!-- Receipt overlay -->
+    <div class="receipt-overlay" id="receiptOverlay">
+      <div class="receipt">
+        <div class="receipt-header">
+          <div class="receipt-retailer" id="rcpRetailer">—</div>
+          <div class="receipt-date" id="rcpDate">—</div>
+        </div>
+        <hr class="receipt-divider">
+        <div id="rcpItems"></div>
+        <hr class="receipt-divider">
+        <div class="receipt-row"><span>basket value</span><span id="rcpBasket">—</span></div>
+        <div class="receipt-row gs"><span>🌿 tier 1 (basket)</span><span id="rcpT1">—</span></div>
+        <div class="receipt-row gs" id="rcpT2Row"><span>🔵 tier 2 (brands)</span><span id="rcpT2">—</span></div>
+        <div class="receipt-row total"><span>total green squares</span><span id="rcpTotal">—</span></div>
+        <div class="receipt-message" id="rcpMessage"></div>
+        <button class="receipt-close" onclick="closeReceipt()">close receipt / new transaction</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Cashier pane ── -->
+  <div class="cashier-pane">
+
+    <!-- Member lookup -->
+    <div class="cp-section">
+      <div class="cp-section-title">member lookup</div>
+      <div class="member-lookup">
+        <select class="basket-add-select" id="memberLookup" style="max-width:280px;" onchange="quickLinkMember(this.value)">
+          <option value="">— search member by name or email —</option>
+        </select>
+        <span class="member-linked-badge" id="memberBadge" style="display:none;">linked ✓</span>
+        <a href="account.html" id="viewAccountLink" class="btn btn-secondary btn-xs" style="display:none;" target="_blank">view account ↗</a>
+      </div>
+    </div>
+
+    <!-- Basket builder -->
+    <div class="cp-section">
+      <div class="cp-section-title">add to basket</div>
+      <div class="basket-controls">
+        <select class="basket-add-select" id="productPicker" onchange="addProduct(this.value)">
+          <option value="">— scan / add GS product —</option>
+        </select>
+        <div class="basket-value-wrap">
+          <label>basket value £</label>
+          <input type="number" class="basket-value-input" id="basketValue" min="0" step="0.01" placeholder="0.00" oninput="recalc()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Basket items -->
+    <div class="basket-items" id="basketItems">
+      <div class="basket-empty" id="basketEmpty">no items yet — scan a product or enter basket value to begin</div>
+    </div>
+
+    <!-- GS totals -->
+    <div class="gs-totals">
+      <div class="gs-totals-row">
+        <span class="gs-totals-label">tier 1 — basket value (£<span id="totBasket">0.00</span> × <span id="totRate">—</span> GS/£)</span>
+        <span class="gs-totals-val" id="totT1">0 GS</span>
+      </div>
+      <div class="gs-totals-row">
+        <span class="gs-totals-label">tier 2 — brand product GS</span>
+        <span class="gs-totals-val" id="totT2">0 GS</span>
+      </div>
+      <div class="gs-totals-row grand">
+        <span class="gs-totals-label">🌿 total green squares this transaction</span>
+        <span class="gs-totals-val" id="totGrand">0</span>
+      </div>
+    </div>
+
+    <!-- Complete -->
+    <div class="complete-wrap">
+      <button class="btn-complete" id="btnComplete" onclick="completeTransaction()">✓ complete transaction</button>
+      <button class="btn-clear" onclick="clearBasket()">✕ clear</button>
+    </div>
+
+    <!-- Dev panel -->
+    <div class="dev-panel">
+      <div class="dev-toggle" id="devToggle" onclick="toggleDev()">
+        <span class="dev-toggle-label">🔧 mgs api payload — epos webhook</span>
+        <span class="dev-toggle-icon">▼</span>
+      </div>
+      <div class="dev-body" id="devBody">
+        <pre class="dev-code" id="devCode">// complete a transaction to see the API payload</pre>
+      </div>
+    </div>
+
+  </div><!-- /cashier-pane -->
+</div><!-- /terminal -->
+
+<script>
+// ── Retailer themes ──────────────────────────────────────────────────────────
+var themes = {
+  "Sainsbury's": { bg:'#f06c00', dark:'#c04e00', tagline:'live well for less', gsPerTxn:10, camId:'CAM001' },
+  'ASDA':        { bg:'#78be20', dark:'#5a9010', tagline:'save money. live better.', gsPerTxn:8,  camId:'CAM002' },
+  'Currys':      { bg:'#002d62', dark:'#001a40', tagline:'we start with you', gsPerTxn:12, camId:'CAM003' },
+  'Thomas Cook': { bg:'#003087', dark:'#001a55', tagline:"we are holiday people", gsPerTxn:15, camId:'CAM005' },
+  'Sky':         { bg:'#0072c9', dark:'#004e99', tagline:'believe in better', gsPerTxn:6,  camId:'CAM004' }
+};
+
+// ── Shared data defaults ─────────────────────────────────────────────────────
+var defaultMembers = [
+  { id:'MEM001', name:'Sarah Johnson',  email:'sarah.j@email.com',      initials:'SJ', gsBalance:2847, gsLifetime:4230, gsRedeemed:1383, joinDate:'2025-09-15', linkedRetailers:["Sainsbury's"], txnCount:47 },
+  { id:'MEM002', name:'James Wilson',   email:'james.w@email.com',       initials:'JW', gsBalance:1234, gsLifetime:2180, gsRedeemed:946,  joinDate:'2025-10-01', linkedRetailers:['ASDA','Currys'], txnCount:28 },
+  { id:'MEM003', name:'Emma Thompson',  email:'emma.t@email.com',        initials:'ET', gsBalance:892,  gsLifetime:1450, gsRedeemed:558,  joinDate:'2025-12-01', linkedRetailers:['Thomas Cook',"Sainsbury's"], txnCount:19 },
+  { id:'MEM004', name:'Demo User',      email:'demo@mygreensquares.com', initials:'DU', gsBalance:0,    gsLifetime:0,    gsRedeemed:0,    joinDate:'2026-01-01', linkedRetailers:[], txnCount:0 }
+];
+
+var defaultProducts = [
+  { id:'PRD001', productName:'Nescafe Gold Blend 200g',  brand:'Nestlé',   sku:'NES-GOLD-200', gsPerUnit:25,  campaignId:'CAM006', active:true, color:'#c05000' },
+  { id:'PRD002', productName:'Nescafe Original 300g',    brand:'Nestlé',   sku:'NES-ORIG-300', gsPerUnit:18,  campaignId:'CAM006', active:true, color:'#c05000' },
+  { id:'PRD003', productName:"Samsung 55\" QLED TV",     brand:'Samsung',  sku:'SAM-QLED-55',  gsPerUnit:250, campaignId:'CAM007', active:true, color:'#1428a0' },
+  { id:'PRD004', productName:'Samsung Galaxy S25',       brand:'Samsung',  sku:'SAM-GAL-S25',  gsPerUnit:85,  campaignId:'CAM007', active:true, color:'#1428a0' },
+  { id:'PRD005', productName:'Persil Bio Liquid 2.5kg',  brand:'Unilever', sku:'UNI-PERS-25',  gsPerUnit:12,  campaignId:'CAM008', active:true, color:'#003087' },
+  { id:'PRD006', productName:'Dove Body Wash 500ml',     brand:'Unilever', sku:'UNI-DOVE-500',  gsPerUnit:8,   campaignId:'CAM008', active:true, color:'#003087' }
+];
+
+var defaultMemberTxns = [
+  { id:'TXN001', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-16', time:'14:32', gsEarned:319, basketValue:42.30, t1Gs:282, t2Gs:37,  products:[{name:'Nescafe Gold Blend 200g',gs:25},{name:'Persil Bio Liquid 2.5kg',gs:12}] },
+  { id:'TXN002', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-12', time:'11:18', gsEarned:266, basketValue:38.70, t1Gs:258, t2Gs:8,   products:[{name:'Dove Body Wash 500ml',gs:8}] },
+  { id:'TXN003', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-08', time:'16:44', gsEarned:398, basketValue:55.10, t1Gs:368, t2Gs:30,  products:[{name:'Nescafe Original 300g',gs:18},{name:'Persil Bio Liquid 2.5kg',gs:12}] },
+  { id:'TXN006', memberId:'MEM002', retailer:'ASDA',        date:'2026-03-15', time:'09:48', gsEarned:284, basketValue:35.50, t1Gs:249, t2Gs:35,  products:[{name:'Nescafe Gold Blend 200g',gs:25},{name:'Dove Body Wash 500ml',gs:8}] },
+  { id:'TXN007', memberId:'MEM002', retailer:'Currys',      date:'2026-03-10', time:'15:30', gsEarned:335, basketValue:299.0, t1Gs:250, t2Gs:85,  products:[{name:'Samsung Galaxy S25',gs:85}] },
+  { id:'TXN008', memberId:'MEM003', retailer:'Thomas Cook', date:'2026-03-01', time:'10:00', gsEarned:420, basketValue:1240.0,t1Gs:420, t2Gs:0,   products:[] }
+];
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var members     = JSON.parse(localStorage.getItem('mgs_members'))      || defaultMembers;
+var allProducts = JSON.parse(localStorage.getItem('mgs_products'))     || defaultProducts;
+var memberTxns  = JSON.parse(localStorage.getItem('mgs_member_txns'))  || defaultMemberTxns;
+var currentRetailer = null;
+var currentMember   = null;
+var basketItems     = [];   // brand products scanned
+var clockTimer;
+
+// ── Boot ─────────────────────────────────────────────────────────────────────
+function boot() {
+  if (!localStorage.getItem('mgs_members'))     localStorage.setItem('mgs_members',     JSON.stringify(members));
+  if (!localStorage.getItem('mgs_member_txns')) localStorage.setItem('mgs_member_txns', JSON.stringify(memberTxns));
+
+  // Retailer selector
+  var rs = document.getElementById('retailerSel');
+  rs.innerHTML = '<option value="">— select retailer —</option>' +
+    Object.keys(themes).map(function(n){ return '<option value="'+n+'">'+n+'</option>'; }).join('');
+
+  // Member selectors
+  buildMemberSelectors();
+
+  // Product picker
+  buildProductPicker();
+
+  // QR mock
+  buildQr();
+
+  // Clock
+  tick(); clockTimer = setInterval(tick, 10000);
+  recalc();
+}
+
+function buildMemberSelectors() {
+  var opts = '<option value="">— no member linked —</option>' +
+    members.map(function(m){ return '<option value="'+m.id+'">'+m.name+' ('+m.id+')</option>'; }).join('');
+  document.getElementById('memberSel').innerHTML = opts;
+  document.getElementById('memberLookup').innerHTML =
+    '<option value="">— search member —</option>' +
+    members.map(function(m){ return '<option value="'+m.id+'">'+m.name+' · '+m.email+'</option>'; }).join('');
+}
+
+function buildProductPicker() {
+  var prods = allProducts.filter(function(p){ return p.active; });
+  document.getElementById('productPicker').innerHTML =
+    '<option value="">— scan / add GS product —</option>' +
+    prods.map(function(p){
+      return '<option value="'+p.id+'">'+p.productName+' ['+p.sku+'] +'+p.gsPerUnit+' GS ('+p.brand+')</option>';
+    }).join('');
+}
+
+function buildQr() {
+  // CSS QR mock — simple grid pattern
+  var box = document.getElementById('qrBox');
+  var pattern = [
+    1,1,1,1,1,1,1,
+    1,0,0,0,0,0,1,
+    1,0,1,0,1,0,1,
+    1,0,0,0,0,0,1,
+    1,0,1,0,1,0,1,
+    1,0,0,0,0,0,1,
+    1,1,1,1,1,1,1
+  ];
+  box.innerHTML = pattern.map(function(v){
+    return '<div class="cd-qr-px" style="background:'+(v?'#1b3410':'white')+'"></div>';
+  }).join('');
+}
+
+function tick() {
+  var d = new Date();
+  document.getElementById('clock').textContent =
+    d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})+' · '+
+    d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+// ── Retailer change ───────────────────────────────────────────────────────────
+function onRetailerChange() {
+  var name = document.getElementById('retailerSel').value;
+  currentRetailer = name ? themes[name] : null;
+  currentRetailer = currentRetailer ? Object.assign({name:name}, currentRetailer) : null;
+
+  var cd = document.getElementById('customerDisplay');
+  if (currentRetailer) {
+    cd.style.background = 'linear-gradient(160deg, '+currentRetailer.bg+' 0%, '+currentRetailer.dark+' 100%)';
+    document.getElementById('cdRetailer').textContent = name;
+    document.getElementById('cdTagline').textContent = currentRetailer.tagline;
+    document.getElementById('cdMessage').textContent =
+      'earn green squares with every '+name+' purchase · protecting the amazon rainforest';
+    document.getElementById('totRate').textContent = currentRetailer.gsPerTxn;
+  } else {
+    cd.style.background = 'linear-gradient(160deg, #1b3410 0%, #0e1e08 100%)';
+    document.getElementById('cdRetailer').textContent = 'my green squares';
+    document.getElementById('cdTagline').textContent = 'select a retailer to begin';
+    document.getElementById('cdMessage').textContent = 'earning green squares at every shop — helping protect the amazon rainforest';
+    document.getElementById('totRate').textContent = '—';
+  }
+  // sync top selector
+  document.getElementById('memberSel').value = currentMember ? currentMember.id : '';
+  recalc();
+}
+
+// ── Member change ─────────────────────────────────────────────────────────────
+function onMemberChange() {
+  var id = document.getElementById('memberSel').value;
+  setMember(id);
+}
+
+function quickLinkMember(id) {
+  document.getElementById('memberSel').value = id;
+  setMember(id);
+}
+
+function setMember(id) {
+  members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+  currentMember = id ? members.find(function(m){ return m.id===id; }) : null;
+  var badge = document.getElementById('memberBadge');
+  var link  = document.getElementById('viewAccountLink');
+  if (currentMember) {
+    badge.style.display = 'inline-flex'; badge.textContent = currentMember.name+' linked ✓';
+    link.style.display = 'inline-flex'; link.href = 'account.html?member='+currentMember.id;
+    document.getElementById('memberLookup').value = currentMember.id;
+  } else {
+    badge.style.display = 'none'; link.style.display = 'none';
+    document.getElementById('memberLookup').value = '';
+  }
+  updateCustomerMember();
+  recalc();
+}
+
+function updateCustomerMember() {
+  var box = document.getElementById('cdMemberBox');
+  if (currentMember) {
+    box.innerHTML = '<div class="cd-member">'+
+      '<div class="cd-member-avatar">'+currentMember.initials+'</div>'+
+      '<div>'+
+        '<div class="cd-member-name">'+currentMember.name+'</div>'+
+        '<div class="cd-member-balance">current balance: 🌿 '+fmt(currentMember.gsBalance)+' GS</div>'+
+      '</div>'+
+    '</div>';
+  } else {
+    box.innerHTML = '<div class="cd-no-member">🔗 link your account at checkout to earn GS</div>';
+  }
+}
+
+// ── Basket management ─────────────────────────────────────────────────────────
+function addProduct(id) {
+  if (!id) return;
+  var prd = allProducts.find(function(p){ return p.id===id; });
+  if (!prd) return;
+  // allow duplicates (same product scanned twice)
+  basketItems.push(JSON.parse(JSON.stringify(prd)));
+  document.getElementById('productPicker').value = '';
+  renderBasket();
+  recalc();
+}
+
+function removeBasketItem(idx) {
+  basketItems.splice(idx, 1);
+  renderBasket();
+  recalc();
+}
+
+function renderBasket() {
+  var el = document.getElementById('basketItems');
+  var empty = document.getElementById('basketEmpty');
+  if (!basketItems.length) {
+    empty.style.display = '';
+    el.innerHTML = '';
+    el.appendChild(empty);
+    return;
+  }
+  empty.style.display = 'none';
+  el.innerHTML = basketItems.map(function(p, i){
+    return '<div class="basket-item">'+
+      '<div class="bi-icon" style="background:'+(p.color||'#6ab023')+'">'+p.brand.slice(0,2).toUpperCase()+'</div>'+
+      '<div style="flex:1;">'+
+        '<div class="bi-name">'+p.productName+'</div>'+
+        '<div class="bi-brand">'+p.brand+' · '+p.sku+'</div>'+
+        '<span class="bi-gs-badge bi-gs-t2">🔵 +'+p.gsPerUnit+' GS (Tier 2)</span>'+
+      '</div>'+
+      '<button class="bi-remove" onclick="removeBasketItem('+i+')">×</button>'+
+    '</div>';
+  }).join('');
+  // Add basket row placeholder
+  el.innerHTML += '<div class="basket-item" style="background:#fafdf7;">'+
+    '<div class="bi-icon" style="background:'+(currentRetailer?currentRetailer.bg:'#6ab023')+'">OB</div>'+
+    '<div style="flex:1;">'+
+      '<div class="bi-name">own brands &amp; other items</div>'+
+      '<div class="bi-brand">basket value entered above</div>'+
+      '<span class="bi-gs-badge bi-gs-t1" id="basketGsBadge">🌿 +0 GS (Tier 1)</span>'+
+    '</div>'+
+  '</div>';
+}
+
+function clearBasket() {
+  basketItems = [];
+  document.getElementById('basketValue').value = '';
+  document.getElementById('memberSel').value = '';
+  document.getElementById('memberLookup').value = '';
+  currentMember = null;
+  document.getElementById('memberBadge').style.display = 'none';
+  document.getElementById('viewAccountLink').style.display = 'none';
+  updateCustomerMember();
+  renderBasket();
+  recalc();
+  document.getElementById('sessionStatus').className = 'session-status session-ready';
+  document.getElementById('sessionStatus').textContent = 'ready';
+}
+
+// ── GS calculation ────────────────────────────────────────────────────────────
+function recalc() {
+  var basketVal = parseFloat(document.getElementById('basketValue').value)||0;
+  var rate = currentRetailer ? currentRetailer.gsPerTxn : 0;
+  var t1 = currentRetailer ? Math.round(basketVal * rate) : 0;
+  var t2 = basketItems.reduce(function(s,p){ return s+p.gsPerUnit; }, 0);
+  var grand = t1 + t2;
+
+  // Customer display
+  var liveEl = document.getElementById('cdGsLive');
+  liveEl.textContent = fmt(grand);
+  document.getElementById('cdT1').textContent = fmt(t1)+' GS';
+  document.getElementById('cdT2').textContent = fmt(t2)+' GS';
+  document.getElementById('cdTotal').textContent = fmt(grand)+' GS';
+
+  // Totals pane
+  document.getElementById('totBasket').textContent = basketVal.toFixed(2);
+  document.getElementById('totT1').textContent = fmt(t1)+' GS';
+  document.getElementById('totT2').textContent = fmt(t2)+' GS';
+  document.getElementById('totGrand').textContent = fmt(grand);
+
+  // Badge on basket row
+  var badge = document.getElementById('basketGsBadge');
+  if (badge) badge.textContent = '🌿 +'+fmt(t1)+' GS (Tier 1)';
+
+  // Update dev panel if open
+  updateDevPanel(t1, t2, grand, basketVal);
+}
+
+// ── Complete transaction ──────────────────────────────────────────────────────
+function completeTransaction() {
+  var basketVal = parseFloat(document.getElementById('basketValue').value)||0;
+  if (!currentRetailer) { alert('Select a retailer first.'); return; }
+  if (basketVal <= 0 && basketItems.length === 0) { alert('Enter a basket value or scan a product first.'); return; }
+
+  var rate = currentRetailer.gsPerTxn;
+  var t1   = Math.round(basketVal * rate);
+  var t2   = basketItems.reduce(function(s,p){ return s+p.gsPerUnit; }, 0);
+  var grand= t1 + t2;
+  var now  = new Date();
+  var txnId = 'TXN'+Date.now();
+
+  // Build transaction
+  var txn = {
+    id:          txnId,
+    memberId:    currentMember ? currentMember.id : null,
+    memberName:  currentMember ? currentMember.name : 'Guest',
+    retailer:    currentRetailer.name,
+    retailerId:  'RET00'+(Object.keys(themes).indexOf(currentRetailer.name)+1),
+    date:        now.toISOString().split('T')[0],
+    time:        now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
+    gsEarned:    grand,
+    basketValue: basketVal,
+    t1Gs:        t1,
+    t2Gs:        t2,
+    products:    basketItems.map(function(p){ return {name:p.productName, sku:p.sku, gs:p.gsPerUnit, brand:p.brand}; }),
+    timestamp:   now.toISOString(),
+    campaignId:  currentRetailer.camId
+  };
+
+  // Persist to member
+  if (currentMember) {
+    members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+    var idx = members.findIndex(function(m){ return m.id===currentMember.id; });
+    if (idx >= 0) {
+      members[idx].gsBalance  += grand;
+      members[idx].gsLifetime += grand;
+      members[idx].txnCount   += 1;
+      // Link retailer if not already linked
+      if (members[idx].linkedRetailers.indexOf(currentRetailer.name) === -1) {
+        members[idx].linkedRetailers.push(currentRetailer.name);
+      }
+      localStorage.setItem('mgs_members', JSON.stringify(members));
+      currentMember = members[idx];
+    }
+    // Add to txn history
+    memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
+    memberTxns.unshift(txn);
+    localStorage.setItem('mgs_member_txns', JSON.stringify(memberTxns));
+
+    // 🔴 Fire live sync — triggers storage event in other open tabs
+    localStorage.setItem('mgs_live_txn', JSON.stringify(txn));
+  }
+
+  // Show receipt
+  showReceipt(txn, t1, t2, grand, basketVal, now);
+
+  // Update session status
+  document.getElementById('sessionStatus').className = 'session-status session-complete';
+  document.getElementById('sessionStatus').textContent = '✓ complete · '+fmt(grand)+' GS';
+
+  // Update dev panel
+  updateDevPanel(t1, t2, grand, basketVal, txn);
+}
+
+// ── Receipt ───────────────────────────────────────────────────────────────────
+function showReceipt(txn, t1, t2, grand, basketVal, now) {
+  document.getElementById('rcpRetailer').textContent = currentRetailer.name;
+  document.getElementById('rcpDate').textContent = now.toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('rcpBasket').textContent = '£'+basketVal.toFixed(2);
+  document.getElementById('rcpT1').textContent = '+'+fmt(t1)+' GS';
+  document.getElementById('rcpT2').textContent = '+'+fmt(t2)+' GS';
+  document.getElementById('rcpTotal').textContent = fmt(grand)+' GS';
+  var t2Row = document.getElementById('rcpT2Row');
+  t2Row.style.display = t2 > 0 ? '' : 'none';
+
+  document.getElementById('rcpItems').innerHTML = basketItems.map(function(p){
+    return '<div class="receipt-row"><span>'+p.productName+'</span><span style="color:#3a6acc;">+'+p.gsPerUnit+' GS</span></div>';
+  }).join('');
+
+  document.getElementById('rcpMessage').textContent =
+    (currentMember ? currentMember.name+' — ' : '')+
+    'you have earned 🌿 '+fmt(grand)+' green squares at '+currentRetailer.name+
+    '. your contribution is helping protect the amazon rainforest. thank you.';
+
+  document.getElementById('receiptOverlay').classList.add('show');
+}
+
+function closeReceipt() {
+  document.getElementById('receiptOverlay').classList.remove('show');
+  clearBasket();
+}
+
+// ── Dev panel ─────────────────────────────────────────────────────────────────
+function updateDevPanel(t1, t2, grand, basketVal, txn) {
+  var retailerId = currentRetailer ? 'RET00'+(Object.keys(themes).indexOf(currentRetailer.name)+1) : 'RET???';
+  var prods = basketItems.map(function(p){ return '{"sku":"'+p.sku+'","gsPerUnit":'+p.gsPerUnit+',"brand":"'+p.brand+'"}'; });
+  var code =
+    '<span style="color:rgba(255,255,255,0.4);">POST /api/v1/mgs/transaction</span>\n'+
+    '<span style="color:rgba(255,255,255,0.25);">Authorization: Bearer {retailer_api_key}</span>\n\n'+
+    '{\n'+
+    '  <span class="dev-key">"event"</span>: <span class="dev-str">"epos.transaction"</span>,\n'+
+    '  <span class="dev-key">"retailerId"</span>: <span class="dev-str">"'+retailerId+'"</span>,\n'+
+    '  <span class="dev-key">"retailerName"</span>: <span class="dev-str">"'+(currentRetailer?currentRetailer.name:'—')+'"</span>,\n'+
+    '  <span class="dev-key">"memberId"</span>: <span class="dev-str">"'+(txn?txn.memberId||'null':'null')+'"</span>,\n'+
+    '  <span class="dev-key">"basketValue"</span>: <span class="dev-num">'+basketVal.toFixed(2)+'</span>,\n'+
+    '  <span class="dev-key">"tier1"</span>: { <span class="dev-key">"gsAwarded"</span>: <span class="dev-num">'+t1+'</span>, <span class="dev-key">"rate"</span>: <span class="dev-num">'+(currentRetailer?currentRetailer.gsPerTxn:0)+'</span> },\n'+
+    '  <span class="dev-key">"tier2"</span>: {\n'+
+    '    <span class="dev-key">"gsAwarded"</span>: <span class="dev-num">'+t2+'</span>,\n'+
+    '    <span class="dev-key">"products"</span>: ['+prods.join(', ')+']\n'+
+    '  },\n'+
+    '  <span class="dev-key">"totalGs"</span>: <span class="dev-num">'+grand+'</span>,\n'+
+    '  <span class="dev-key">"timestamp"</span>: <span class="dev-str">"'+new Date().toISOString()+'"</span>,\n'+
+    '  <span class="dev-key">"campaignId"</span>: <span class="dev-str">"'+(currentRetailer?currentRetailer.camId:'—')+'"</span>\n'+
+    '}'+
+    (txn ? '\n\n<span style="color:rgba(255,255,255,0.3);">// Response 200 OK — transaction recorded, GS credited to member account</span>' : '');
+  document.getElementById('devCode').innerHTML = code;
+}
+
+function toggleDev() {
+  var t = document.getElementById('devToggle');
+  var b = document.getElementById('devBody');
+  t.classList.toggle('open');
+  b.classList.toggle('open');
+}
+
+function fmt(n) { return parseInt(n||0).toLocaleString(); }
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MGS — Consumer App</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; background: #1b3410; min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 40px; padding: 30px 20px; }
+
+    /* ── Demo controls panel (left of phone) ── */
+    .demo-panel { width: 220px; flex-shrink: 0; }
+    .dp-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+    .dp-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+    .dp-label { font-size: 9px; text-transform: uppercase; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; margin-bottom: 6px; }
+    .dp-select { width: 100%; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; color: white; font-size: 11px; padding: 6px 8px; font-family: inherit; cursor: pointer; }
+    .dp-select option { background: #1b3410; }
+    .live-status { display: flex; align-items: center; gap: 7px; margin-top: 8px; font-size: 10px; color: rgba(255,255,255,0.5); }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #6ab023; animation: pulse 2s infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .dp-links a { display: block; color: rgba(255,255,255,0.45); font-size: 10px; text-decoration: none; padding: 4px 0; text-transform: lowercase; }
+    .dp-links a:hover { color: #6ab023; }
+    .dp-hint { font-size: 10px; color: rgba(255,255,255,0.3); line-height: 1.6; }
+    .dp-hint strong { color: rgba(255,255,255,0.55); }
+
+    /* ── Phone device ── */
+    .device-outer { position: relative; width: 393px; flex-shrink: 0; }
+    .device-frame { background: #1c1c1e; border-radius: 54px; padding: 13px; box-shadow: 0 0 0 1px #3a3a3c, 0 0 0 3px #2a2a2c, 0 40px 100px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.06); }
+    /* Side buttons */
+    .device-frame::before { content:''; position:absolute; left:-4px; top:120px; width:4px; height:32px; background:#2a2a2c; border-radius:3px 0 0 3px; }
+    .device-frame::after  { content:''; position:absolute; right:-4px; top:160px; width:4px; height:60px; background:#2a2a2c; border-radius:0 3px 3px 0; }
+    .device-screen { background: #f0f0f0; border-radius: 42px; overflow: hidden; height: 852px; position: relative; }
+
+    /* Dynamic island */
+    .dynamic-island { position:absolute; top:14px; left:50%; transform:translateX(-50%); width:126px; height:36px; background:#1c1c1e; border-radius:20px; z-index:200; display:flex; align-items:center; justify-content:center; }
+    .di-camera { width:11px; height:11px; border-radius:50%; background:#2a2a2c; border:1px solid #111; }
+
+    /* Status bar */
+    .status-bar { position:absolute; top:0; left:0; right:0; height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 28px 6px; z-index:100; }
+    .sb-time { font-size:15px; font-weight:600; color:white; }
+    .sb-icons { display:flex; align-items:center; gap:6px; }
+    .sb-icon { font-size:11px; color:white; }
+
+    /* App screens container */
+    .screens-container { height: 100%; display: flex; flex-direction: column; }
+    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+    .screen.active { display: flex; }
+
+    /* ── Screen 1: Home ── */
+    .home-header { background: linear-gradient(160deg, #1b3410 0%, #2d5518 60%, #4a8820 100%); padding: 60px 24px 24px; flex-shrink: 0; }
+    .home-greeting { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+    .home-name { font-size: 18px; font-weight: bold; color: white; margin-bottom: 20px; }
+    .home-balance-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+    .home-balance { font-size: 52px; font-weight: bold; color: #6ab023; line-height: 1; transition: all 0.4s; }
+    .home-balance.bump { color: #b8f068; transform: scale(1.05); }
+    .home-gs-label { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 10px; }
+    .home-forest { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .home-body { flex: 1; overflow-y: auto; background: #f7faf3; padding: 16px; }
+    .home-section-title { font-size: 11px; font-weight: bold; color: #1b3410; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .home-card { background: white; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .home-txn-row { display: flex; align-items: center; gap: 10px; }
+    .home-txn-dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: white; flex-shrink: 0; }
+    .home-txn-name { font-size: 12px; font-weight: bold; color: #1b3410; }
+    .home-txn-date { font-size: 10px; color: #aaa; }
+    .home-txn-gs { font-size: 14px; font-weight: bold; color: #6ab023; margin-left: auto; }
+    .home-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .home-stat { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .home-stat-val { font-size: 18px; font-weight: bold; color: #1b3410; }
+    .home-stat-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+    /* In-app notification */
+    .app-notif { position:absolute; top:60px; left:12px; right:12px; background:#1b3410; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; z-index:300; transform:translateY(-130%); transition:transform 0.35s ease; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+    .app-notif.show { transform:translateY(0); }
+    .app-notif-icon { font-size:22px; flex-shrink:0; }
+    .app-notif-title { font-size:12px; font-weight:bold; color:white; }
+    .app-notif-sub { font-size:10px; color:rgba(255,255,255,0.6); margin-top:2px; }
+
+    /* ── Screen 2: Earn ── */
+    .earn-header { background: #1b3410; padding: 60px 24px 20px; flex-shrink: 0; }
+    .earn-title { font-size: 20px; font-weight: bold; color: white; margin-bottom: 4px; text-transform: lowercase; }
+    .earn-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
+    .earn-body { flex: 1; overflow-y: auto; background: white; padding: 20px; }
+    .qr-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+    .qr-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.12); text-align: center; margin-bottom: 14px; width: 100%; }
+    .qr-frame { width: 160px; height: 160px; margin: 0 auto 12px; background: #1b3410; border-radius: 12px; padding: 12px; display: grid; grid-template-columns: repeat(11,1fr); gap: 1.5px; }
+    .qr-px { border-radius: 1px; }
+    .qr-member-id { font-size: 12px; font-weight: bold; color: #1b3410; letter-spacing: 2px; font-family: monospace; }
+    .qr-hint { font-size: 10px; color: #aaa; margin-top: 4px; }
+    .earn-or { text-align: center; font-size: 10px; color: #aaa; margin: 10px 0; }
+    .earn-email { font-size: 12px; color: #1b3410; background: #f0f6e8; border: 1px solid #ccd8b8; border-radius: 8px; padding: 10px 14px; text-align: center; margin-bottom: 16px; font-family: monospace; }
+    .nearby-title { font-size: 11px; font-weight: bold; color: #1b3410; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .nearby-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f4e8; }
+    .nearby-item:last-child { border-bottom: none; }
+    .nearby-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .nearby-name { font-size: 12px; color: #1b3410; font-weight: bold; }
+    .nearby-cat { font-size: 10px; color: #aaa; }
+    .nearby-dist { font-size: 10px; color: #6ab023; margin-left: auto; font-weight: bold; }
+    .boost-banner { background: linear-gradient(90deg, #f06c00, #ff9933); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+    .boost-icon { font-size: 20px; flex-shrink: 0; }
+    .boost-text { font-size: 11px; color: white; line-height: 1.5; }
+    .boost-text strong { font-size: 13px; display: block; margin-bottom: 2px; }
+
+    /* ── Screen 3: History ── */
+    .history-header { background: #1b3410; padding: 60px 24px 16px; flex-shrink: 0; }
+    .history-title { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; }
+    .history-total { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+    .history-body { flex: 1; overflow-y: auto; background: #f7faf3; }
+    .history-group { }
+    .history-date { font-size: 10px; font-weight: bold; color: #aaa; text-transform: uppercase; padding: 10px 16px 4px; letter-spacing: 0.5px; }
+    .history-item { background: white; margin: 0 12px 6px; border-radius: 10px; padding: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .history-item.new-item { animation: newItem 1.5s ease; }
+    @keyframes newItem { 0%{background:#d0f0a0;} 100%{background:white;} }
+    .hi-row { display: flex; align-items: center; gap: 10px; }
+    .hi-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white; flex-shrink: 0; }
+    .hi-name { font-size: 12px; font-weight: bold; color: #1b3410; }
+    .hi-time { font-size: 10px; color: #aaa; }
+    .hi-gs { font-size: 14px; font-weight: bold; color: #6ab023; margin-left: auto; }
+    .hi-products { padding: 6px 0 0 42px; display: flex; flex-wrap: wrap; gap: 4px; }
+    .hi-prd { font-size: 9px; background: #e8f0ff; color: #1a3a88; padding: 2px 7px; border-radius: 8px; border: 1px solid #c8d4f0; }
+
+    /* ── Screen 4: Redeem ── */
+    .redeem-header { background: #1b3410; padding: 60px 24px 16px; flex-shrink: 0; }
+    .redeem-title { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; }
+    .redeem-balance { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+    .redeem-body { flex: 1; overflow-y: auto; background: #f7faf3; padding: 14px; }
+    .redeem-intro { font-size: 11px; color: #555; line-height: 1.6; margin-bottom: 14px; background: white; border-radius: 10px; padding: 12px 14px; }
+    .project-card-app { background: white; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .pca-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .pca-icon { font-size: 24px; flex-shrink: 0; }
+    .pca-name { font-size: 12px; font-weight: bold; color: #1b3410; }
+    .pca-loc { font-size: 10px; color: #aaa; }
+    .pca-standard { font-size: 9px; background: #e4f0d0; color: #2d5518; padding: 1px 5px; border-radius: 4px; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 2px; }
+    .pca-action { font-size: 10px; color: #6ab023; font-weight: bold; margin-bottom: 8px; }
+    .pca-btn { width: 100%; background: #1b3410; color: white; border: none; border-radius: 8px; padding: 9px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; }
+    .pca-btn:hover { background: #2d5518; }
+    .redeem-confirm { background: #e4f0d0; border: 1px solid #b8d898; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 11px; color: #2d5518; line-height: 1.6; display: none; }
+
+    /* ── Screen 5: Impact ── */
+    .impact-header { background: linear-gradient(160deg, #0e1e08 0%, #1b3410 100%); padding: 60px 24px 20px; flex-shrink: 0; }
+    .impact-title { font-size: 20px; font-weight: bold; color: white; text-transform: lowercase; }
+    .impact-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+    .impact-body { flex: 1; overflow-y: auto; background: #f7faf3; padding: 14px; }
+    .impact-big-card { background: linear-gradient(135deg, #1b3410, #2d5518); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+    .ibc-val { font-size: 42px; font-weight: bold; color: #6ab023; line-height: 1; }
+    .ibc-unit { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 12px; }
+    .ibc-sub { font-size: 10px; color: rgba(255,255,255,0.45); line-height: 1.5; }
+    .impact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .impact-mini { background: white; border-radius: 12px; padding: 13px; box-shadow: 0 1px 5px rgba(0,0,0,0.06); }
+    .im-icon { font-size: 16px; margin-bottom: 5px; }
+    .im-val { font-size: 16px; font-weight: bold; color: #1b3410; }
+    .im-lbl { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+    .verra-badge { background: #1b3410; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+    .vb-text { font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+    .vb-logo { font-size: 11px; font-weight: bold; color: #6ab023; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Bottom nav ── */
+    .bottom-nav { background: white; border-top: 1px solid #eee; display: flex; height: 82px; flex-shrink: 0; padding: 0 0 16px; position: relative; z-index: 50; }
+    .bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; transition: all 0.1s; padding-top: 8px; }
+    .bn-icon { font-size: 20px; }
+    .bn-label { font-size: 9px; color: #aaa; text-transform: lowercase; }
+    .bn-item.active .bn-label { color: #6ab023; font-weight: bold; }
+    .bn-item.active .bn-icon { transform: scale(1.12); }
+    .bn-dot { width: 4px; height: 4px; border-radius: 50%; background: #6ab023; position: absolute; bottom: 20px; opacity: 0; transition: opacity 0.2s; }
+    .bn-item.active .bn-dot { opacity: 1; }
+
+    /* Scrollbar inside phone */
+    .screen *::-webkit-scrollbar { width: 3px; }
+    .screen *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Demo controls ── -->
+<div class="demo-panel">
+  <div class="dp-title">demo controls</div>
+
+  <div class="dp-card">
+    <div class="dp-label">viewing as member</div>
+    <select class="dp-select" id="dpMemberSel" onchange="switchAppMember(this.value)">
+      <option value="">— select —</option>
+    </select>
+    <div class="live-status">
+      <span class="live-dot"></span>
+      <span>live · listening for EPOS transactions</span>
+    </div>
+  </div>
+
+  <div class="dp-card dp-links">
+    <div class="dp-label">open in parallel</div>
+    <a href="epos-terminal.html" target="_blank">🖥 EPOS terminal ↗</a>
+    <a href="account.html" target="_blank">👤 web account ↗</a>
+    <a href="admin.html" target="_blank">⚙ admin dashboard ↗</a>
+  </div>
+
+  <div class="dp-card">
+    <div class="dp-label">live demo tip</div>
+    <div class="dp-hint">
+      <strong>1.</strong> Open EPOS Terminal in a second tab<br>
+      <strong>2.</strong> Select same member here<br>
+      <strong>3.</strong> Complete a transaction on the EPOS<br>
+      <strong>4.</strong> Watch GS arrive here in real time 🌿
+    </div>
+  </div>
+</div>
+
+<!-- ── Phone device ── -->
+<div class="device-outer">
+  <div class="device-frame">
+    <div class="device-screen">
+
+      <!-- Dynamic island -->
+      <div class="dynamic-island"><div class="di-camera"></div></div>
+
+      <!-- In-app notification (fires on live sync) -->
+      <div class="app-notif" id="appNotif">
+        <div class="app-notif-icon">🌿</div>
+        <div>
+          <div class="app-notif-title" id="appNotifTitle">+0 Green Squares earned!</div>
+          <div class="app-notif-sub" id="appNotifSub">tap to view transaction</div>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div class="status-bar" id="statusBar" style="position:absolute;">
+        <span class="sb-time" id="sbTime">09:41</span>
+        <div class="sb-icons">
+          <span class="sb-icon">●●●</span>
+          <span class="sb-icon">WiFi</span>
+          <span class="sb-icon">🔋</span>
+        </div>
+      </div>
+
+      <!-- Screens container -->
+      <div class="screens-container">
+
+        <!-- Screen 1: Home -->
+        <div class="screen active" id="screen-home">
+          <div class="home-header">
+            <div class="home-greeting" id="homeGreeting">good morning,</div>
+            <div class="home-name" id="homeName">—</div>
+            <div class="home-balance-label">green squares</div>
+            <div class="home-balance" id="homeBalance">0</div>
+            <div class="home-gs-label">in your account</div>
+            <div class="home-forest" id="homeForest">🌲 your forest: — m² protected</div>
+          </div>
+          <div class="home-body">
+            <div class="home-section-title">recent activity</div>
+            <div class="home-card" id="homeRecentTxn">
+              <div style="font-size:11px;color:#bbb;text-align:center;padding:8px;">no recent transactions</div>
+            </div>
+            <div class="home-section-title">your impact</div>
+            <div class="home-stats" id="homeStats"></div>
+          </div>
+        </div>
+
+        <!-- Screen 2: Earn -->
+        <div class="screen" id="screen-earn">
+          <div class="earn-header">
+            <div class="earn-title">earn</div>
+            <div class="earn-sub">show this at checkout to link your GS account</div>
+          </div>
+          <div class="earn-body">
+            <div class="qr-wrap">
+              <div class="qr-card">
+                <div class="qr-frame" id="appQr"></div>
+                <div class="qr-member-id" id="qrMemberId">MEM001</div>
+                <div class="qr-hint">scan at MGS retailer checkout</div>
+              </div>
+            </div>
+            <div class="earn-or">— or link by email —</div>
+            <div class="earn-email" id="earnEmail">sarah.j@email.com</div>
+            <div class="nearby-title">nearby GS retailers</div>
+            <div id="nearbyRetailers"></div>
+            <div class="boost-banner">
+              <div class="boost-icon">⚡</div>
+              <div class="boost-text">
+                <strong>GS boost week!</strong>
+                Sainsbury's is running 2× GS on all Nestlé products this week. Shop and double your green squares.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen 3: History -->
+        <div class="screen" id="screen-history">
+          <div class="history-header">
+            <div class="history-title">history</div>
+            <div class="history-total" id="historyTotal">— transactions · — GS earned</div>
+          </div>
+          <div class="history-body" id="historyBody"></div>
+        </div>
+
+        <!-- Screen 4: Redeem -->
+        <div class="screen" id="screen-redeem">
+          <div class="redeem-header">
+            <div class="redeem-title">direct my GS</div>
+            <div class="redeem-balance" id="redeemBalance">— GS available</div>
+          </div>
+          <div class="redeem-body">
+            <div class="redeem-intro">
+              Your Green Squares are committed to conservation the moment you earn them. Choose where to direct your impact — each project is validated to Verra VCS standard or above.
+            </div>
+            <div class="redeem-confirm" id="redeemConfirm"></div>
+            <div id="projectCards"></div>
+          </div>
+        </div>
+
+        <!-- Screen 5: Impact -->
+        <div class="screen" id="screen-impact">
+          <div class="impact-header">
+            <div class="impact-title">your impact</div>
+            <div class="impact-sub" id="impactLifetime">— GS lifetime · Verra VCS</div>
+          </div>
+          <div class="impact-body">
+            <div class="impact-big-card">
+              <div class="ibc-val" id="impactCo2">0</div>
+              <div class="ibc-unit">kg CO₂ offset</div>
+              <div class="ibc-sub" id="impactCo2Sub">based on 0.45 kg CO₂e per Green Square · Verra VCS verified</div>
+            </div>
+            <div class="impact-row" id="impactRow"></div>
+            <div class="verra-badge">
+              <div style="font-size:20px;">🌿</div>
+              <div class="vb-text">
+                <span class="vb-logo">Verra VCS · MGS CIC</span><br>
+                All Green Squares validated to Verra Verified Carbon Standard. Independently audited. CIC conservation fund — not-for-profit.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom nav -->
+        <div class="bottom-nav">
+          <div class="bn-item active" onclick="showScreen('home')" id="nav-home">
+            <span class="bn-icon">🏠</span>
+            <span class="bn-label">home</span>
+            <span class="bn-dot"></span>
+          </div>
+          <div class="bn-item" onclick="showScreen('earn')" id="nav-earn">
+            <span class="bn-icon">🔗</span>
+            <span class="bn-label">earn</span>
+            <span class="bn-dot"></span>
+          </div>
+          <div class="bn-item" onclick="showScreen('history')" id="nav-history">
+            <span class="bn-icon">📋</span>
+            <span class="bn-label">history</span>
+            <span class="bn-dot"></span>
+          </div>
+          <div class="bn-item" onclick="showScreen('redeem')" id="nav-redeem">
+            <span class="bn-icon">🌳</span>
+            <span class="bn-label">direct</span>
+            <span class="bn-dot"></span>
+          </div>
+          <div class="bn-item" onclick="showScreen('impact')" id="nav-impact">
+            <span class="bn-icon">🌍</span>
+            <span class="bn-label">impact</span>
+            <span class="bn-dot"></span>
+          </div>
+        </div>
+      </div><!-- /screens-container -->
+
+    </div><!-- /device-screen -->
+  </div><!-- /device-frame -->
+</div><!-- /device-outer -->
+
+<script>
+var equiv = { carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18 };
+
+var defaultMembers = [
+  { id:'MEM001', name:'Sarah Johnson',  email:'sarah.j@email.com',      initials:'SJ', gsBalance:2847, gsLifetime:4230, gsRedeemed:1383, joinDate:'2025-09-15', linkedRetailers:["Sainsbury's"], txnCount:47 },
+  { id:'MEM002', name:'James Wilson',   email:'james.w@email.com',       initials:'JW', gsBalance:1234, gsLifetime:2180, gsRedeemed:946,  joinDate:'2025-10-01', linkedRetailers:['ASDA','Currys'], txnCount:28 },
+  { id:'MEM003', name:'Emma Thompson',  email:'emma.t@email.com',        initials:'ET', gsBalance:892,  gsLifetime:1450, gsRedeemed:558,  joinDate:'2025-12-01', linkedRetailers:['Thomas Cook',"Sainsbury's"], txnCount:19 },
+  { id:'MEM004', name:'Demo User',      email:'demo@mygreensquares.com', initials:'DU', gsBalance:0,    gsLifetime:0,    gsRedeemed:0,    joinDate:'2026-01-01', linkedRetailers:[], txnCount:0 }
+];
+
+var defaultMemberTxns = [
+  { id:'TXN001', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-16', time:'14:32', gsEarned:319, basketValue:42.30, t1Gs:282, t2Gs:37,  products:[{name:'Nescafe Gold Blend 200g',gs:25},{name:'Persil Bio Liquid 2.5kg',gs:12}] },
+  { id:'TXN002', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-12', time:'11:18', gsEarned:266, basketValue:38.70, t1Gs:258, t2Gs:8,   products:[{name:'Dove Body Wash 500ml',gs:8}] },
+  { id:'TXN003', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-08', time:'16:44', gsEarned:398, basketValue:55.10, t1Gs:368, t2Gs:30,  products:[{name:'Nescafe Original 300g',gs:18},{name:'Persil Bio Liquid 2.5kg',gs:12}] },
+  { id:'TXN006', memberId:'MEM002', retailer:'ASDA',        date:'2026-03-15', time:'09:48', gsEarned:284, basketValue:35.50, t1Gs:249, t2Gs:35,  products:[{name:'Nescafe Gold Blend 200g',gs:25},{name:'Dove Body Wash 500ml',gs:8}] },
+  { id:'TXN007', memberId:'MEM002', retailer:'Currys',      date:'2026-03-10', time:'15:30', gsEarned:335, basketValue:299.0, t1Gs:250, t2Gs:85,  products:[{name:'Samsung Galaxy S25',gs:85}] },
+  { id:'TXN008', memberId:'MEM003', retailer:'Thomas Cook', date:'2026-03-01', time:'10:00', gsEarned:420, basketValue:1240.0,t1Gs:420, t2Gs:0,   products:[] }
+];
+
+var defaultProjects = [
+  { id:'PRJ001', icon:'🌳', name:'Amazon Rainforest Protection', loc:'Pará, Brazil',          standard:'Verra VCS',      gsForAction:100, actionDesc:'100 GS = 1 m² protected for 10 years' },
+  { id:'PRJ002', icon:'🌿', name:'Borneo Peat Forest Restoration', loc:'Kalimantan, Indonesia',standard:'Verra VCS',     gsForAction:80,  actionDesc:'80 GS = 0.8 m² peat forest restored' },
+  { id:'PRJ003', icon:'🦁', name:'Kenyan Savanna Conservation',   loc:'Laikipia, Kenya',       standard:'Verra VCS Gold', gsForAction:60,  actionDesc:'60 GS = 3 m² savanna protected' },
+  { id:'PRJ004', icon:'🦌', name:'Scottish Rewilding Project',    loc:'Cairngorms, Scotland',  standard:'Plan Vivo',      gsForAction:50,  actionDesc:'50 GS = 1 native tree supported' }
+];
+
+var DOTS = { "Sainsbury's":'#f06c00','ASDA':'#78be20','Currys':'#002d62','Thomas Cook':'#003087','Sky':'#0072c9','H&M':'#e4003a' };
+var NEARBY = [
+  { name:"Sainsbury's", cat:'grocery',    dist:'0.3 mi', color:'#f06c00' },
+  { name:'ASDA',        cat:'grocery',    dist:'0.8 mi', color:'#78be20' },
+  { name:'Currys',      cat:'electrical', dist:'1.2 mi', color:'#002d62' }
+];
+
+var members    = JSON.parse(localStorage.getItem('mgs_members'))      || defaultMembers;
+var memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns'))  || defaultMemberTxns;
+var redeems    = JSON.parse(localStorage.getItem('mgs_redeems'))      || [];
+var currentMem = null;
+var notifTimer = null;
+
+function boot() {
+  if (!localStorage.getItem('mgs_members'))     localStorage.setItem('mgs_members',     JSON.stringify(members));
+  if (!localStorage.getItem('mgs_member_txns')) localStorage.setItem('mgs_member_txns', JSON.stringify(memberTxns));
+
+  var sel = document.getElementById('dpMemberSel');
+  sel.innerHTML = '<option value="">— select —</option>'+
+    members.map(function(m){ return '<option value="'+m.id+'">'+m.name+'</option>'; }).join('');
+
+  buildQr();
+  buildNearby();
+  buildProjects();
+
+  // Status bar time
+  setInterval(function(){
+    var d = new Date();
+    document.getElementById('sbTime').textContent =
+      d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    // set status bar color based on current screen
+  }, 10000);
+  document.getElementById('sbTime').textContent =
+    new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+
+  switchAppMember('MEM001');
+  window.addEventListener('storage', onStorageEvent);
+}
+
+function switchAppMember(id) {
+  members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+  memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
+  currentMem = id ? members.find(function(m){ return m.id===id; }) : null;
+  document.getElementById('dpMemberSel').value = id||'';
+  renderAll();
+}
+
+function renderAll() {
+  if (!currentMem) return;
+  var m = currentMem;
+  var co2    = (m.gsLifetime * equiv.carbonKgPerGs).toFixed(1);
+  var vcs    = (m.gsLifetime * equiv.vcsCreditsPerGs).toFixed(4);
+  var fossil = (m.gsLifetime * equiv.fossilLitresPerGs).toFixed(1);
+  var forest = (m.gsLifetime * 0.134).toFixed(2);  // m² per 1000 GS
+
+  // Screen 1: Home
+  var hr = new Date().getHours();
+  var greet = hr < 12 ? 'good morning,' : hr < 18 ? 'good afternoon,' : 'good evening,';
+  document.getElementById('homeGreeting').textContent = greet;
+  document.getElementById('homeName').textContent = m.name.split(' ')[0]+' 👋';
+  document.getElementById('homeBalance').textContent = fmt(m.gsBalance);
+  document.getElementById('homeForest').textContent = '🌲 your forest: '+forest+' m² protected';
+
+  var myTxns = memberTxns.filter(function(t){ return t.memberId===m.id; })
+    .sort(function(a,b){ return b.date>a.date?1:b.date<a.date?-1:0; });
+
+  if (myTxns.length) {
+    var latest = myTxns[0];
+    var col = DOTS[latest.retailer]||'#6ab023';
+    var init = latest.retailer.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    document.getElementById('homeRecentTxn').innerHTML =
+      '<div class="home-txn-row">'+
+        '<div class="home-txn-dot" style="background:'+col+'">'+init+'</div>'+
+        '<div>'+
+          '<div class="home-txn-name">'+latest.retailer+'</div>'+
+          '<div class="home-txn-date">'+fmtDate(latest.date)+' · '+latest.time+'</div>'+
+          (latest.products&&latest.products.length?'<div style="font-size:9px;color:#3a6acc;margin-top:2px;">🔵 '+latest.products.map(function(p){return p.name;}).join(', ')+'</div>':'')+
+        '</div>'+
+        '<div class="home-txn-gs">+'+fmt(latest.gsEarned)+' 🌿</div>'+
+      '</div>';
+  } else {
+    document.getElementById('homeRecentTxn').innerHTML =
+      '<div style="font-size:11px;color:#bbb;text-align:center;padding:8px;">no transactions yet — visit an MGS retailer</div>';
+  }
+
+  document.getElementById('homeStats').innerHTML =
+    homeStat('🌡', co2+' kg', 'CO₂ offset')+
+    homeStat('📜', vcs, 'VCS credits')+
+    homeStat('⛽', fossil+' L', 'fossil equiv.')+
+    homeStat('🏅', m.txnCount, 'transactions');
+
+  // Screen 2: Earn
+  document.getElementById('qrMemberId').textContent = m.id;
+  document.getElementById('earnEmail').textContent = m.email;
+
+  // Screen 3: History
+  document.getElementById('historyTotal').textContent =
+    m.txnCount+' transactions · '+fmt(m.gsLifetime)+' GS earned';
+  renderHistory(myTxns);
+
+  // Screen 4: Redeem
+  document.getElementById('redeemBalance').textContent = fmt(m.gsBalance)+' GS available';
+
+  // Screen 5: Impact
+  document.getElementById('impactLifetime').textContent = fmt(m.gsLifetime)+' GS lifetime · Verra VCS';
+  document.getElementById('impactCo2').textContent = co2;
+  document.getElementById('impactCo2Sub').textContent =
+    'based on '+equiv.carbonKgPerGs+' kg CO₂e per Green Square · Verra VCS verified · '+m.gsLifetime+' GS lifetime';
+  document.getElementById('impactRow').innerHTML =
+    impactMini('📜', vcs, 'VCS credits')+
+    impactMini('⛽', fossil+' L', 'fossil equiv.')+
+    impactMini('🌲', forest+' m²', 'forest area')+
+    impactMini('🏅', m.txnCount, 'transactions');
+}
+
+function renderHistory(txns) {
+  var body = document.getElementById('historyBody');
+  if (!txns.length) {
+    body.innerHTML = '<div style="padding:30px;text-align:center;color:#bbb;font-size:11px;">no transactions yet</div>';
+    return;
+  }
+  // Group by date
+  var grouped = {};
+  txns.forEach(function(t){
+    if (!grouped[t.date]) grouped[t.date] = [];
+    grouped[t.date].push(t);
+  });
+  body.innerHTML = Object.keys(grouped).sort(function(a,b){return b>a?1:-1;}).map(function(date){
+    return '<div class="history-group">'+
+      '<div class="history-date">'+fmtDate(date)+'</div>'+
+      grouped[date].map(histItemHtml).join('')+
+    '</div>';
+  }).join('');
+}
+
+function histItemHtml(t) {
+  var col = DOTS[t.retailer]||'#6ab023';
+  var init = t.retailer.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+  return '<div class="history-item">'+
+    '<div class="hi-row">'+
+      '<div class="hi-dot" style="background:'+col+'">'+init+'</div>'+
+      '<div>'+
+        '<div class="hi-name">'+t.retailer+'</div>'+
+        '<div class="hi-time">'+t.time+' · £'+(t.basketValue||0).toFixed(2)+'</div>'+
+      '</div>'+
+      '<div class="hi-gs">+'+fmt(t.gsEarned)+' 🌿</div>'+
+    '</div>'+
+    (t.products&&t.products.length
+      ? '<div class="hi-products">'+t.products.map(function(p){ return '<span class="hi-prd">🔵 '+p.name+' +'+p.gs+'</span>'; }).join('')+'</div>'
+      : '')+
+  '</div>';
+}
+
+function buildQr() {
+  // 11×11 CSS QR mock
+  var frame = document.getElementById('appQr');
+  var rows = 11;
+  var cells = [];
+  for (var i=0;i<rows*rows;i++) cells.push(Math.random()>0.45?1:0);
+  // Force corner squares
+  [0,1,2,3,4,5,6,11,17,22,24,33,44,55,66,77,88,99,104,105,106,107,108,109,110].forEach(function(i){ cells[i]=1; });
+  frame.innerHTML = cells.map(function(v){
+    return '<div class="qr-px" style="background:'+(v?'white':'transparent')+'"></div>';
+  }).join('');
+}
+
+function buildNearby() {
+  document.getElementById('nearbyRetailers').innerHTML = NEARBY.map(function(r){
+    return '<div class="nearby-item">'+
+      '<div class="nearby-dot" style="background:'+r.color+'"></div>'+
+      '<div><div class="nearby-name">'+r.name+'</div><div class="nearby-cat">'+r.cat+'</div></div>'+
+      '<div class="nearby-dist">'+r.dist+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function buildProjects() {
+  document.getElementById('projectCards').innerHTML = defaultProjects.map(function(p){
+    return '<div class="project-card-app">'+
+      '<div class="pca-top">'+
+        '<div class="pca-icon">'+p.icon+'</div>'+
+        '<div>'+
+          '<div class="pca-name">'+p.name+'</div>'+
+          '<div class="pca-loc">📍 '+p.loc+'</div>'+
+          '<span class="pca-standard">'+p.standard+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="pca-action">'+p.actionDesc+'</div>'+
+      '<button class="pca-btn" onclick="redeemProject(\''+p.id+'\',\''+p.name+'\',\''+p.icon+'\','+p.gsForAction+')">direct '+p.gsForAction+' GS →</button>'+
+    '</div>';
+  }).join('');
+}
+
+function redeemProject(id, name, icon, amount) {
+  if (!currentMem) return;
+  if (currentMem.gsBalance < amount) {
+    showAppNotif('not enough GS', 'you need '+amount+' GS — you have '+fmt(currentMem.gsBalance));
+    return;
+  }
+  members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+  var idx = members.findIndex(function(m){ return m.id===currentMem.id; });
+  if (idx>=0) {
+    members[idx].gsBalance -= amount;
+    members[idx].gsRedeemed += amount;
+    localStorage.setItem('mgs_members', JSON.stringify(members));
+    currentMem = members[idx];
+  }
+  var c = document.getElementById('redeemConfirm');
+  c.style.display = 'block';
+  c.innerHTML = icon+' <strong>'+fmt(amount)+' GS directed to '+name+'</strong><br>'+
+    (amount*equiv.carbonKgPerGs).toFixed(1)+' kg CO₂ equivalent · Verra VCS verified · thank you 🌿';
+  renderAll();
+  setTimeout(function(){ c.style.display='none'; }, 5000);
+}
+
+// ── Screen navigation ─────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.bn-item').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  // Status bar colour
+  var dark = ['home','history','redeem','impact'].indexOf(name) >= 0;
+}
+
+// ── Live sync ─────────────────────────────────────────────────────────────────
+function onStorageEvent(e) {
+  if (e.key !== 'mgs_live_txn') return;
+  var txn = JSON.parse(e.newValue||'null'); if (!txn) return;
+  if (!currentMem || txn.memberId !== currentMem.id) return;
+  members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+  memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
+  currentMem = members.find(function(m){ return m.id===txn.memberId; }) || currentMem;
+
+  // Flash balance on home
+  var bal = document.getElementById('homeBalance');
+  bal.classList.add('bump'); setTimeout(function(){ bal.classList.remove('bump'); }, 500);
+
+  // Show in-app notification
+  showAppNotif('+'+fmt(txn.gsEarned)+' Green Squares earned! 🌿', txn.retailer+' · just now');
+
+  renderAll();
+}
+
+function showAppNotif(title, sub) {
+  document.getElementById('appNotifTitle').textContent = title;
+  document.getElementById('appNotifSub').textContent = sub;
+  var n = document.getElementById('appNotif');
+  n.classList.add('show');
+  if (notifTimer) clearTimeout(notifTimer);
+  notifTimer = setTimeout(function(){ n.classList.remove('show'); }, 3500);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function homeStat(icon, val, lbl) {
+  return '<div class="home-stat">'+
+    '<div style="font-size:16px;margin-bottom:3px;">'+icon+'</div>'+
+    '<div class="home-stat-val">'+val+'</div>'+
+    '<div class="home-stat-lbl">'+lbl+'</div>'+
+  '</div>';
+}
+
+function impactMini(icon, val, lbl) {
+  return '<div class="impact-mini">'+
+    '<div class="im-icon">'+icon+'</div>'+
+    '<div class="im-val">'+val+'</div>'+
+    '<div class="im-lbl">'+lbl+'</div>'+
+  '</div>';
+}
+
+function fmt(n) { return parseInt(n||0).toLocaleString(); }
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+boot();
+</script>
+</body>
+</html>

@@ -3,272 +3,526 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>mygreensquares.com — my green squares wallet</title>
-  <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
+  <title>My Green Squares — Account</title>
   <style>
-    body { background-color: var(--color-green-pale); margin: 0; }
-    .page-wrapper { max-width: 960px; margin: 0 auto; background: var(--color-white); box-shadow: 0 0 20px rgba(0,0,0,0.15); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 13px; color: #333; background: #eef2e8; min-height: 100vh; }
 
-    /* Utility / header (shared) */
-    .utility-bar { background: var(--color-green-pale); display: flex; justify-content: flex-end; align-items: center; padding: 5px 12px; gap: 5px; }
-    .utility-bar input { width: 170px; padding: 4px 10px; font-size: 11px; border: 1px solid #c8c8b8; border-radius: 3px; background: rgba(255,255,255,0.8); font-family: var(--font-primary); color: var(--color-grey-text); }
-    .utility-bar input::placeholder { color: var(--color-grey-meta); }
-    .utility-bar button { background: var(--color-green-primary); color: white; border: none; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
-    .site-header { background: var(--color-green-primary); display: flex; align-items: center; justify-content: space-between; padding: 38px 16px; }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .site-nav { display: flex; align-items: stretch; }
-    .site-nav a { color: white; font-size: 13px; text-transform: lowercase; text-decoration: none; padding: 0 14px; display: flex; align-items: center; transition: background 0.15s; }
-    .site-nav a:hover { background: rgba(0,0,0,0.15); text-decoration: none; }
-    .site-nav .nav-acct { background: rgba(0,0,0,0.18); border-left: 1px solid rgba(255,255,255,0.2); font-size: 12px; }
-    .nav-pipe { color: rgba(255,255,255,0.35); padding: 0 2px; font-size: 12px; display: flex; align-items: center; }
+    /* ── Header ── */
+    .site-header { background: #1b3410; padding: 0 28px; height: 54px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .header-logo { display: flex; align-items: center; gap: 10px; }
+    .header-logo img { height: 32px; }
+    .header-logo-text { color: rgba(255,255,255,0.55); font-size: 9px; text-transform: lowercase; line-height: 1.3; }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .live-indicator { display: flex; align-items: center; gap: 5px; font-size: 10px; color: rgba(255,255,255,0.5); background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 10px; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #6ab023; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+    .member-selector select { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; color: white; font-size: 11px; padding: 5px 9px; font-family: inherit; cursor: pointer; }
+    .member-selector select option { background: #1b3410; }
+    .header-nav a { color: rgba(255,255,255,0.5); font-size: 11px; text-decoration: none; text-transform: lowercase; padding: 4px 7px; border-radius: 3px; transition: all 0.12s; }
+    .header-nav a:hover { color: white; background: rgba(255,255,255,0.08); }
 
-    /* Footer (shared) */
-    footer { background: var(--color-green-olive); margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; flex-wrap: wrap; gap: 10px; }
-    .footer-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .footer-label { font-size: 11px; color: rgba(255,255,255,0.55); }
-    .footer-label strong { color: rgba(255,255,255,0.8); }
-    .soc-btn { width: 26px; height: 26px; background: rgba(255,255,255,0.12); border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 11px; text-decoration: none; }
-    .soc-btn:hover { background: rgba(255,255,255,0.25); text-decoration: none; }
-    .footer-right { text-align: right; }
-    .fnav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0; margin-bottom: 4px; }
-    .fnav a { font-size: 10px; color: rgba(255,255,255,0.55); text-decoration: none; padding: 0 6px; border-right: 1px solid rgba(255,255,255,0.2); }
-    .fnav a:last-child { border-right: none; }
-    .fnav a:hover { color: white; }
-    .footer-copy { font-size: 10px; color: rgba(255,255,255,0.35); }
+    /* ── Hero ── */
+    .hero { background: linear-gradient(135deg, #0e1e08 0%, #1b3410 45%, #2d5518 100%); padding: 38px 28px 34px; }
+    .hero-inner { max-width: 940px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+    .hero-balance { font-size: 58px; font-weight: bold; color: #6ab023; line-height: 1; margin-bottom: 4px; transition: color 0.3s, transform 0.3s; }
+    .hero-balance.flash { color: #b8f068; transform: scale(1.06); }
+    .hero-balance-label { font-size: 12px; color: rgba(255,255,255,0.5); text-transform: lowercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .hero-name { font-size: 15px; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+    .hero-meta { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 18px; }
+    .hero-btns { display: flex; gap: 10px; }
+    .hero-right { text-align: right; }
+    .tier-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(106,176,35,0.2); border: 1px solid rgba(106,176,35,0.4); border-radius: 20px; padding: 8px 16px; color: #9ad84a; font-size: 12px; font-weight: bold; text-transform: lowercase; }
+    .hero-email { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 10px; }
 
-    /* Squares area wrapper — matches index.html */
-    .squares-area { background: var(--color-green-pale); padding: 4px; display: flex; flex-direction: column; gap: 4px; }
-    .main-area { display: flex; align-items: flex-start; gap: 4px; }
-    .main-content { flex: 1; min-width: 0; }
-    .main-sidebar { width: 315px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
-    .bottom-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+    /* ── Stats bar ── */
+    .stats-bar { background: white; border-bottom: 1px solid #dde8d0; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+    .stats-bar-inner { max-width: 940px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); }
+    .stat-item { padding: 14px 22px; border-right: 1px solid #eef2e8; }
+    .stat-item:last-child { border-right: none; }
+    .stat-val { font-size: 20px; font-weight: bold; color: #1b3410; line-height: 1; margin-bottom: 3px; }
+    .stat-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #aaa; }
+    .stat-sub { font-size: 10px; color: #ccc; margin-top: 1px; }
 
-    /* Shared panel base */
-    .panel { padding: 14px 16px; height: 315px; box-sizing: border-box; overflow: hidden; border-radius: 8px; }
+    /* ── Tabs ── */
+    .tab-bar { background: white; border-bottom: 2px solid #eef2e8; }
+    .tab-bar-inner { max-width: 940px; margin: 0 auto; display: flex; }
+    .tab { padding: 12px 22px; font-size: 12px; color: #999; cursor: pointer; text-transform: lowercase; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.12s; }
+    .tab:hover { color: #1b3410; }
+    .tab.active { color: #6ab023; border-bottom-color: #6ab023; font-weight: bold; }
 
-    /* Placeholder panels */
-    .panel-placeholder { background: var(--color-green-category); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 2px dashed rgba(255,255,255,0.25); }
-    .ph-icon { font-size: 34px; opacity: 0.65; margin-bottom: 10px; }
-    .ph-label { font-size: 16px; color: white; text-transform: lowercase; font-weight: normal; }
-    .ph-hint { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 6px; text-transform: lowercase; }
+    /* ── Content ── */
+    .content-wrap { max-width: 940px; margin: 0 auto; padding: 20px 28px 52px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    /* ---- Account main square ---- */
-    .acct-main {
-      height: 633px;
-      border-radius: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      background: #1a2a10;
-    }
+    /* ── Panels ── */
+    .panel { background: white; border-radius: 8px; border: 1px solid #dde8d0; overflow: hidden; margin-bottom: 16px; }
+    .panel-header { padding: 11px 15px; border-bottom: 1px solid #eef2e8; background: #fafcf7; display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 12px; font-weight: bold; color: #1b3410; text-transform: lowercase; }
+    .panel-body { padding: 14px 15px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
-    /* Account hero */
-    .acct-hero {
-      position: relative;
-      height: 300px;
-      flex-shrink: 0;
-      background: url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=760&h=300&fit=crop&q=80') center/cover no-repeat;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 20px 16px;
-    }
-    .acct-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)); }
-    .acct-hero > * { position: relative; z-index: 1; }
+    /* ── Transaction items ── */
+    .txn-item { padding: 11px 15px; border-bottom: 1px solid #f5f7f2; display: flex; align-items: flex-start; gap: 12px; transition: background 0.15s; }
+    .txn-item:last-child { border-bottom: none; }
+    .txn-item:hover { background: #fafdf7; }
+    .txn-item.new-txn { animation: newTxn 1.5s ease; }
+    @keyframes newTxn { 0%{background:#d4f0a0;} 100%{background:transparent;} }
+    .txn-dot { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: white; flex-shrink: 0; }
+    .txn-body { flex: 1; min-width: 0; }
+    .txn-retailer { font-size: 12px; font-weight: bold; color: #1b3410; }
+    .txn-products { font-size: 10px; color: #3a6acc; margin-top: 2px; }
+    .txn-meta { font-size: 10px; color: #bbb; margin-top: 2px; }
+    .txn-gs-val { font-size: 14px; font-weight: bold; color: #6ab023; white-space: nowrap; }
+    .txn-gs-t { font-size: 9px; color: #bbb; white-space: nowrap; text-align: right; }
 
-    .acct-top { display: flex; align-items: flex-start; gap: 14px; }
-    .avatar { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(255,255,255,0.6); flex-shrink: 0; }
-    .avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .acct-greeting { color: white; }
-    .acct-hi { font-size: 18px; font-weight: normal; text-transform: lowercase; }
-    .acct-count { font-size: 22px; font-weight: normal; }
-    .acct-count strong { font-size: 32px; font-weight: bold; }
+    /* ── Impact grid ── */
+    .impact-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+    .impact-card { background: white; border-radius: 7px; border: 1px solid #dde8d0; padding: 16px 14px; }
+    .impact-icon { font-size: 20px; margin-bottom: 6px; }
+    .impact-val { font-size: 22px; font-weight: bold; color: #1b3410; line-height: 1; margin-bottom: 3px; }
+    .impact-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.4px; color: #aaa; }
+    .impact-sub { font-size: 9px; color: #ccc; margin-top: 2px; }
 
-    .acct-actions { display: flex; gap: 6px; margin-top: 8px; }
-    .action-sq { width: 34px; height: 34px; background: var(--color-green-tile); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 14px; text-decoration: none; color: white; transition: background 0.15s; }
-    .action-sq:hover { background: var(--color-green-dark); }
-    .action-label { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 3px; text-align: center; }
-    .action-wrap { display: flex; flex-direction: column; align-items: center; }
+    /* ── Projects ── */
+    .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .project-card { border: 1px solid #dde8d0; border-radius: 7px; padding: 15px; background: white; transition: border-color 0.15s, box-shadow 0.15s; }
+    .project-card:hover { border-color: #6ab023; box-shadow: 0 2px 10px rgba(106,176,35,0.15); }
+    .proj-icon { font-size: 22px; margin-bottom: 7px; }
+    .proj-name { font-size: 12px; font-weight: bold; color: #1b3410; margin-bottom: 2px; text-transform: lowercase; }
+    .proj-loc { font-size: 10px; color: #aaa; margin-bottom: 6px; }
+    .proj-standard { font-size: 9px; font-weight: bold; background: #e4f0d0; color: #2d5518; padding: 2px 7px; border-radius: 3px; text-transform: uppercase; display: inline-block; margin-bottom: 8px; }
+    .proj-stat { font-size: 10px; color: #555; margin-bottom: 10px; line-height: 1.55; }
+    .proj-action { font-size: 10px; font-weight: bold; color: #6ab023; margin-bottom: 8px; }
+    .proj-input-row { display: flex; gap: 6px; align-items: center; }
+    .proj-input-row input { flex: 1; border: 1px solid #ccd8b8; border-radius: 4px; padding: 5px 8px; font-size: 11px; font-family: inherit; max-width: 120px; }
+    .proj-input-row input:focus { outline: none; border-color: #6ab023; box-shadow: 0 0 0 2px rgba(106,176,35,0.1); }
 
-    .did-you-know { background: rgba(0,0,0,0.35); border-radius: 3px; padding: 8px 12px; font-size: 11px; color: rgba(255,255,255,0.85); max-width: 340px; }
-    .did-you-know strong { color: var(--color-green-bright); }
+    /* ── Settings ── */
+    .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid #f5f7f2; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 12px; color: #333; }
+    .settings-sub { font-size: 10px; color: #aaa; margin-top: 2px; }
+    .toggle { width: 36px; height: 20px; border-radius: 10px; background: #dde8d0; position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .toggle.on { background: #6ab023; }
+    .toggle::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:white; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    .toggle.on::after { transform:translateX(16px); }
+    .ret-chip { font-size: 11px; background: #e4f0d0; color: #2d5518; padding: 4px 12px; border-radius: 10px; border: 1px solid #b8d898; display: inline-block; }
 
-    /* Sponsors */
-    .acct-sponsors { flex: 1; padding: 16px; background: white; overflow: hidden; }
-    .sponsors-label { font-size: 18px; color: var(--color-grey-dark); font-weight: normal; text-transform: lowercase; margin-bottom: 12px; }
-    .sponsors-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 8px; }
-    .sp-logo { background: white; border: 1px solid #e0e0d8; border-radius: 2px; display: flex; align-items: center; justify-content: center; height: 38px; font-weight: bold; font-size: 10px; }
-    .acct-invite { display: flex; align-items: center; justify-content: space-between; background: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=740&h=60&fit=crop&q=60') center/cover; padding: 8px 16px; border-radius: 2px; margin-top: 4px; }
-    .acct-invite span { font-size: 12px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+    /* ── Buttons ── */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 16px; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.12s; }
+    .btn-primary  { background: #6ab023; color: white; border-color: #5a9a1d; }
+    .btn-primary:hover  { background: #5a9a1d; }
+    .btn-secondary{ background: white; color: #555; border-color: #ccd8b8; }
+    .btn-secondary:hover{ background: #f5f8f0; }
+    .btn-dark     { background: #1b3410; color: white; border-color: #0e1e08; }
+    .btn-dark:hover     { background: #2d5518; }
+    .btn-xs { padding: 3px 9px; font-size: 10px; }
+    .btn-sm { padding: 5px 11px; font-size: 11px; }
 
-    .btn-gs { display: inline-block; background: var(--color-green-primary); color: white; border: 1px solid var(--color-green-dark); border-radius: 3px; padding: 6px 14px; font-size: 12px; font-family: var(--font-primary); text-transform: lowercase; text-decoration: none; cursor: pointer; }
-    .btn-gs:hover { background: var(--color-green-dark); text-decoration: none; color: white; }
-    .btn-gs.sm { font-size: 11px; padding: 5px 10px; }
+    /* ── Toast ── */
+    .toast { position: fixed; top: 68px; right: 22px; background: white; border: 1px solid #dde8d0; border-left: 4px solid #6ab023; border-radius: 7px; padding: 13px 17px; box-shadow: 0 6px 24px rgba(0,0,0,0.18); max-width: 290px; z-index: 9999; transform: translateX(140%); transition: transform 0.3s ease; }
+    .toast.show { transform: translateX(0); }
+    .toast-gs { font-size: 15px; font-weight: bold; color: #6ab023; margin-bottom: 3px; }
+    .toast-detail { font-size: 11px; color: #555; }
+    .toast-time { font-size: 9px; color: #bbb; margin-top: 5px; }
+
+    /* ── Footer ── */
+    .site-footer { background: #1b3410; padding: 18px 28px; }
+    .footer-inner { max-width: 940px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { color: rgba(255,255,255,0.3); font-size: 10px; text-transform: lowercase; }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { color: rgba(255,255,255,0.3); font-size: 10px; text-decoration: none; text-transform: lowercase; }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #b8ccaa; border-radius: 3px; }
   </style>
 </head>
 <body>
-<div class="page-wrapper">
 
-  <!-- Utility bar -->
-  <div class="utility-bar">
-    <input type="text" placeholder="type to search site">
-    <button>&#9906;</button>
+<!-- ── Header ── -->
+<header class="site-header">
+  <div class="header-logo">
+    <img src="assets/images/logo.png" alt="MGS">
+    <div class="header-logo-text">my green squares<br>member account</div>
+  </div>
+  <div class="header-right">
+    <div class="live-indicator">
+      <span class="live-dot" id="liveDot"></span>
+      <span id="liveLabel">live · epos connected</span>
+    </div>
+    <div class="member-selector">
+      <select id="memberSelect" onchange="switchMember(this.value)">
+        <option value="">— select member —</option>
+      </select>
+    </div>
+    <nav class="header-nav">
+      <a href="epos-terminal.html">🖥 epos</a>
+      <a href="consumer-app.html">📱 app</a>
+      <a href="admin.html">admin →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-balance" id="heroBalance">—</div>
+      <div class="hero-balance-label">green squares</div>
+      <div class="hero-name" id="heroName">—</div>
+      <div class="hero-meta" id="heroMeta">—</div>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="showTab('impact')">🌿 direct my GS</button>
+        <button class="btn btn-dark" onclick="showTab('transactions')">view transactions</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="tier-badge">🌿 green tier member</div>
+      <div class="hero-email" id="heroEmail"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats bar ── -->
+<div class="stats-bar">
+  <div class="stats-bar-inner" id="statsBar"></div>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tab-bar">
+  <div class="tab-bar-inner">
+    <div class="tab active" onclick="showTab('overview')"     id="tab-overview">overview</div>
+    <div class="tab" onclick="showTab('transactions')" id="tab-transactions">transactions</div>
+    <div class="tab" onclick="showTab('impact')"       id="tab-impact">impact &amp; redeem</div>
+    <div class="tab" onclick="showTab('settings')"     id="tab-settings">settings</div>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<div class="content-wrap">
+
+  <!-- OVERVIEW -->
+  <div class="tab-panel active" id="panel-overview">
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">recent transactions</span>
+          <button class="btn btn-secondary btn-xs" onclick="showTab('transactions')">view all</button>
+        </div>
+        <div id="recentTxns"></div>
+      </div>
+      <div>
+        <div class="panel" style="margin-bottom:14px;">
+          <div class="panel-header"><span class="panel-title">linked retailers</span></div>
+          <div class="panel-body" id="linkedRetailers" style="min-height:36px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">gs balance summary</span></div>
+          <div class="panel-body" id="gsSummary"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Header -->
-  <header class="site-header">
-    <a href="index.html" class="logo">
-      <img src="assets/images/logo.png" alt="My Green Squares" height="52">
-    </a>
-    <nav class="site-nav">
-      <a href="index.html">about</a>
-      <a href="map.html">projects</a>
-      <a href="index.html">contact</a>
-      <a href="index.html">news</a>
-      <a href="account.html" class="nav-acct">my account</a>
-      <span class="nav-pipe">|</span>
-      <a href="index.html" class="nav-acct">logout</a>
-    </nav>
-  </header>
+  <!-- TRANSACTIONS -->
+  <div class="tab-panel" id="panel-transactions">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">all transactions</span>
+        <span id="txnCount" style="font-size:10px;color:#aaa;"></span>
+      </div>
+      <div id="allTxns"></div>
+    </div>
+  </div>
 
-  <!-- Squares area -->
-  <div class="squares-area">
+  <!-- IMPACT & REDEEM -->
+  <div class="tab-panel" id="panel-impact">
+    <div class="impact-grid" id="impactGrid"></div>
+    <div class="panel" style="margin-bottom:16px;">
+      <div class="panel-header"><span class="panel-title">direct your green squares to conservation</span></div>
+      <div class="panel-body">
+        <p style="font-size:11px;color:#555;margin-bottom:16px;line-height:1.65;max-width:680px;">
+          Your Green Squares are already committed to the MGS CIC conservation fund at the moment you earn them.
+          Choose where to direct them — each project is independently validated to <strong>Verra VCS</strong> standard or above.
+        </p>
+        <div class="project-grid" id="projectGrid"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">your redemption history</span></div>
+      <div id="redeemHistory"></div>
+    </div>
+  </div>
 
-    <!-- Main two-column row -->
-    <div class="main-area">
-
-      <!-- Main square: account content (633px) -->
-      <div class="main-content">
-        <div class="acct-main">
-
-          <!-- Account hero -->
-          <div class="acct-hero">
-            <div class="acct-top">
-              <div class="avatar">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=52&h=52&fit=crop&crop=face&q=80" alt="Profile photo">
-              </div>
-              <div>
-                <div class="acct-greeting">
-                  <div class="acct-hi">hi James,</div>
-                  <div class="acct-count">you own <strong>3,521</strong> green squares</div>
-                </div>
-                <div class="acct-actions" style="margin-top:10px;">
-                  <div class="action-wrap">
-                    <a href="#" class="action-sq">f</a>
-                    <div class="action-label">share</div>
-                  </div>
-                  <div class="action-wrap">
-                    <a href="#" class="action-sq">t</a>
-                    <div class="action-label">tweet</div>
-                  </div>
-                  <div class="action-wrap">
-                    <a href="#" class="action-sq">g+</a>
-                    <div class="action-label">g+</div>
-                  </div>
-                  <div class="action-wrap">
-                    <a href="#" class="action-sq">P</a>
-                    <div class="action-label">pin</div>
-                  </div>
-                  <div class="action-wrap">
-                    <a href="#" class="action-sq" style="background: var(--color-green-dark); border: 1px solid rgba(255,255,255,0.3);">🎁</a>
-                    <div class="action-label">gift</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="did-you-know">
-              <strong>did you know?</strong> X feet of rainforest is destroyed every day — it costs the world far more money to replace what the trees provide for free than it costs to save them.
-            </div>
-          </div><!-- /acct-hero -->
-
-          <!-- Corporate sponsors -->
-          <div class="acct-sponsors">
-            <div class="sponsors-label">corporate sponsors</div>
-            <div class="sponsors-grid">
-              <div class="sp-logo" style="color:#003399;">currys</div>
-              <div class="sp-logo" style="background:#00aeef;color:white;">sky</div>
-              <div class="sp-logo" style="color:#cc0000;">H&amp;M</div>
-              <div class="sp-logo" style="background:#e8820c;color:white;font-size:9px;">Sainsbury's</div>
-              <div class="sp-logo" style="background:#78ac3e;color:white;">ASDA</div>
-              <div class="sp-logo" style="background:#003399;color:white;font-size:9px;">PC World</div>
-              <div class="sp-logo" style="background:#003087;color:white;font-size:9px;">Thomas Cook</div>
-              <div class="sp-logo" style="background:#003399;color:white;font-size:9px;">PC World</div>
-              <div class="sp-logo" style="color:#003399;">currys</div>
-              <div class="sp-logo" style="background:#003087;color:white;font-size:9px;">Thomas Cook</div>
-              <div class="sp-logo" style="background:#00aeef;color:white;">sky</div>
-              <div class="sp-logo" style="color:#cc0000;">H&amp;M</div>
-            </div>
-            <div class="acct-invite">
-              <span>Help balance your lifestyle with Green Squares</span>
-              <a href="#" class="btn-gs sm">invite a friend</a>
-            </div>
+  <!-- SETTINGS -->
+  <div class="tab-panel" id="panel-settings">
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">account details</span></div>
+        <div class="panel-body" id="accountDetails"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">notifications</span></div>
+        <div class="panel-body">
+          <div class="settings-row">
+            <div><div class="settings-label">GS earned alert</div><div class="settings-sub">notify when GS earned at checkout</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
           </div>
-
-        </div><!-- /acct-main -->
-      </div><!-- /main-content -->
-
-      <!-- Sidebar: 2 placeholder panels -->
-      <div class="main-sidebar">
-        <div class="panel panel-placeholder">
-          <div class="ph-icon">📊</div>
-          <div class="ph-label">your squares summary</div>
-          <div class="ph-hint">dashboard coming soon</div>
-        </div>
-        <div class="panel panel-placeholder">
-          <div class="ph-icon">🕐</div>
-          <div class="ph-label">latest activity</div>
-          <div class="ph-hint">activity feed coming soon</div>
+          <div class="settings-row">
+            <div><div class="settings-label">conservation updates</div><div class="settings-sub">monthly impact report from your projects</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">GS boost alerts</div><div class="settings-sub">double-GS promotions at your retailers</div></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div><div class="settings-label">redemption reminders</div><div class="settings-sub">if GS sit unredeemed for 30+ days</div></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
         </div>
       </div>
-
-    </div><!-- /main-area -->
-
-    <!-- Bottom strip: 3 placeholder panels -->
-    <div class="bottom-strip">
-      <div class="panel panel-placeholder">
-        <div class="ph-icon">🏆</div>
-        <div class="ph-label">achievements</div>
-        <div class="ph-hint">badges &amp; milestones coming soon</div>
-      </div>
-      <div class="panel panel-placeholder">
-        <div class="ph-icon">🌍</div>
-        <div class="ph-label">your impact</div>
-        <div class="ph-hint">environmental stats coming soon</div>
-      </div>
-      <div class="panel panel-placeholder">
-        <div class="ph-icon">⚙</div>
-        <div class="ph-label">settings</div>
-        <div class="ph-hint">account preferences coming soon</div>
-      </div>
     </div>
-
-  </div><!-- /squares-area -->
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-left">
-      <span class="footer-label">socialise with us — it's <strong>free</strong> and it <strong>helps!</strong></span>
-      <a href="#" class="soc-btn">f</a>
-      <a href="#" class="soc-btn">▶</a>
-      <a href="#" class="soc-btn">t</a>
-      <a href="#" class="soc-btn">P</a>
-      <a href="#" class="soc-btn">g+</a>
-      <a href="#" class="soc-btn">📷</a>
-      <a href="#" class="soc-btn">~</a>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">linked retailers</span></div>
+      <div class="panel-body" id="linkedRetailersSettings"></div>
     </div>
-    <div class="footer-right">
-      <nav class="fnav">
-        <a href="#">my account</a>
-        <a href="#">help</a>
-        <a href="#">site map</a>
-        <a href="#">terms &amp; conditions</a>
-        <a href="#">legal</a>
-        <a href="#">privacy</a>
-      </nav>
-      <div class="footer-copy">a PROFOCO company &nbsp;|&nbsp; © copyright 2026 mygreensquares</div>
-    </div>
-  </footer>
+  </div>
 
-</div><!-- /page-wrapper -->
+</div><!-- /content-wrap -->
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast">
+  <div class="toast-gs" id="toastGs"></div>
+  <div class="toast-detail" id="toastDetail"></div>
+  <div class="toast-time" id="toastTime"></div>
+</div>
+
+<!-- ── Footer ── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copy">© 2026 my green squares · cic conservation fund · powered by verra vcs</div>
+    <div class="footer-links">
+      <a href="map.html">project map</a>
+      <a href="epos-terminal.html">epos terminal</a>
+      <a href="consumer-app.html">mobile app</a>
+      <a href="admin.html">admin</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+var equiv = { carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18 };
+
+var defaultMembers = [
+  { id:'MEM001', name:'Sarah Johnson',  email:'sarah.j@email.com',           initials:'SJ', gsBalance:2847, gsLifetime:4230, gsRedeemed:1383, joinDate:'2025-09-15', linkedRetailers:["Sainsbury's"], txnCount:47 },
+  { id:'MEM002', name:'James Wilson',   email:'james.w@email.com',            initials:'JW', gsBalance:1234, gsLifetime:2180, gsRedeemed:946,  joinDate:'2025-10-01', linkedRetailers:['ASDA','Currys'], txnCount:28 },
+  { id:'MEM003', name:'Emma Thompson',  email:'emma.t@email.com',             initials:'ET', gsBalance:892,  gsLifetime:1450, gsRedeemed:558,  joinDate:'2025-12-01', linkedRetailers:['Thomas Cook',"Sainsbury's"], txnCount:19 },
+  { id:'MEM004', name:'Demo User',      email:'demo@mygreensquares.com',      initials:'DU', gsBalance:0,    gsLifetime:0,    gsRedeemed:0,    joinDate:'2026-01-01', linkedRetailers:[], txnCount:0 }
+];
+
+var defaultMemberTxns = [
+  { id:'TXN001', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-16', time:'14:32', gsEarned:319, basketValue:42.30, t1Gs:282, t2Gs:37,  products:[{name:'Nescafe Gold Blend 200g',gs:25},{name:'Persil Bio Liquid 2.5kg',gs:12}] },
+  { id:'TXN002', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-12', time:'11:18', gsEarned:266, basketValue:38.70, t1Gs:258, t2Gs:8,   products:[{name:'Dove Body Wash 500ml',gs:8}] },
+  { id:'TXN003', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-03-08', time:'16:44', gsEarned:398, basketValue:55.10, t1Gs:368, t2Gs:30,  products:[{name:'Nescafe Original 300g',gs:18},{name:'Persil Bio Liquid 2.5kg',gs:12}] },
+  { id:'TXN004', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-02-28', time:'10:05', gsEarned:208, basketValue:31.20, t1Gs:208, t2Gs:0,   products:[] },
+  { id:'TXN005', memberId:'MEM001', retailer:"Sainsbury's", date:'2026-02-20', time:'13:22', gsEarned:351, basketValue:48.90, t1Gs:326, t2Gs:25,  products:[{name:'Nescafe Gold Blend 200g',gs:25}] },
+  { id:'TXN006', memberId:'MEM002', retailer:'ASDA',        date:'2026-03-15', time:'09:48', gsEarned:284, basketValue:35.50, t1Gs:249, t2Gs:35,  products:[{name:'Nescafe Gold Blend 200g',gs:25},{name:'Dove Body Wash 500ml',gs:8}] },
+  { id:'TXN007', memberId:'MEM002', retailer:'Currys',      date:'2026-03-10', time:'15:30', gsEarned:335, basketValue:299.0, t1Gs:250, t2Gs:85,  products:[{name:'Samsung Galaxy S25',gs:85}] },
+  { id:'TXN008', memberId:'MEM003', retailer:'Thomas Cook', date:'2026-03-01', time:'10:00', gsEarned:420, basketValue:1240.0,t1Gs:420, t2Gs:0,   products:[] }
+];
+
+var defaultProjects = [
+  { id:'PRJ001', icon:'🌳', name:'Amazon Rainforest Protection', loc:'Pará, Brazil',          standard:'Verra VCS',      gsForAction:100, actionDesc:'100 GS = 1 m² of Amazon protected for 10 years', desc:'Protecting 125,000 hectares of primary Amazon rainforest through community land rights and satellite monitoring.' },
+  { id:'PRJ002', icon:'🌿', name:'Borneo Peat Forest Restoration', loc:'Kalimantan, Indonesia',standard:'Verra VCS',     gsForAction:80,  actionDesc:'80 GS = 0.8 m² of peat forest restored',          desc:'Restoring degraded peat forests to lock in vast carbon stores and protect orangutan habitat.' },
+  { id:'PRJ003', icon:'🦁', name:'Kenyan Savanna Conservation',   loc:'Laikipia, Kenya',       standard:'Verra VCS Gold', gsForAction:60,  actionDesc:'60 GS = 3 m² of savanna protected',               desc:'Community-based conservation protecting savanna corridors, empowering Maasai-led land stewardship.' },
+  { id:'PRJ004', icon:'🦌', name:'Scottish Rewilding Project',    loc:'Cairngorms, Scotland',  standard:'Plan Vivo',      gsForAction:50,  actionDesc:'50 GS = 1 native tree supported for 30 years',     desc:'Rewilding ancient Caledonian forest and reintroducing native species across 15,000 hectares.' }
+];
+
+var DOTS = { "Sainsbury's":'#f06c00', 'ASDA':'#78be20', 'Currys':'#002d62', 'Thomas Cook':'#003087', 'Sky':'#0072c9', 'H&M':'#e4003a' };
+
+var members = JSON.parse(localStorage.getItem('mgs_members'))      || defaultMembers;
+var memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
+var redeemHistory = JSON.parse(localStorage.getItem('mgs_redeems')) || [];
+var currentMem = null;
+var toastTimer = null;
+
+function boot() {
+  if (!localStorage.getItem('mgs_members'))     localStorage.setItem('mgs_members',     JSON.stringify(members));
+  if (!localStorage.getItem('mgs_member_txns')) localStorage.setItem('mgs_member_txns', JSON.stringify(memberTxns));
+  var sel = document.getElementById('memberSelect');
+  sel.innerHTML = members.map(function(m){ return '<option value="'+m.id+'">'+m.name+'</option>'; }).join('');
+  var params = new URLSearchParams(location.search);
+  switchMember(params.get('member')||'MEM001');
+  window.addEventListener('storage', onStorageEvent);
+}
+
+function switchMember(id) {
+  members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+  memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
+  currentMem = members.find(function(m){ return m.id===id; }) || members[0];
+  document.getElementById('memberSelect').value = currentMem.id;
+  history.replaceState(null,'','?member='+currentMem.id);
+  render();
+}
+
+function render() {
+  var m = currentMem;
+  var co2    = (m.gsLifetime * equiv.carbonKgPerGs).toFixed(1);
+  var vcs    = (m.gsLifetime * equiv.vcsCreditsPerGs).toFixed(4);
+  var forest = (m.gsLifetime * 0.000134 * 1000).toFixed(2);
+
+  document.getElementById('heroBalance').textContent = fmt(m.gsBalance);
+  document.getElementById('heroName').textContent = m.name;
+  document.getElementById('heroMeta').textContent =
+    'member since '+fmtDate(m.joinDate)+'  ·  '+fmt(m.gsLifetime)+' GS lifetime  ·  '+fmt(m.gsRedeemed)+' GS directed';
+  document.getElementById('heroEmail').textContent = m.email;
+
+  document.getElementById('statsBar').innerHTML =
+    statItem(co2+' kg', 'CO₂ offset', equiv.carbonKgPerGs+' kg / GS') +
+    statItem(vcs, 'VCS credits', 'Verra verified') +
+    statItem(m.txnCount, 'transactions', fmt(m.gsLifetime)+' GS total') +
+    statItem(forest+' m²', 'forest protected', 'estimated');
+
+  var chips = m.linkedRetailers.length
+    ? m.linkedRetailers.map(function(r){ return '<span class="ret-chip">'+r+'</span>'; }).join('')
+    : '<span style="font-size:11px;color:#bbb;font-style:italic;">no retailers linked yet</span>';
+  document.getElementById('linkedRetailers').innerHTML = chips;
+
+  var unredeemed = m.gsBalance;
+  document.getElementById('gsSummary').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'+
+    mini(fmt(m.gsLifetime), 'lifetime earned')+
+    mini(fmt(m.gsRedeemed), 'GS directed')+
+    mini(fmt(unredeemed),   'in account')+
+    mini((m.gsLifetime>0?Math.round(unredeemed/m.gsLifetime*100):0)+'%','pending direction')+
+    '</div>';
+
+  var myTxns = memberTxns.filter(function(t){ return t.memberId===m.id; })
+    .sort(function(a,b){ return b.date>a.date?1:b.date<a.date?-1:b.time>a.time?1:-1; });
+  document.getElementById('recentTxns').innerHTML = myTxns.slice(0,5).map(txnHtml).join('') ||
+    '<div style="padding:24px;text-align:center;color:#bbb;font-size:11px;">no transactions yet</div>';
+  document.getElementById('allTxns').innerHTML = myTxns.map(txnHtml).join('') ||
+    '<div style="padding:28px;text-align:center;color:#bbb;">no transactions yet — visit an MGS retailer to start earning green squares</div>';
+  document.getElementById('txnCount').textContent = '('+myTxns.length+')';
+
+  document.getElementById('impactGrid').innerHTML =
+    iCard('🌿', fmt(m.gsBalance), 'in your account', 'unredeemed GS')+
+    iCard('🌡', co2+' kg', 'CO₂ offset', 'Verra verified')+
+    iCard('📜', vcs, 'VCS credits', 'tradable standard')+
+    iCard('🌲', forest+' m²', 'forest est.', 'area protected');
+
+  document.getElementById('projectGrid').innerHTML = defaultProjects.map(function(p){
+    return '<div class="project-card">'+
+      '<div class="proj-icon">'+p.icon+'</div>'+
+      '<div class="proj-name">'+p.name+'</div>'+
+      '<div class="proj-loc">📍 '+p.loc+'</div>'+
+      '<span class="proj-standard">'+p.standard+'</span>'+
+      '<div class="proj-stat">'+p.desc+'</div>'+
+      '<div class="proj-action">'+p.actionDesc+'</div>'+
+      '<div class="proj-input-row">'+
+        '<input type="number" id="gs_'+p.id+'" min="0" max="'+m.gsBalance+'" step="'+p.gsForAction+'" placeholder="GS to direct">'+
+        '<button class="btn btn-primary btn-sm" onclick="directGs(\''+p.id+'\',\''+p.name+'\',\''+p.icon+'\')">direct →</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  var myRedeems = redeemHistory.filter(function(r){ return r.memberId===m.id; });
+  document.getElementById('redeemHistory').innerHTML = myRedeems.length
+    ? myRedeems.map(function(r){
+        return '<div style="padding:11px 15px;border-bottom:1px solid #f5f7f2;display:flex;align-items:center;gap:12px;">'+
+          '<span style="font-size:18px;">'+r.icon+'</span>'+
+          '<div style="flex:1;"><div style="font-size:12px;font-weight:bold;color:#1b3410;">'+r.project+'</div>'+
+          '<div style="font-size:10px;color:#bbb;">'+fmtDate(r.date)+'</div></div>'+
+          '<div style="font-size:12px;font-weight:bold;color:#6ab023;">'+fmt(r.gs)+' GS</div></div>';
+      }).join('')
+    : '<div style="padding:20px;text-align:center;color:#bbb;font-size:11px;">no redemptions yet — direct your GS to a conservation project above</div>';
+
+  document.getElementById('accountDetails').innerHTML =
+    row('name', m.name)+row('email', m.email)+
+    row('member id', '<code style="font-size:10px;color:#6ab023;">'+m.id+'</code>')+
+    row('member since', fmtDate(m.joinDate))+
+    '<div style="margin-top:10px;font-size:11px;color:#6ab023;font-weight:bold;background:#f0f6e8;padding:7px 10px;border-radius:4px;">🌿 green tier member</div>';
+
+  document.getElementById('linkedRetailersSettings').innerHTML = m.linkedRetailers.length
+    ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">'+
+      m.linkedRetailers.map(function(r){ return '<span class="ret-chip">'+r+'</span>'; }).join('')+'</div>'+
+      '<div style="font-size:10px;color:#aaa;">Link additional retailers at their EPOS checkout using your member ID or email.</div>'
+    : '<div style="font-size:11px;color:#bbb;">No retailers linked yet. Visit an MGS retailer and ask to link your account at checkout, or use the <a href="epos-terminal.html" style="color:#6ab023;">EPOS terminal demo</a>.</div>';
+}
+
+function directGs(pId, pName, icon) {
+  var inp = document.getElementById('gs_'+pId);
+  var amount = parseInt(inp.value)||0;
+  if (!amount) { alert('Enter a GS amount.'); return; }
+  if (amount > currentMem.gsBalance) { alert('Not enough GS. You have '+fmt(currentMem.gsBalance)+' available.'); return; }
+  currentMem.gsBalance -= amount;
+  currentMem.gsRedeemed += amount;
+  redeemHistory.unshift({ memberId:currentMem.id, project:pName, icon:icon, gs:amount, date:new Date().toISOString().split('T')[0] });
+  members = members.map(function(m){ return m.id===currentMem.id?currentMem:m; });
+  localStorage.setItem('mgs_members', JSON.stringify(members));
+  localStorage.setItem('mgs_redeems', JSON.stringify(redeemHistory));
+  showToast('🌿 '+fmt(amount)+' GS directed!', pName+' · '+(amount*equiv.carbonKgPerGs).toFixed(1)+' kg CO₂ equiv.');
+  inp.value='';
+  render();
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function onStorageEvent(e) {
+  if (e.key !== 'mgs_live_txn') return;
+  var txn = JSON.parse(e.newValue||'null'); if (!txn) return;
+  if (txn.memberId !== currentMem.id) return;
+  members = JSON.parse(localStorage.getItem('mgs_members')) || defaultMembers;
+  memberTxns = JSON.parse(localStorage.getItem('mgs_member_txns')) || defaultMemberTxns;
+  currentMem = members.find(function(m){ return m.id===txn.memberId; }) || currentMem;
+  var el = document.getElementById('heroBalance');
+  el.classList.add('flash'); setTimeout(function(){ el.classList.remove('flash'); }, 600);
+  showToast('🌿 +'+fmt(txn.gsEarned)+' green squares', 'earned at '+txn.retailer);
+  render();
+}
+
+function showToast(gs, detail) {
+  document.getElementById('toastGs').textContent = gs;
+  document.getElementById('toastDetail').textContent = detail||'';
+  document.getElementById('toastTime').textContent = 'just now · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  var t = document.getElementById('toast'); t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 4500);
+}
+
+function txnHtml(t) {
+  var col = DOTS[t.retailer]||'#6ab023';
+  var init = t.retailer.split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+  return '<div class="txn-item">'+
+    '<div class="txn-dot" style="background:'+col+'">'+init+'</div>'+
+    '<div class="txn-body">'+
+      '<div class="txn-retailer">'+t.retailer+'</div>'+
+      (t.products&&t.products.length?'<div class="txn-products">🔵 '+t.products.map(function(p){return p.name+' +'+p.gs+' GS';}).join(' · ')+'</div>':'')+
+      '<div class="txn-meta">'+fmtDate(t.date)+' · '+t.time+' · basket £'+(t.basketValue||0).toFixed(2)+'</div>'+
+    '</div>'+
+    '<div style="text-align:right;"><div class="txn-gs-val">+'+fmt(t.gsEarned)+' 🌿</div>'+
+    '<div class="txn-gs-t">T1: +'+t.t1Gs+(t.t2Gs?' · T2: +'+t.t2Gs:'')+'</div></div>'+
+  '</div>';
+}
+
+function statItem(v,l,s){ return '<div class="stat-item"><div class="stat-val">'+v+'</div><div class="stat-lbl">'+l+'</div><div class="stat-sub">'+s+'</div></div>'; }
+function mini(v,l){ return '<div style="background:#f6faf0;border:1px solid #e0ecd0;border-radius:5px;padding:9px 11px;"><div style="font-size:14px;font-weight:bold;color:#1b3410;">'+v+'</div><div style="font-size:9px;text-transform:uppercase;color:#aaa;letter-spacing:0.4px;margin-top:2px;">'+l+'</div></div>'; }
+function iCard(i,v,l,s){ return '<div class="impact-card"><div class="impact-icon">'+i+'</div><div class="impact-val">'+v+'</div><div class="impact-lbl">'+l+'</div><div class="impact-sub">'+s+'</div></div>'; }
+function row(l,v){ return '<div class="settings-row"><div class="settings-label">'+l+'</div><div style="font-size:11px;color:#555;">'+v+'</div></div>'; }
+function fmt(n){ return parseInt(n||0).toLocaleString(); }
+function fmtDate(d){ if(!d)return'—'; return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+
+boot();
+</script>
 </body>
 </html>
