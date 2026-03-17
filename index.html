@@ -127,9 +127,12 @@
     .main-area {
       display: flex;
       align-items: flex-start;
+      gap: 8px;
+      background: var(--color-green-pale);
+      padding: 8px;
     }
     .main-content { flex: 1; min-width: 0; }
-    .main-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 2px; }
+    .main-sidebar { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
 
     /* Hero / Carousel */
     .hero-wrap {
@@ -196,7 +199,7 @@
     /* Sidebar panels */
     .panel {
       padding: 14px 16px;
-      height: 319px;
+      height: 316px;
       box-sizing: border-box;
       overflow: hidden;
       border-radius: 8px;
@@ -286,7 +289,9 @@
     .bottom-strip {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 2px;
+      gap: 8px;
+      background: var(--color-green-pale);
+      padding: 0 8px 8px 8px;
     }
 
     /* News panel */
