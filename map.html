@@ -71,6 +71,9 @@
     .badge-title { font-size: 20px; font-weight: normal; text-transform: lowercase; line-height: 1.2; margin-bottom: 8px; }
     .badge-body { font-size: 11px; color: rgba(255,255,255,0.82); line-height: 1.45; }
 
+    /* Polygon hover fade */
+    .leaflet-overlay-pane path { transition: fill-opacity 0.35s ease, stroke-opacity 0.35s ease; }
+
     /* Custom map pins */
     .mgs-pin {
       width: 22px; height: 22px;
@@ -402,13 +405,20 @@
     [-7.3, -60.0], [-6.8, -59.2], [-6.0, -59.1]
   ];
 
-  L.polygon(boundary, {
+  var projectPolygon = L.polygon(boundary, {
     color: '#6ab023',
     weight: 2,
     opacity: 0.85,
     fillColor: '#6ab023',
     fillOpacity: 0.14
   }).addTo(projectMap);
+
+  projectPolygon.on('mouseover', function() {
+    projectPolygon.setStyle({ fillOpacity: 0, opacity: 0 });
+  });
+  projectPolygon.on('mouseout', function() {
+    projectPolygon.setStyle({ fillOpacity: 0.14, opacity: 0.85 });
+  });
 
   // ── Custom square pin icon ────────────────────────────────────────────────
   function makePinIcon() {
