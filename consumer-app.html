@@ -473,7 +473,7 @@ function renderAll() {
           '<div class="home-txn-date">'+fmtDate(latest.date)+' · '+latest.time+'</div>'+
           (latest.products&&latest.products.length?'<div style="font-size:9px;color:#3a6acc;margin-top:2px;">🔵 '+latest.products.map(function(p){return p.name;}).join(', ')+'</div>':'')+
         '</div>'+
-        '<div class="home-txn-gs">+'+fmt(latest.gsEarned)+' 🌿</div>'+
+        '<div class="home-txn-gs">+'+fmt(latest.gsEarned)+'<img src="assets/images/gs-logo.png" style="height:13px;vertical-align:middle;margin-left:3px;"></div>'+
       '</div>';
   } else {
     document.getElementById('homeRecentTxn').innerHTML =
@@ -540,7 +540,7 @@ function histItemHtml(t) {
         '<div class="hi-name">'+t.retailer+'</div>'+
         '<div class="hi-time">'+t.time+' · £'+(t.basketValue||0).toFixed(2)+'</div>'+
       '</div>'+
-      '<div class="hi-gs">+'+fmt(t.gsEarned)+' 🌿</div>'+
+      '<div class="hi-gs">+'+fmt(t.gsEarned)+'<img src="assets/images/gs-logo.png" style="height:13px;vertical-align:middle;margin-left:3px;"></div>'+
     '</div>'+
     (t.products&&t.products.length
       ? '<div class="hi-products">'+t.products.map(function(p){ return '<span class="hi-prd">🔵 '+p.name+' +'+p.gs+'</span>'; }).join('')+'</div>'
