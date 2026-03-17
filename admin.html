@@ -8,100 +8,107 @@
   <link rel="stylesheet" href="assets/css/mgs-style-guide.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-primary, 'Helvetica Neue', Arial, sans-serif); font-size: 13px; color: #333; background: #eef2e8; height: 100vh; overflow: hidden; }
+    body { font-family: var(--font-primary,'Helvetica Neue',Arial,sans-serif); font-size: 13px; color: #333; background: #eef2e8; height: 100vh; overflow: hidden; }
 
-    /* ── Shell ── */
     .shell { display: flex; height: 100vh; }
 
     /* ── Sidebar ── */
     .sidebar { width: 225px; flex-shrink: 0; background: #1b3410; display: flex; flex-direction: column; }
-    .sidebar-logo { padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+    .sidebar-logo { padding: 16px 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
     .sidebar-logo img { height: 34px; }
-    .sidebar-logo-text { color: rgba(255,255,255,0.65); font-size: 10px; line-height: 1.4; text-transform: lowercase; }
-    .sidebar-nav { flex: 1; padding: 8px 0; overflow-y: auto; }
-    .nav-group-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.28); padding: 13px 16px 4px; }
-    .sidebar-nav a { display: flex; align-items: center; gap: 9px; padding: 9px 16px; color: rgba(255,255,255,0.65); font-size: 12px; text-transform: lowercase; cursor: pointer; transition: background 0.12s, color 0.12s; text-decoration: none; border-left: 3px solid transparent; }
+    .sidebar-logo-text { color: rgba(255,255,255,0.6); font-size: 10px; line-height: 1.4; text-transform: lowercase; }
+    .sidebar-nav { flex: 1; padding: 6px 0; overflow-y: auto; }
+    .nav-group-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.28); padding: 12px 16px 3px; }
+    .sidebar-nav a { display: flex; align-items: center; gap: 9px; padding: 8px 16px; color: rgba(255,255,255,0.62); font-size: 12px; text-transform: lowercase; cursor: pointer; transition: background 0.12s, color 0.12s; text-decoration: none; border-left: 3px solid transparent; }
     .sidebar-nav a:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); }
     .sidebar-nav a.active { background: rgba(106,176,35,0.22); color: white; border-left-color: #6ab023; }
-    .nav-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
-    .sidebar-footer { padding: 10px 16px 14px; border-top: 1px solid rgba(255,255,255,0.1); }
-    .sidebar-footer a { display: block; color: rgba(255,255,255,0.42); font-size: 11px; text-decoration: none; padding: 4px 0; }
+    .nav-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+    .sidebar-footer { padding: 10px 16px 12px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer a { display: block; color: rgba(255,255,255,0.4); font-size: 11px; text-decoration: none; padding: 3px 0; cursor: pointer; }
     .sidebar-footer a:hover { color: rgba(255,255,255,0.85); }
+    .sidebar-footer a.danger:hover { color: rgba(255,80,80,0.8); }
 
     /* ── Main ── */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-
-    /* ── Topbar ── */
     .topbar { background: white; border-bottom: 1px solid #dde8d0; padding: 0 22px; height: 50px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .topbar-section { font-size: 15px; color: #1b3410; text-transform: lowercase; font-weight: normal; }
-    .topbar-right { display: flex; gap: 7px; align-items: center; }
+    .topbar-section { font-size: 15px; color: #1b3410; text-transform: lowercase; }
+    .content { flex: 1; overflow-y: auto; padding: 18px 22px 30px; }
 
-    /* ── Content ── */
-    .content { flex: 1; overflow-y: auto; padding: 20px 22px 30px; }
     .section { display: none; }
     .section.active { display: block; }
-
-    /* ── Sec header ── */
-    .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .sec-title { font-size: 17px; color: #1b3410; text-transform: lowercase; font-weight: normal; }
 
-    /* ── KPI grid ── */
-    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
-    .kpi-card { background: white; border-radius: 7px; padding: 14px 16px; border: 1px solid #dde8d0; }
-    .kpi-card.highlight { background: #6ab023; border-color: #5a9a1d; }
-    .kpi-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: #999; margin-bottom: 5px; }
-    .kpi-card.highlight .kpi-label { color: rgba(255,255,255,0.7); }
-    .kpi-value { font-size: 26px; font-weight: bold; color: #1b3410; line-height: 1; margin-bottom: 4px; }
-    .kpi-card.highlight .kpi-value { color: white; }
-    .kpi-sub { font-size: 10px; color: #aaa; }
-    .kpi-card.highlight .kpi-sub { color: rgba(255,255,255,0.6); }
+    /* ── KPI ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 16px; }
+    .kpi-card { background: white; border-radius: 7px; padding: 13px 15px; border: 1px solid #dde8d0; }
+    .kpi-card.hi { background: #6ab023; border-color: #5a9a1d; }
+    .kpi-card.mid { background: #2d5518; border-color: #1b3410; }
+    .kpi-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 4px; }
+    .kpi-card.hi .kpi-label, .kpi-card.mid .kpi-label { color: rgba(255,255,255,0.65); }
+    .kpi-value { font-size: 24px; font-weight: bold; color: #1b3410; line-height: 1; margin-bottom: 3px; }
+    .kpi-card.hi .kpi-value, .kpi-card.mid .kpi-value { color: white; }
+    .kpi-sub { font-size: 10px; color: #bbb; }
+    .kpi-card.hi .kpi-sub, .kpi-card.mid .kpi-sub { color: rgba(255,255,255,0.55); }
 
-    /* ── Layout helpers ── */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    /* ── Layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 14px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 13px; margin-bottom: 14px; }
 
     /* ── Panel ── */
-    .panel { background: white; border-radius: 7px; border: 1px solid #dde8d0; overflow: hidden; margin-bottom: 16px; }
-    .panel-header { padding: 11px 15px; border-bottom: 1px solid #eef2e8; display: flex; align-items: center; justify-content: space-between; background: #fafcf7; }
+    .panel { background: white; border-radius: 7px; border: 1px solid #dde8d0; overflow: hidden; margin-bottom: 14px; }
+    .panel-header { padding: 10px 14px; border-bottom: 1px solid #eef2e8; display: flex; align-items: center; justify-content: space-between; background: #fafcf7; }
     .panel-title { font-size: 12px; font-weight: bold; color: #1b3410; text-transform: lowercase; }
-    .panel-body { padding: 15px; }
+    .panel-body { padding: 14px; }
 
-    /* ── Campaign cards ── */
-    .campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-    .campaign-card { background: white; border: 1px solid #dde8d0; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
-    .cc-header { background: #1b3410; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; }
-    .cc-client { font-size: 14px; color: white; font-weight: bold; text-transform: lowercase; }
-    .cc-id { font-size: 9px; color: rgba(255,255,255,0.45); font-family: monospace; margin-top: 2px; }
-    .cc-body { padding: 13px 15px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
-    .cc-progress-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 4px; }
-    .prog-bar { background: #e4f0d0; border-radius: 3px; height: 7px; overflow: hidden; }
-    .prog-fill { background: #6ab023; height: 100%; border-radius: 3px; }
-    .cc-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-    .cc-meta-item .ml { font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; color: #bbb; margin-bottom: 1px; }
-    .cc-meta-item .mv { font-size: 12px; color: #333; font-weight: bold; }
-    .cc-message { font-size: 10px; color: #555; font-style: italic; background: #f6faf0; border-left: 3px solid #6ab023; padding: 6px 9px; border-radius: 0 3px 3px 0; line-height: 1.45; }
-    .cc-chips { display: flex; gap: 5px; flex-wrap: wrap; }
-    .chip { font-size: 9px; padding: 2px 6px; border-radius: 3px; background: #e4f0d0; color: #2d5518; }
-    .chip-vcs { background: #e8f4d0; }
-    .chip-fossil { background: #fff3e0; color: #7a4500; }
-    .chip-nz { background: #e0f0ff; color: #1a4a88; }
-    .cc-footer { padding: 8px 15px; background: #fafcf7; border-top: 1px solid #eef2e8; display: flex; gap: 6px; }
+    /* ── Tier badges ── */
+    .tier-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: bold; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; }
+    .tier-retailer { background: rgba(106,176,35,0.18); color: #2d5518; border: 1px solid rgba(106,176,35,0.35); }
+    .tier-brand    { background: rgba(30,80,160,0.14); color: #1a3a88; border: 1px solid rgba(30,80,160,0.28); }
 
-    /* ── Status pills ── */
-    .pill { font-size: 9px; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; font-weight: bold; flex-shrink: 0; }
+    /* ── Pill ── */
+    .pill { font-size: 9px; padding: 2px 7px; border-radius: 10px; text-transform: uppercase; font-weight: bold; }
     .pill-active   { background: #6ab023; color: white; }
     .pill-draft    { background: #aaa; color: white; }
     .pill-paused   { background: #f0a500; color: white; }
     .pill-complete { background: #3c3c28; color: rgba(255,255,255,0.7); }
+    .pill-approved { background: #6ab023; color: white; }
+    .pill-pending  { background: #f0a500; color: white; }
+    .pill-rejected { background: #cc3333; color: white; }
+
+    /* ── Campaign cards ── */
+    .campaign-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(295px, 1fr)); gap: 13px; }
+    .campaign-card { background: white; border: 1px solid #dde8d0; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+    .cc-header { padding: 11px 14px; display: flex; align-items: flex-start; justify-content: space-between; }
+    .cc-header.retailer-hdr { background: #1b3410; }
+    .cc-header.brand-hdr    { background: #1a2d5a; }
+    .cc-client { font-size: 13px; color: white; font-weight: bold; text-transform: lowercase; }
+    .cc-id-row { display: flex; align-items: center; gap: 5px; margin-top: 3px; }
+    .cc-id { font-size: 9px; color: rgba(255,255,255,0.4); font-family: monospace; }
+    .cc-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 9px; }
+    .cc-prog-label { display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-bottom: 3px; }
+    .prog-bar { background: #e4f0d0; border-radius: 3px; height: 6px; overflow: hidden; }
+    .prog-fill { background: #6ab023; height: 100%; border-radius: 3px; }
+    .cc-meta { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+    .ml { font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; color: #ccc; margin-bottom: 1px; }
+    .mv { font-size: 12px; color: #333; font-weight: bold; }
+    .cc-message { font-size: 10px; color: #555; font-style: italic; background: #f6faf0; border-left: 3px solid #6ab023; padding: 6px 8px; border-radius: 0 3px 3px 0; line-height: 1.45; }
+    .cc-retailers { font-size: 10px; color: #1a2d5a; background: #f0f4ff; border-left: 3px solid #6080cc; padding: 5px 8px; border-radius: 0 3px 3px 0; }
+    .cc-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+    .chip { font-size: 9px; padding: 2px 5px; border-radius: 3px; }
+    .chip-green { background: #e4f0d0; color: #2d5518; }
+    .chip-blue  { background: #e4ecff; color: #1a3a88; }
+    .chip-amber { background: #fff3e0; color: #7a4500; }
+    .cc-footer { padding: 8px 14px; background: #fafcf7; border-top: 1px solid #eef2e8; display: flex; gap: 5px; }
 
     /* ── Table ── */
     .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .data-table th { text-align: left; padding: 7px 12px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; border-bottom: 2px solid #eef2e8; background: #fafcf7; font-weight: normal; white-space: nowrap; }
-    .data-table td { padding: 8px 12px; border-bottom: 1px solid #f5f7f2; vertical-align: middle; }
+    .data-table th { text-align: left; padding: 7px 11px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; border-bottom: 2px solid #eef2e8; background: #fafcf7; font-weight: normal; white-space: nowrap; }
+    .data-table td { padding: 8px 11px; border-bottom: 1px solid #f5f7f2; vertical-align: middle; }
     .data-table tr:last-child td { border-bottom: none; }
     .data-table tr:hover td { background: #fafdf7; }
 
-    /* ── Pin badge / tags ── */
+    /* ── Tags ── */
     .pin-badge { background: #2d5518; color: white; font-size: 9px; padding: 1px 5px; border-radius: 2px; font-family: monospace; }
     .tag { display: inline-block; border-radius: 2px; padding: 1px 6px; font-size: 9px; font-weight: bold; }
     .tag-food    { background: #e4f0d0; color: #2d5518; }
@@ -109,74 +116,97 @@
     .tag-hi-tech { background: #ede0ff; color: #6600cc; }
     .tag-travel  { background: #fff3e0; color: #885500; }
     .tag-home    { background: #ffe0e0; color: #882222; }
+    .tag-grocery { background: #e4f0d0; color: #2d5518; }
+    .tag-electrical { background: #ede0ff; color: #6600cc; }
 
-    /* ── Equivalence cards ── */
-    .equiv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
-    .equiv-card { background: white; border: 1px solid #dde8d0; border-radius: 7px; padding: 18px; }
-    .equiv-icon { font-size: 22px; margin-bottom: 8px; }
-    .equiv-val { font-size: 30px; font-weight: bold; color: #6ab023; line-height: 1; margin-bottom: 3px; }
-    .equiv-lbl { font-size: 11px; font-weight: bold; color: #1b3410; margin-bottom: 3px; }
-    .equiv-sub { font-size: 10px; color: #999; line-height: 1.4; }
+    /* ── Retailer cards ── */
+    .retailer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 11px; }
+    .retailer-card { background: white; border: 1px solid #dde8d0; border-radius: 7px; padding: 13px; display: flex; flex-direction: column; gap: 7px; }
 
-    /* ── Retailer grid ── */
-    .retailer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
-    .retailer-card { background: white; border: 1px solid #dde8d0; border-radius: 7px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
-    .ret-name { font-size: 14px; font-weight: bold; color: #1b3410; }
-    .ret-cat  { font-size: 10px; color: #888; text-transform: lowercase; }
+    /* ── Products / Relationships ── */
+    .rel-group { margin-bottom: 16px; }
+    .rel-group-title { font-size: 12px; font-weight: bold; color: #1a2d5a; background: #eef2ff; padding: 8px 12px; border-radius: 5px 5px 0 0; border: 1px solid #c8d4f0; border-bottom: none; }
+    .rel-group-body { border: 1px solid #c8d4f0; border-radius: 0 0 5px 5px; overflow: hidden; }
+
+    /* ── Equivalence ── */
+    .equiv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-bottom: 16px; }
+    .equiv-card { background: white; border: 1px solid #dde8d0; border-radius: 7px; padding: 16px; }
+    .equiv-icon { font-size: 20px; margin-bottom: 7px; }
+    .equiv-val { font-size: 28px; font-weight: bold; color: #6ab023; line-height: 1; margin-bottom: 2px; }
+    .equiv-lbl { font-size: 11px; font-weight: bold; color: #1b3410; margin-bottom: 2px; }
+    .equiv-sub { font-size: 10px; color: #aaa; line-height: 1.4; }
+
+    /* ── EPOS Simulator ── */
+    .epos-sim { background: #0e1e08; border-radius: 8px; padding: 18px; color: white; }
+    .epos-title { font-size: 13px; font-weight: bold; color: #6ab023; text-transform: lowercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .epos-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+    .epos-field { display: flex; flex-direction: column; gap: 4px; }
+    .epos-field label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.45); }
+    .epos-field select, .epos-field input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 6px 9px; font-size: 12px; color: white; font-family: inherit; min-width: 160px; }
+    .epos-field select option { background: #1b3410; color: white; }
+    .epos-products-list { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; min-height: 32px; }
+    .epos-product-chip { background: rgba(106,176,35,0.25); border: 1px solid rgba(106,176,35,0.5); border-radius: 4px; padding: 4px 8px; font-size: 10px; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 5px; }
+    .epos-product-chip button { background: none; border: none; color: rgba(255,100,100,0.7); cursor: pointer; font-size: 12px; padding: 0; line-height: 1; }
+    .epos-product-chip button:hover { color: #ff6666; }
+    .epos-receipt { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 14px; font-size: 11px; line-height: 1.6; }
+    .epos-receipt-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .epos-receipt-row:last-child { border-bottom: none; }
+    .epos-receipt-row.total { border-top: 1px solid rgba(106,176,35,0.5); margin-top: 6px; padding-top: 8px; font-weight: bold; font-size: 13px; color: #6ab023; }
+    .epos-receipt-row.brand-row { color: rgba(100,160,255,0.9); }
+    .epos-message { margin-top: 10px; background: rgba(106,176,35,0.15); border-left: 3px solid #6ab023; padding: 8px 10px; font-size: 10px; color: rgba(255,255,255,0.8); font-style: italic; border-radius: 0 4px 4px 0; line-height: 1.5; }
 
     /* ── Forms ── */
-    .form-group { margin-bottom: 11px; }
-    .form-group label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 4px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 3px; }
     .form-group input, .form-group textarea, .form-group select {
-      width: 100%; border: 1px solid #ccd8b8; border-radius: 4px; padding: 7px 9px;
+      width: 100%; border: 1px solid #ccd8b8; border-radius: 4px; padding: 6px 9px;
       font-size: 12px; font-family: inherit; color: #333; background: white;
     }
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-      outline: none; border-color: #6ab023; box-shadow: 0 0 0 2px rgba(106,176,35,0.14);
+      outline: none; border-color: #6ab023; box-shadow: 0 0 0 2px rgba(106,176,35,0.12);
     }
     .form-row { display: grid; gap: 10px; }
     .form-row-2 { grid-template-columns: 1fr 1fr; }
     .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
     .form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-    .form-group textarea { resize: vertical; min-height: 58px; }
-    .form-section-label { font-size: 10px; font-weight: bold; color: #1b3410; text-transform: lowercase; background: #f0f6e8; border-radius: 4px; padding: 7px 10px; margin: 14px 0 10px; border-left: 3px solid #6ab023; }
+    .form-group textarea { resize: vertical; min-height: 56px; }
+    .form-divider { font-size: 10px; font-weight: bold; color: #1b3410; background: #f0f6e8; border-radius: 4px; padding: 6px 10px; margin: 12px 0 9px; border-left: 3px solid #6ab023; }
 
     /* ── Buttons ── */
-    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.12s; }
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 13px; border-radius: 4px; font-size: 12px; font-family: inherit; text-transform: lowercase; cursor: pointer; border: 1px solid transparent; text-decoration: none; transition: all 0.12s; }
     .btn-primary   { background: #6ab023; color: white; border-color: #5a9a1d; }
     .btn-primary:hover { background: #5a9a1d; color: white; }
     .btn-secondary { background: white; color: #555; border-color: #ccd8b8; }
     .btn-secondary:hover { background: #f5f8f0; }
     .btn-danger    { background: white; color: #cc3333; border-color: #ffcccc; }
     .btn-danger:hover { background: #fff5f5; }
+    .btn-blue      { background: #1a3a88; color: white; border-color: #102266; }
+    .btn-blue:hover { background: #102266; color: white; }
     .btn-sm  { padding: 5px 10px; font-size: 11px; }
-    .btn-xs  { padding: 3px 8px; font-size: 10px; }
+    .btn-xs  { padding: 2px 7px; font-size: 10px; }
 
     /* ── Modal ── */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2000; align-items: flex-start; justify-content: center; padding: 30px 20px; overflow-y: auto; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2000; align-items: flex-start; justify-content: center; padding: 28px 20px; overflow-y: auto; }
     .modal-overlay.open { display: flex; }
     .modal { background: white; border-radius: 8px; width: 100%; max-width: 720px; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.32); }
     .modal.modal-sm { max-width: 440px; }
-    .modal-header { background: #1b3410; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-header { background: #1b3410; padding: 14px 19px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-header.brand-header { background: #1a2d5a; }
     .modal-title { color: white; font-size: 14px; text-transform: lowercase; }
     .modal-close { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 22px; cursor: pointer; line-height: 1; padding: 0; }
     .modal-close:hover { color: white; }
-    .modal-body { padding: 20px; max-height: 72vh; overflow-y: auto; }
-    .modal-footer { padding: 12px 20px; background: #f6faf0; border-top: 1px solid #dde8d0; display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-body { padding: 18px; max-height: 72vh; overflow-y: auto; }
+    .modal-footer { padding: 11px 18px; background: #f6faf0; border-top: 1px solid #dde8d0; display: flex; justify-content: flex-end; gap: 8px; }
 
     /* ── Mini map ── */
-    .mini-map-wrap { border: 1px solid #ccd8b8; border-radius: 4px; overflow: hidden; margin-bottom: 12px; position: relative; }
-    #adminMap { height: 200px; }
+    .mini-map-wrap { border: 1px solid #ccd8b8; border-radius: 4px; overflow: hidden; margin-bottom: 11px; position: relative; }
+    #adminMap { height: 195px; }
     .mini-map-hint { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 4px 8px; text-align: center; pointer-events: none; z-index: 1000; }
 
-    /* ── Dupe warning ── */
-    .dupe-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; padding: 8px 11px; font-size: 11px; color: #856404; display: none; margin-top: 6px; }
+    .dupe-warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; padding: 7px 10px; font-size: 11px; color: #856404; display: none; margin-top: 5px; }
+    .empty-state { padding: 36px; text-align: center; color: #bbb; }
+    .empty-icon { font-size: 26px; margin-bottom: 7px; opacity: 0.5; }
 
-    /* ── Empty state ── */
-    .empty-state { padding: 40px; text-align: center; color: #bbb; }
-    .empty-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
-
-    /* ── Scrollbars ── */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #b8ccaa; border-radius: 3px; }
@@ -185,7 +215,6 @@
 <body>
 <div class="shell">
 
-  <!-- ── Sidebar ────────────────────────────────────────────────── -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <img src="assets/images/logo.png" alt="MGS">
@@ -193,108 +222,142 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-group-label">analytics</div>
-      <a onclick="showSection('overview')" id="nav-overview" class="active">
-        <span class="nav-icon">📊</span> overview
-      </a>
+      <a onclick="showSection('overview')" id="nav-overview" class="active"><span class="nav-icon">📊</span> overview</a>
+
       <div class="nav-group-label">commercial</div>
-      <a onclick="showSection('campaigns')" id="nav-campaigns">
-        <span class="nav-icon">🤝</span> campaigns
-      </a>
-      <a onclick="showSection('retailers')" id="nav-retailers">
-        <span class="nav-icon">🏪</span> retailers
-      </a>
+      <a onclick="showSection('campaigns')" id="nav-campaigns"><span class="nav-icon">🤝</span> campaigns</a>
+      <a onclick="showSection('products')"  id="nav-products"><span class="nav-icon">📦</span> gs products</a>
+      <a onclick="showSection('relations')" id="nav-relations"><span class="nav-icon">🔗</span> relationships</a>
+      <a onclick="showSection('retailers')" id="nav-retailers"><span class="nav-icon">🏪</span> retailers</a>
+
       <div class="nav-group-label">map data</div>
-      <a onclick="showSection('pins')" id="nav-pins">
-        <span class="nav-icon">📍</span> pins
-      </a>
+      <a onclick="showSection('pins')" id="nav-pins"><span class="nav-icon">📍</span> pins</a>
+
       <div class="nav-group-label">methodology</div>
-      <a onclick="showSection('equivalence')" id="nav-equivalence">
-        <span class="nav-icon">⚖</span> gs equivalence
-      </a>
+      <a onclick="showSection('equivalence')" id="nav-equivalence"><span class="nav-icon">⚖</span> gs equivalence</a>
     </nav>
     <div class="sidebar-footer">
       <a href="map.html">🗺 view live map →</a>
       <a href="index.html">🏠 website home</a>
-      <a onclick="exportAllData()" style="cursor:pointer;">📥 export all data</a>
-      <a onclick="resetAllData()" style="cursor:pointer;color:rgba(255,80,80,0.6);">↺ reset to defaults</a>
+      <a onclick="exportAllData()">📥 export all data</a>
+      <a onclick="resetAllData()" class="danger">↺ reset to defaults</a>
     </div>
   </aside>
 
-  <!-- ── Main ───────────────────────────────────────────────────── -->
   <div class="main">
     <header class="topbar">
       <span class="topbar-section" id="topbarLabel">overview</span>
-      <div class="topbar-right">
-        <span id="topbarClock" style="font-size:11px;color:#aaa;"></span>
-      </div>
+      <span id="topbarClock" style="font-size:11px;color:#bbb;"></span>
     </header>
 
     <main class="content">
 
-      <!-- ══ OVERVIEW ══════════════════════════════════════════════ -->
+      <!-- ══ OVERVIEW ══ -->
       <section id="sec-overview" class="section active">
-
         <div class="kpi-grid" id="kpiGrid"></div>
 
         <div class="two-col">
           <div class="panel">
             <div class="panel-header">
-              <span class="panel-title">campaign progress</span>
-              <button onclick="showSection('campaigns')" class="btn btn-secondary btn-xs">manage</button>
+              <span class="panel-title">tier 1 — retailer campaigns</span>
+              <span class="tier-badge tier-retailer">retailer</span>
             </div>
-            <table class="data-table">
-              <thead><tr><th>client</th><th>contracted</th><th>issued</th><th>progress</th><th>status</th></tr></thead>
-              <tbody id="overviewCamBody"></tbody>
-            </table>
+            <table class="data-table"><thead><tr><th>client</th><th>contracted</th><th>issued</th><th>progress</th><th>status</th></tr></thead>
+            <tbody id="ovRetailerBody"></tbody></table>
           </div>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">tier 2 — brand campaigns</span>
+              <span class="tier-badge tier-brand">brand</span>
+            </div>
+            <table class="data-table"><thead><tr><th>brand</th><th>contracted</th><th>issued</th><th>progress</th><th>retailers</th></tr></thead>
+            <tbody id="ovBrandBody"></tbody></table>
+          </div>
+        </div>
+
+        <div class="two-col">
           <div class="panel">
             <div class="panel-header"><span class="panel-title">carbon impact to date</span></div>
             <div class="panel-body" id="carbonPanel"></div>
           </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title">recent pins</span>
-            <button onclick="showSection('pins')" class="btn btn-secondary btn-xs">all pins</button>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">recent pins</span>
+              <button onclick="showSection('pins')" class="btn btn-secondary btn-xs">manage</button>
+            </div>
+            <table class="data-table"><thead><tr><th>id</th><th>retailer</th><th>user</th><th>squares</th><th>date</th></tr></thead>
+            <tbody id="recentPinsBody"></tbody></table>
           </div>
-          <table class="data-table">
-            <thead><tr><th>id</th><th>retailer</th><th>user</th><th>squares</th><th>category</th><th>date</th></tr></thead>
-            <tbody id="recentPinsBody"></tbody>
-          </table>
         </div>
 
+        <!-- EPOS Simulator -->
+        <div class="epos-sim">
+          <div class="epos-title">🖥 epos transaction simulator</div>
+          <div class="epos-controls">
+            <div class="epos-field">
+              <label>retailer</label>
+              <select id="simRetailer" onchange="simUpdate()"></select>
+            </div>
+            <div class="epos-field">
+              <label>basket value (£)</label>
+              <input type="number" id="simBasket" value="45" min="1" style="width:90px;" oninput="simUpdate()">
+            </div>
+            <div class="epos-field">
+              <label>add gs product</label>
+              <select id="simProductPicker" onchange="simAddProduct()"></select>
+            </div>
+          </div>
+          <div class="epos-products-list" id="simProductsList"></div>
+          <div class="epos-receipt" id="simReceipt"></div>
+        </div>
       </section>
 
-      <!-- ══ CAMPAIGNS ═════════════════════════════════════════════ -->
+      <!-- ══ CAMPAIGNS ══ -->
       <section id="sec-campaigns" class="section">
         <div class="sec-header">
           <h2 class="sec-title">campaigns</h2>
-          <button onclick="openCampaignModal()" class="btn btn-primary">+ new campaign</button>
+          <div style="display:flex;gap:7px;">
+            <button onclick="openCampaignModal('retailer')" class="btn btn-primary">+ retailer campaign</button>
+            <button onclick="openCampaignModal('brand')"    class="btn btn-blue">+ brand campaign</button>
+          </div>
+        </div>
+        <div style="margin-bottom:10px;font-size:11px;color:#888;">
+          <span class="tier-badge tier-retailer" style="margin-right:6px;">tier 1</span> Retailer campaigns earn GS on basket value at EPOS. &nbsp;
+          <span class="tier-badge tier-brand" style="margin-right:6px;">tier 2</span> Brand campaigns earn GS when a specific product is scanned — at any approved retailer.
         </div>
         <div class="campaign-grid" id="campaignGrid"></div>
       </section>
 
-      <!-- ══ PINS ══════════════════════════════════════════════════ -->
-      <section id="sec-pins" class="section">
+      <!-- ══ GS PRODUCTS ══ -->
+      <section id="sec-products" class="section">
         <div class="sec-header">
-          <h2 class="sec-title">pins <span id="pinCountLabel" style="font-size:13px;color:#aaa;"></span></h2>
-          <button onclick="openPinModal()" class="btn btn-primary">+ add pin</button>
+          <h2 class="sec-title">gs products <span id="productCountLabel" style="font-size:13px;color:#aaa;"></span></h2>
+          <button onclick="openProductModal()" class="btn btn-blue">+ register product</button>
+        </div>
+        <div style="margin-bottom:12px;font-size:11px;color:#888;">
+          Brand-registered products that carry GS at EPOS. When a customer scans this product at an approved retailer, the brand's campaign issues GS directly into the customer's account — in addition to any retailer campaign.
         </div>
         <div class="panel">
           <table class="data-table">
-            <thead>
-              <tr>
-                <th>id</th><th>title</th><th>retailer</th><th>user</th>
-                <th>squares</th><th>category</th><th>coords</th><th>date</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="allPinsBody"></tbody>
+            <thead><tr><th>id</th><th>product name</th><th>brand</th><th>sku</th><th>gs / unit</th><th>campaign</th><th>category</th><th>status</th><th></th></tr></thead>
+            <tbody id="allProductsBody"></tbody>
           </table>
         </div>
       </section>
 
-      <!-- ══ RETAILERS ═════════════════════════════════════════════ -->
+      <!-- ══ RELATIONSHIPS ══ -->
+      <section id="sec-relations" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">retailer ↔ brand relationships</h2>
+          <button onclick="openRelModal()" class="btn btn-blue">+ add relationship</button>
+        </div>
+        <div style="margin-bottom:12px;font-size:11px;color:#888;">
+          MGS must approve each brand campaign at each retailer before GS can be issued at that retailer's EPOS.
+          This ensures all dual-award transactions are transparent, validated and CPRD-compliant.
+        </div>
+        <div id="relGroups"></div>
+      </section>
+
+      <!-- ══ RETAILERS ══ -->
       <section id="sec-retailers" class="section">
         <div class="sec-header">
           <h2 class="sec-title">retailers</h2>
@@ -303,33 +366,44 @@
         <div class="retailer-grid" id="retailerGrid"></div>
       </section>
 
-      <!-- ══ EQUIVALENCE ═══════════════════════════════════════════ -->
+      <!-- ══ PINS ══ -->
+      <section id="sec-pins" class="section">
+        <div class="sec-header">
+          <h2 class="sec-title">pins <span id="pinCountLabel" style="font-size:13px;color:#aaa;"></span></h2>
+          <button onclick="openPinModal()" class="btn btn-primary">+ add pin</button>
+        </div>
+        <div class="panel">
+          <table class="data-table">
+            <thead><tr><th>id</th><th>title</th><th>retailer</th><th>user</th><th>squares</th><th>category</th><th>coords</th><th>date</th><th></th></tr></thead>
+            <tbody id="allPinsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ══ EQUIVALENCE ══ -->
       <section id="sec-equivalence" class="section">
         <div class="sec-header">
           <h2 class="sec-title">green square equivalence</h2>
           <button onclick="saveEquivalence()" class="btn btn-primary">save settings</button>
         </div>
-
-        <div class="panel" style="margin-bottom:14px;">
-          <div class="panel-body" style="padding:14px 16px;">
+        <div class="panel" style="margin-bottom:13px;">
+          <div class="panel-body" style="padding:13px 15px;">
             <p style="font-size:12px;color:#555;line-height:1.65;max-width:760px;">
-              Each <strong>Green Square</strong> holds a standardised equivalence value — a calculable, comparable measure of carbon offset and fossil fuel reduction.
-              This value underpins every campaign and every consumer message. The minimum standard is <strong>Verra VCS</strong>; no lower-grade credits are accepted.
+              Each <strong>Green Square</strong> holds a standardised equivalence value — calculable, comparable, and independently validated by MGS.
+              This value underpins every campaign at every tier. The minimum carbon standard is <strong>Verra VCS</strong>. No lower-grade credits are accepted.
               Net Zero and offset contributions must sum to 100%.
             </p>
           </div>
         </div>
-
         <div class="equiv-grid" id="equivCards"></div>
-
         <div class="panel">
           <div class="panel-header"><span class="panel-title">edit global equivalence settings</span></div>
           <div class="panel-body">
-            <div class="form-section-label">📐 per green square values</div>
+            <div class="form-divider">📐 per green square values</div>
             <div class="form-row form-row-3">
               <div class="form-group"><label>carbon (kg CO₂e) per GS</label><input type="number" id="eqCarbon" step="0.001" min="0"></div>
               <div class="form-group"><label>VCS credits per GS</label><input type="number" id="eqVcs" step="0.0001" min="0"></div>
-              <div class="form-group"><label>fossil fuel reduction (litres) per GS</label><input type="number" id="eqFossil" step="0.001" min="0"></div>
+              <div class="form-group"><label>fossil fuel reduction (L) per GS</label><input type="number" id="eqFossil" step="0.001" min="0"></div>
             </div>
             <div class="form-row form-row-4">
               <div class="form-group"><label>net zero %</label><input type="number" id="eqNetZeroPct" step="1" min="0" max="100"></div>
@@ -345,13 +419,13 @@
               </div>
               <div class="form-group"><label>approved by</label><input type="text" id="eqApprovedBy"></div>
             </div>
-            <div class="form-section-label">📋 project reference</div>
+            <div class="form-divider">📋 project reference</div>
             <div class="form-row form-row-3">
               <div class="form-group"><label>project reference</label><input type="text" id="eqProjectRef"></div>
               <div class="form-group"><label>project name</label><input type="text" id="eqProjectName"></div>
               <div class="form-group"><label>effective date</label><input type="date" id="eqEffectiveDate"></div>
             </div>
-            <div class="form-row form-row-3">
+            <div class="form-row form-row-2">
               <div class="form-group"><label>review date</label><input type="date" id="eqReviewDate"></div>
             </div>
           </div>
@@ -362,18 +436,49 @@
   </div>
 </div>
 
-<!-- ══ CAMPAIGN MODAL ══════════════════════════════════════════════ -->
+<!-- ══ CAMPAIGN MODAL ══ -->
 <div class="modal-overlay" id="campaignModal">
   <div class="modal">
-    <div class="modal-header">
+    <div class="modal-header" id="camModalHeader">
       <span class="modal-title" id="camModalTitle">new campaign</span>
       <button class="modal-close" onclick="closeCampaignModal()">&times;</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="camId">
+      <input type="hidden" id="camParticipantType">
+
+      <div id="camTierBadge" style="margin-bottom:10px;"></div>
 
       <div class="form-row form-row-2">
         <div class="form-group"><label>client name *</label><input type="text" id="camClient" placeholder="e.g. Sainsbury's"></div>
+        <div class="form-group"><label>campaign type</label>
+          <select id="camCampaignType">
+            <option value="retailer-basket">retailer — basket value</option>
+            <option value="product-purchase">product — per item scanned</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-divider" id="camBrandRetailersDiv" style="display:none;">🔗 approved retailers (brand campaigns)</div>
+      <div class="form-group" id="camBrandRetailersGroup" style="display:none;">
+        <label>approved retailers (comma-separated)</label>
+        <input type="text" id="camApprovedRetailers" placeholder="e.g. Tesco, Sainsbury's, ASDA">
+      </div>
+
+      <div class="form-divider">💷 commercial terms</div>
+      <div class="form-row form-row-4">
+        <div class="form-group"><label>contracted GS *</label><input type="number" id="camContractedGs" min="1" placeholder="50000"></div>
+        <div class="form-group"><label>GS issued to date</label><input type="number" id="camGsIssued" min="0" placeholder="0"></div>
+        <div class="form-group" id="camGsPerTxnGroup"><label>GS per transaction</label><input type="number" id="camGsPerTxn" min="1" placeholder="120"></div>
+        <div class="form-group" id="camGsPerUnitGroup" style="display:none;"><label>GS per unit (product)</label><input type="number" id="camGsPerUnit" min="1" placeholder="25"></div>
+      </div>
+      <div class="form-row form-row-3">
+        <div class="form-group"><label>rate per GS (£)</label><input type="number" id="camRate" step="0.01" placeholder="1.00"></div>
+        <div class="form-group"><label>start date</label><input type="date" id="camStart"></div>
+        <div class="form-group"><label>end date</label><input type="date" id="camEnd"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>budget (£)</label><input type="number" id="camBudget" placeholder="50000"></div>
         <div class="form-group"><label>status</label>
           <select id="camStatus">
             <option value="draft">draft</option>
@@ -384,22 +489,9 @@
         </div>
       </div>
 
-      <div class="form-section-label">💷 commercial terms</div>
-      <div class="form-row form-row-4">
-        <div class="form-group"><label>contracted GS *</label><input type="number" id="camContractedGs" min="1" placeholder="50000"></div>
-        <div class="form-group"><label>GS issued to date</label><input type="number" id="camGsIssued" min="0" placeholder="0"></div>
-        <div class="form-group"><label>GS per transaction *</label><input type="number" id="camGsPerTxn" min="1" placeholder="120"></div>
-        <div class="form-group"><label>rate per GS (£)</label><input type="number" id="camRate" step="0.01" placeholder="1.00"></div>
-      </div>
-      <div class="form-row form-row-3">
-        <div class="form-group"><label>budget (£)</label><input type="number" id="camBudget" placeholder="50000"></div>
-        <div class="form-group"><label>start date</label><input type="date" id="camStart"></div>
-        <div class="form-group"><label>end date</label><input type="date" id="camEnd"></div>
-      </div>
-
-      <div class="form-section-label">💬 consumer messaging</div>
+      <div class="form-divider">💬 consumer message</div>
       <div class="form-group">
-        <label>consumer message (shown on account / receipt) *</label>
+        <label>message shown to customer at point of purchase / on account *</label>
         <textarea id="camMessage" rows="3" placeholder="Your purchase is helping save the Amazon rainforest — every choice you make builds a future for your children."></textarea>
       </div>
       <div class="form-group">
@@ -407,15 +499,15 @@
         <input type="text" id="camProductCodes" placeholder="SAI-NECTAR-001, SAI-XMAS-2025">
       </div>
 
-      <div class="form-section-label">⚖ gs equivalence for this campaign</div>
+      <div class="form-divider">⚖ gs equivalence for this campaign</div>
       <div class="form-row form-row-3">
-        <div class="form-group"><label>carbon kg CO₂e per GS</label><input type="number" id="camCarbon" step="0.001" placeholder="0.450"></div>
-        <div class="form-group"><label>VCS credits per GS</label><input type="number" id="camVcs" step="0.0001" placeholder="0.0025"></div>
-        <div class="form-group"><label>fossil fuel reduction (L) per GS</label><input type="number" id="camFossil" step="0.001" placeholder="0.180"></div>
+        <div class="form-group"><label>carbon kg CO₂e per GS</label><input type="number" id="camCarbon" step="0.001"></div>
+        <div class="form-group"><label>VCS credits per GS</label><input type="number" id="camVcs" step="0.0001"></div>
+        <div class="form-group"><label>fossil fuel reduction (L) per GS</label><input type="number" id="camFossil" step="0.001"></div>
       </div>
       <div class="form-row form-row-3">
-        <div class="form-group"><label>net zero %</label><input type="number" id="camNetZero" step="1" min="0" max="100" placeholder="65"></div>
-        <div class="form-group"><label>offset %</label><input type="number" id="camOffset" step="1" min="0" max="100" placeholder="35"></div>
+        <div class="form-group"><label>net zero %</label><input type="number" id="camNetZero" step="1" min="0" max="100"></div>
+        <div class="form-group"><label>offset %</label><input type="number" id="camOffset" step="1" min="0" max="100"></div>
         <div class="form-group"><label>carbon standard</label>
           <select id="camStandard">
             <option value="Verra VCS">Verra VCS</option>
@@ -434,7 +526,89 @@
   </div>
 </div>
 
-<!-- ══ PIN MODAL ═══════════════════════════════════════════════════ -->
+<!-- ══ PRODUCT MODAL ══ -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal modal-sm">
+    <div class="modal-header brand-header">
+      <span class="modal-title" id="prdModalTitle">register gs product</span>
+      <button class="modal-close" onclick="closeProductModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="prdId">
+      <div class="form-group"><label>product name *</label><input type="text" id="prdName" placeholder="e.g. Nescafe Gold Blend 200g"></div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>brand *</label><input type="text" id="prdBrand" placeholder="e.g. Nestlé"></div>
+        <div class="form-group"><label>sku / barcode *</label><input type="text" id="prdSku" placeholder="e.g. NES-GOLD-200"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>gs per unit *</label><input type="number" id="prdGs" min="1" placeholder="25"></div>
+        <div class="form-group"><label>category</label>
+          <select id="prdCategory">
+            <option value="grocery">grocery</option>
+            <option value="electrical">electrical</option>
+            <option value="fashion">fashion</option>
+            <option value="home">home</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>brand campaign</label>
+          <select id="prdCampaign"></select>
+        </div>
+        <div class="form-group"><label>status</label>
+          <select id="prdActive">
+            <option value="true">active</option>
+            <option value="false">inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeProductModal()" class="btn btn-secondary">cancel</button>
+      <button onclick="saveProduct()" class="btn btn-blue">save product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RELATIONSHIP MODAL ══ -->
+<div class="modal-overlay" id="relModal">
+  <div class="modal modal-sm">
+    <div class="modal-header brand-header">
+      <span class="modal-title">add retailer ↔ brand relationship</span>
+      <button class="modal-close" onclick="closeRelModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="relId">
+      <div class="form-group"><label>brand campaign *</label>
+        <select id="relCampaign"></select>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>retailer name *</label><input type="text" id="relRetailer" placeholder="e.g. Tesco"></div>
+        <div class="form-group"><label>mgs approval status</label>
+          <select id="relStatus">
+            <option value="pending">pending MGS approval</option>
+            <option value="approved">approved</option>
+            <option value="rejected">rejected</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div class="form-group"><label>approval date</label><input type="date" id="relApprovalDate"></div>
+        <div class="form-group"><label>mgs reference</label><input type="text" id="relMgsRef" placeholder="e.g. MGS-REL-001"></div>
+      </div>
+      <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:9px 11px;font-size:10px;color:#856404;line-height:1.55;">
+        ⚠ <strong>CPRD compliance:</strong> MGS approval confirms this dual-award arrangement is genuinely additional conservation value and does not constitute a misleading commercial practice under the Consumer Protection from Unfair Trading Regulations.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeRelModal()" class="btn btn-secondary">cancel</button>
+      <button onclick="saveRel()" class="btn btn-blue">save relationship</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PIN MODAL ══ -->
 <div class="modal-overlay" id="pinModal">
   <div class="modal">
     <div class="modal-header">
@@ -443,25 +617,22 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="pinId">
-      <div class="mini-map-wrap">
-        <div id="adminMap"></div>
-        <div class="mini-map-hint">click the map to set pin location</div>
-      </div>
+      <div class="mini-map-wrap"><div id="adminMap"></div><div class="mini-map-hint">click the map to set pin location</div></div>
       <div class="form-row form-row-2">
         <div class="form-group"><label>latitude *</label><input type="number" id="pinLat" step="0.000001" placeholder="-5.300000"></div>
         <div class="form-group"><label>longitude *</label><input type="number" id="pinLng" step="0.000001" placeholder="-60.050000"></div>
       </div>
       <div class="form-group"><label>title *</label><input type="text" id="pinTitle" placeholder="e.g. Weekly Shop — Sainsbury's"></div>
       <div class="form-row form-row-2">
-        <div class="form-group"><label>retailer *</label><input type="text" id="pinRetailer" placeholder="e.g. Sainsbury's"></div>
-        <div class="form-group"><label>product id</label><input type="text" id="pinProductId" placeholder="e.g. SAI-001"></div>
+        <div class="form-group"><label>retailer *</label><input type="text" id="pinRetailer"></div>
+        <div class="form-group"><label>product id</label><input type="text" id="pinProductId"></div>
       </div>
       <div class="form-row form-row-2">
-        <div class="form-group"><label>user id</label><input type="text" id="pinUserId" placeholder="e.g. james001"></div>
-        <div class="form-group"><label>user name *</label><input type="text" id="pinUserName" placeholder="e.g. James T."></div>
+        <div class="form-group"><label>user id</label><input type="text" id="pinUserId"></div>
+        <div class="form-group"><label>user name *</label><input type="text" id="pinUserName"></div>
       </div>
       <div class="form-row form-row-3">
-        <div class="form-group"><label>squares *</label><input type="number" id="pinSquares" placeholder="120" min="1"></div>
+        <div class="form-group"><label>squares *</label><input type="number" id="pinSquares" min="1"></div>
         <div class="form-group"><label>date *</label><input type="date" id="pinDate"></div>
         <div class="form-group"><label>category</label>
           <select id="pinCategory">
@@ -473,7 +644,7 @@
           </select>
         </div>
       </div>
-      <div class="form-group"><label>description</label><textarea id="pinDescription" rows="2" placeholder="Describe the purchase and its conservation contribution..."></textarea></div>
+      <div class="form-group"><label>description</label><textarea id="pinDescription" rows="2"></textarea></div>
       <div class="form-group"><label>image url</label><input type="text" id="pinImage" placeholder="assets/images/amazon.png"></div>
       <div class="dupe-warning" id="dupeWarning"></div>
     </div>
@@ -484,7 +655,7 @@
   </div>
 </div>
 
-<!-- ══ RETAILER MODAL ══════════════════════════════════════════════ -->
+<!-- ══ RETAILER MODAL ══ -->
 <div class="modal-overlay" id="retailerModal">
   <div class="modal modal-sm">
     <div class="modal-header">
@@ -497,20 +668,13 @@
       <div class="form-row form-row-2">
         <div class="form-group"><label>category</label>
           <select id="retCategory">
-            <option value="grocery">grocery</option>
-            <option value="electrical">electrical</option>
-            <option value="fashion">fashion</option>
-            <option value="telecoms">telecoms</option>
-            <option value="travel">travel</option>
-            <option value="home">home</option>
-            <option value="other">other</option>
+            <option value="grocery">grocery</option><option value="electrical">electrical</option>
+            <option value="fashion">fashion</option><option value="telecoms">telecoms</option>
+            <option value="travel">travel</option><option value="home">home</option><option value="other">other</option>
           </select>
         </div>
         <div class="form-group"><label>status</label>
-          <select id="retActive">
-            <option value="true">active</option>
-            <option value="false">inactive</option>
-          </select>
+          <select id="retActive"><option value="true">active</option><option value="false">inactive</option></select>
         </div>
       </div>
     </div>
@@ -523,576 +687,856 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  // ── Default data ──────────────────────────────────────────────────────────
-  var defaultEquiv = {
-    carbonKgPerGs: 0.45, vcsCreditsPerGs: 0.0025, fossilLitresPerGs: 0.18,
-    netZeroPct: 65, offsetPct: 35, carbonStandard: 'Verra VCS',
-    projectRef: 'VCS-1566', projectName: 'Juma Sustainable Development Reserve',
-    effectiveDate: '2026-01-01', reviewDate: '2026-06-30', approvedBy: 'MGS Carbon Committee'
-  };
+// ── Default data ─────────────────────────────────────────────────────────────
+var defaultEquiv = {
+  carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18,
+  netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS',
+  projectRef:'VCS-1566', projectName:'Juma Sustainable Development Reserve',
+  effectiveDate:'2026-01-01', reviewDate:'2026-06-30', approvedBy:'MGS Carbon Committee'
+};
 
-  var defaultCampaigns = [
-    { id:'CAM001', clientName:"Sainsbury's", contractedGs:50000, gsIssued:12450, gsPerTxn:120, rate:1.00, budget:50000,
-      startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
-      consumerMessage:"Your Sainsbury's shop is helping save the Amazon rainforest — every item you buy plants a green square in the Juma Reserve.",
-      productCodes:'SAI-NECTAR-001, SAI-XMAS-2025',
-      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
-    { id:'CAM002', clientName:'Sky', contractedGs:25000, gsIssued:8730, gsPerTxn:255, rate:1.00, budget:25000,
-      startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
-      consumerMessage:"Your Sky subscription is protecting ancient Amazon rainforest for future generations — your choices are making a real difference.",
-      productCodes:'SKY-BB-2026, SKY-MOB-24M',
-      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
-    { id:'CAM003', clientName:'Currys', contractedGs:30000, gsIssued:9150, gsPerTxn:500, rate:1.00, budget:30000,
-      startDate:'2026-02-01', endDate:'2026-11-30', status:'active',
-      consumerMessage:"Every Currys purchase contributes to Amazon conservation — your tech choices are saving the planet one square at a time.",
-      productCodes:'CUR-SAMS-4K55, CUR-WM-AEG-001',
-      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
-    { id:'CAM004', clientName:'Thomas Cook', contractedGs:15000, gsIssued:3102, gsPerTxn:1034, rate:1.00, budget:15000,
-      startDate:'2026-01-15', endDate:'2026-10-31', status:'active',
-      consumerMessage:"Your Thomas Cook holiday is funding real conservation in the Amazon — your travel decisions are making a future for your children.",
-      productCodes:'TC-HOL-PT-26',
-      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
-    { id:'CAM005', clientName:'ASDA', contractedGs:40000, gsIssued:880, gsPerTxn:88, rate:1.00, budget:40000,
-      startDate:'2026-03-01', endDate:'2026-12-31', status:'active',
-      consumerMessage:"Your ASDA Green Token shop is protecting the Amazon rainforest — every purchase decision builds a better planet for everyone.",
-      productCodes:'ASDA-GT-MAR26',
-      carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' }
-  ];
+var defaultCampaigns = [
+  // ── Tier 1 Retailers ──
+  { id:'CAM001', participantType:'retailer', campaignType:'retailer-basket',    clientName:"Sainsbury's",  contractedGs:50000, gsIssued:12450, gsPerTxn:120, gsPerUnit:0,   rate:1.00, budget:50000,  startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
+    consumerMessage:"Your Sainsbury's shop is helping save the Amazon rainforest — every item you buy plants a green square in the Juma Reserve.",
+    productCodes:'SAI-NECTAR-001, SAI-XMAS-2025', approvedRetailers:'',
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  var defaultRetailers = [
-    { id:'RET001', name:"Sainsbury's", category:'grocery',    active:true  },
-    { id:'RET002', name:'Sky',         category:'telecoms',   active:true  },
-    { id:'RET003', name:'Currys',      category:'electrical', active:true  },
-    { id:'RET004', name:'Thomas Cook', category:'travel',     active:true  },
-    { id:'RET005', name:'ASDA',        category:'grocery',    active:true  },
-    { id:'RET006', name:'H&M',         category:'fashion',    active:true  },
-    { id:'RET007', name:'PC World',    category:'electrical', active:false }
-  ];
+  { id:'CAM002', participantType:'retailer', campaignType:'retailer-basket',    clientName:'ASDA',         contractedGs:40000, gsIssued:880,   gsPerTxn:88,  gsPerUnit:0,   rate:1.00, budget:40000,  startDate:'2026-03-01', endDate:'2026-12-31', status:'active',
+    consumerMessage:"Your ASDA Green Token shop is protecting the Amazon rainforest — every purchase decision builds a better planet for everyone.",
+    productCodes:'ASDA-GT-MAR26', approvedRetailers:'',
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  // ── State ─────────────────────────────────────────────────────────────────
-  var pins = [], campaigns = [], retailers = [], equiv = {};
-  var editingPinId = null, editingCamId = null, editingRetId = null;
-  var adminMap, tempMarker, mapInitialised = false;
+  { id:'CAM003', participantType:'retailer', campaignType:'retailer-basket',    clientName:'Currys',       contractedGs:30000, gsIssued:9150,  gsPerTxn:500, gsPerUnit:0,   rate:1.00, budget:30000,  startDate:'2026-02-01', endDate:'2026-11-30', status:'active',
+    consumerMessage:"Every Currys purchase contributes to Amazon conservation — your tech choices are saving the planet one square at a time.",
+    productCodes:'CUR-SAMS-4K55, CUR-WM-AEG-001', approvedRetailers:'',
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  var boundary = [
-    [-5.1,-59.3],[-4.6,-59.9],[-4.7,-60.8],[-5.2,-61.3],[-6.0,-61.5],
-    [-7.0,-61.0],[-7.3,-60.0],[-6.8,-59.2],[-6.0,-59.1]
-  ];
+  { id:'CAM004', participantType:'retailer', campaignType:'product-purchase',   clientName:'Sky',          contractedGs:25000, gsIssued:8730,  gsPerTxn:255, gsPerUnit:0,   rate:1.00, budget:25000,  startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
+    consumerMessage:"Your Sky subscription is protecting ancient Amazon rainforest for future generations — your choices are making a real difference.",
+    productCodes:'SKY-BB-2026, SKY-MOB-24M', approvedRetailers:'',
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  // ── Load ──────────────────────────────────────────────────────────────────
-  function loadData() {
-    equiv     = JSON.parse(localStorage.getItem('mgs_equiv'))     || defaultEquiv;
-    campaigns = JSON.parse(localStorage.getItem('mgs_campaigns')) || defaultCampaigns;
-    retailers = JSON.parse(localStorage.getItem('mgs_retailers')) || defaultRetailers;
-    var stored = localStorage.getItem('mgs_pins');
-    if (stored) {
-      pins = JSON.parse(stored); boot();
-    } else {
-      fetch('assets/data/pins.json')
-        .then(function(r){ return r.json(); })
-        .then(function(d){ pins = d; persist('pins'); boot(); })
-        .catch(function(){ pins = []; boot(); });
-    }
-  }
+  { id:'CAM005', participantType:'retailer', campaignType:'product-purchase',   clientName:'Thomas Cook',  contractedGs:15000, gsIssued:3102,  gsPerTxn:1034,gsPerUnit:0,   rate:1.00, budget:15000,  startDate:'2026-01-15', endDate:'2026-10-31', status:'active',
+    consumerMessage:"Your Thomas Cook holiday is funding real conservation in the Amazon — your travel decisions are making a future for your children.",
+    productCodes:'TC-HOL-PT-26', approvedRetailers:'',
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  function persist(what) {
-    if (what==='pins')      localStorage.setItem('mgs_pins',      JSON.stringify(pins));
-    if (what==='campaigns') localStorage.setItem('mgs_campaigns', JSON.stringify(campaigns));
-    if (what==='retailers') localStorage.setItem('mgs_retailers', JSON.stringify(retailers));
-    if (what==='equiv')     localStorage.setItem('mgs_equiv',     JSON.stringify(equiv));
-  }
+  // ── Tier 2 Brands ──
+  { id:'CAM006', participantType:'brand',    campaignType:'product-purchase',   clientName:"Nestlé (Nescafe)", contractedGs:20000, gsIssued:4360,  gsPerTxn:0,   gsPerUnit:25,  rate:1.00, budget:20000,  startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
+    consumerMessage:"Your Nescafe purchase has planted a green square in the Amazon rainforest. Your morning coffee is saving the planet.",
+    productCodes:'NES-GOLD-200, NES-ORIG-300', approvedRetailers:"Sainsbury's, ASDA, Tesco",
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  function boot() {
-    renderOverview(); renderCampaigns(); renderAllPins(); renderRetailers(); populateEquivForm();
-  }
+  { id:'CAM007', participantType:'brand',    campaignType:'product-purchase',   clientName:'Samsung',      contractedGs:12000, gsIssued:2850,  gsPerTxn:0,   gsPerUnit:250, rate:1.00, budget:12000,  startDate:'2026-02-01', endDate:'2026-12-31', status:'active',
+    consumerMessage:"Your Samsung purchase has protected Amazon rainforest. Samsung and Currys are committed to a greener future with Green Squares.",
+    productCodes:'SAM-QLED-55, SAM-GAL-S25', approvedRetailers:'Currys, PC World',
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' },
 
-  // ── Clock ─────────────────────────────────────────────────────────────────
-  function tick() {
-    var d = new Date();
-    document.getElementById('topbarClock').textContent =
-      d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) + '  ' +
-      d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  }
+  { id:'CAM008', participantType:'brand',    campaignType:'product-purchase',   clientName:'Unilever (Persil)', contractedGs:30000, gsIssued:6240,  gsPerTxn:0,   gsPerUnit:12,  rate:1.00, budget:30000,  startDate:'2026-01-01', endDate:'2026-12-31', status:'active',
+    consumerMessage:"Your Persil purchase is part of the Unilever Green Squares commitment — every wash you do protects rainforest for your children.",
+    productCodes:'UNI-PERS-25, UNI-DOVE-500', approvedRetailers:"Sainsbury's, ASDA, Tesco",
+    carbonKgPerGs:0.45, vcsCreditsPerGs:0.0025, fossilLitresPerGs:0.18, netZeroPct:65, offsetPct:35, carbonStandard:'Verra VCS' }
+];
+
+var defaultProducts = [
+  { id:'PRD001', campaignId:'CAM006', brand:'Nestlé',   productName:'Nescafe Gold Blend 200g',  sku:'NES-GOLD-200', gsPerUnit:25,  category:'grocery',    active:true },
+  { id:'PRD002', campaignId:'CAM006', brand:'Nestlé',   productName:'Nescafe Original 300g',    sku:'NES-ORIG-300', gsPerUnit:18,  category:'grocery',    active:true },
+  { id:'PRD003', campaignId:'CAM007', brand:'Samsung',  productName:'55" QLED 4K Smart TV',     sku:'SAM-QLED-55',  gsPerUnit:250, category:'electrical', active:true },
+  { id:'PRD004', campaignId:'CAM007', brand:'Samsung',  productName:'Galaxy S25 Smartphone',    sku:'SAM-GAL-S25',  gsPerUnit:85,  category:'electrical', active:true },
+  { id:'PRD005', campaignId:'CAM008', brand:'Unilever', productName:'Persil Bio Liquid 2.5kg',  sku:'UNI-PERS-25',  gsPerUnit:12,  category:'grocery',    active:true },
+  { id:'PRD006', campaignId:'CAM008', brand:'Unilever', productName:'Dove Body Wash 500ml',     sku:'UNI-DOVE-500', gsPerUnit:8,   category:'grocery',    active:true }
+];
+
+var defaultRelationships = [
+  { id:'REL001', brandCampaignId:'CAM006', retailerName:"Sainsbury's", status:'approved', approvalDate:'2026-01-05', mgsRef:'MGS-REL-001' },
+  { id:'REL002', brandCampaignId:'CAM006', retailerName:'ASDA',        status:'approved', approvalDate:'2026-01-15', mgsRef:'MGS-REL-002' },
+  { id:'REL003', brandCampaignId:'CAM006', retailerName:'Tesco',       status:'approved', approvalDate:'2026-02-01', mgsRef:'MGS-REL-003' },
+  { id:'REL004', brandCampaignId:'CAM007', retailerName:'Currys',      status:'approved', approvalDate:'2026-02-01', mgsRef:'MGS-REL-004' },
+  { id:'REL005', brandCampaignId:'CAM007', retailerName:'PC World',    status:'approved', approvalDate:'2026-02-01', mgsRef:'MGS-REL-005' },
+  { id:'REL006', brandCampaignId:'CAM008', retailerName:"Sainsbury's", status:'approved', approvalDate:'2026-01-10', mgsRef:'MGS-REL-006' },
+  { id:'REL007', brandCampaignId:'CAM008', retailerName:'ASDA',        status:'approved', approvalDate:'2026-01-10', mgsRef:'MGS-REL-007' },
+  { id:'REL008', brandCampaignId:'CAM008', retailerName:'Tesco',       status:'pending',  approvalDate:'',           mgsRef:'' }
+];
+
+var defaultRetailers = [
+  { id:'RET001', name:"Sainsbury's", category:'grocery',    active:true  },
+  { id:'RET002', name:'Sky',         category:'telecoms',   active:true  },
+  { id:'RET003', name:'Currys',      category:'electrical', active:true  },
+  { id:'RET004', name:'Thomas Cook', category:'travel',     active:true  },
+  { id:'RET005', name:'ASDA',        category:'grocery',    active:true  },
+  { id:'RET006', name:'H&M',         category:'fashion',    active:true  },
+  { id:'RET007', name:'PC World',    category:'electrical', active:false },
+  { id:'RET008', name:'Tesco',       category:'grocery',    active:true  }
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+var pins=[], campaigns=[], products=[], relationships=[], retailers=[], equiv={};
+var editingPinId=null, editingCamId=null, editingPrdId=null, editingRelId=null, editingRetId=null;
+var adminMap, tempMarker, mapInitialised=false;
+var simBasketProducts = [];
+
+var boundary=[[-5.1,-59.3],[-4.6,-59.9],[-4.7,-60.8],[-5.2,-61.3],[-6.0,-61.5],[-7.0,-61.0],[-7.3,-60.0],[-6.8,-59.2],[-6.0,-59.1]];
+
+// ── Load ───────────────────────────────────────────────────────────────────
+function loadData() {
+  equiv         = JSON.parse(localStorage.getItem('mgs_equiv'))        || defaultEquiv;
+  campaigns     = JSON.parse(localStorage.getItem('mgs_campaigns'))    || defaultCampaigns;
+  products      = JSON.parse(localStorage.getItem('mgs_products'))     || defaultProducts;
+  relationships = JSON.parse(localStorage.getItem('mgs_rels'))         || defaultRelationships;
+  retailers     = JSON.parse(localStorage.getItem('mgs_retailers'))    || defaultRetailers;
+  var stored    = localStorage.getItem('mgs_pins');
+  if (stored) { pins = JSON.parse(stored); boot(); }
+  else { fetch('assets/data/pins.json').then(function(r){return r.json();}).then(function(d){pins=d;persist('pins');boot();}).catch(function(){pins=[];boot();}); }
+}
+
+function persist(w) {
+  if(w==='pins')     localStorage.setItem('mgs_pins',      JSON.stringify(pins));
+  if(w==='campaigns')localStorage.setItem('mgs_campaigns', JSON.stringify(campaigns));
+  if(w==='products') localStorage.setItem('mgs_products',  JSON.stringify(products));
+  if(w==='rels')     localStorage.setItem('mgs_rels',      JSON.stringify(relationships));
+  if(w==='retailers')localStorage.setItem('mgs_retailers', JSON.stringify(retailers));
+  if(w==='equiv')    localStorage.setItem('mgs_equiv',     JSON.stringify(equiv));
+}
+
+function boot() {
+  renderOverview(); renderCampaigns(); renderAllPins(); renderProducts();
+  renderRelationships(); renderRetailers(); populateEquivForm(); buildSimDropdowns();
   tick(); setInterval(tick, 30000);
+}
 
-  // ── Navigation ────────────────────────────────────────────────────────────
-  function showSection(name) {
-    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-    document.querySelectorAll('.sidebar-nav a').forEach(function(a){ a.classList.remove('active'); });
-    document.getElementById('sec-'  + name).classList.add('active');
-    document.getElementById('nav-'  + name).classList.add('active');
-    document.getElementById('topbarLabel').textContent = name.replace('-',' ');
-    if (name === 'pins' && !mapInitialised) initAdminMap();
-  }
+// ── Clock ──────────────────────────────────────────────────────────────────
+function tick() {
+  var d=new Date();
+  document.getElementById('topbarClock').textContent =
+    d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) + '  ' +
+    d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+}
 
-  // ── Overview ──────────────────────────────────────────────────────────────
-  function renderOverview() {
-    var tCon  = campaigns.reduce(function(s,c){ return s+c.contractedGs; }, 0);
-    var tIss  = campaigns.reduce(function(s,c){ return s+c.gsIssued; }, 0);
-    var tSq   = pins.reduce(function(s,p){ return s+p.squares; }, 0);
-    var tCO2  = tSq * equiv.carbonKgPerGs;
-    var tVcs  = tSq * equiv.vcsCreditsPerGs;
-    var tFoss = tSq * equiv.fossilLitresPerGs;
-    var tRev  = campaigns.reduce(function(s,c){ return s+(c.contractedGs*(c.rate||1)); }, 0);
-    var aCams = campaigns.filter(function(c){ return c.status==='active'; }).length;
+// ── Nav ────────────────────────────────────────────────────────────────────
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.sidebar-nav a').forEach(function(a){a.classList.remove('active');});
+  document.getElementById('sec-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  document.getElementById('topbarLabel').textContent = name.replace('-',' ');
+  if(name==='pins' && !mapInitialised) initAdminMap();
+}
 
-    document.getElementById('kpiGrid').innerHTML = [
-      kpi('Total GS Contracted',  fmt(tCon),                    campaigns.length + ' campaigns',        false),
-      kpi('GS Issued',            fmt(tIss),                    pct(tIss,tCon) + '% of contracted',    true),
-      kpi('GS Remaining',         fmt(tCon-tIss),               'still to be earned',                  false),
-      kpi('Pins on Map',          pins.length,                  fmt(tSq) + ' total squares',            false),
-      kpi('CO₂e Offset',          (tCO2/1000).toFixed(2)+'t',  tVcs.toFixed(2)+' VCS credits',         false),
-      kpi('Fossil Fuel Saved',    tFoss.toFixed(0)+' L',        'equivalent reduction',                 false),
-      kpi('Active Campaigns',     aCams,                        campaigns.length + ' total',            false),
-      kpi('Campaign Revenue',     '£'+fmt(tRev),                'contracted value',                     false)
-    ].join('');
+// ── Overview ───────────────────────────────────────────────────────────────
+function renderOverview() {
+  var t1 = campaigns.filter(function(c){return c.participantType==='retailer';});
+  var t2 = campaigns.filter(function(c){return c.participantType==='brand';});
+  var tCon1=t1.reduce(function(s,c){return s+c.contractedGs;},0);
+  var tIss1=t1.reduce(function(s,c){return s+c.gsIssued;},0);
+  var tCon2=t2.reduce(function(s,c){return s+c.contractedGs;},0);
+  var tIss2=t2.reduce(function(s,c){return s+c.gsIssued;},0);
+  var tSq  =pins.reduce(function(s,p){return s+p.squares;},0);
+  var tCO2 =tSq*equiv.carbonKgPerGs;
+  var tVcs =tSq*equiv.vcsCreditsPerGs;
+  var tFoss=tSq*equiv.fossilLitresPerGs;
+  var tRev =campaigns.reduce(function(s,c){return s+(c.contractedGs*(c.rate||1));},0);
 
-    // Campaign table
-    document.getElementById('overviewCamBody').innerHTML = campaigns.map(function(c) {
-      var p = pct(c.gsIssued, c.contractedGs);
-      return '<tr><td><strong>' + c.clientName + '</strong></td><td>' + fmt(c.contractedGs) +
-        '</td><td>' + fmt(c.gsIssued) + '</td><td>' +
-        '<div class="prog-bar" style="width:90px;display:inline-block;vertical-align:middle">' +
-        '<div class="prog-fill" style="width:'+p+'%"></div></div> <span style="font-size:10px;color:#999">'+p+'%</span>' +
-        '</td><td><span class="pill pill-' + c.status + '">' + c.status + '</span></td></tr>';
+  document.getElementById('kpiGrid').innerHTML = [
+    kpi('Tier 1 GS (Retailers)', fmt(tCon1),           t1.length+' retailer campaigns',         'hi'),
+    kpi('Tier 2 GS (Brands)',    fmt(tCon2),           t2.length+' brand campaigns',             'mid'),
+    kpi('Total GS Issued',       fmt(tIss1+tIss2),     pct(tIss1+tIss2,tCon1+tCon2)+'% of total contracted', ''),
+    kpi('GS Remaining',          fmt((tCon1+tCon2)-(tIss1+tIss2)), 'still to be earned',        ''),
+    kpi('Pins on Map',           pins.length,          fmt(tSq)+' total squares',                ''),
+    kpi('CO₂e Offset',           (tCO2/1000).toFixed(2)+'t', tVcs.toFixed(2)+' VCS credits',   ''),
+    kpi('Fossil Fuel Saved',     tFoss.toFixed(0)+' L','equivalent reduction',                   ''),
+    kpi('Total Revenue',         '£'+fmt(tRev),        'contracted value across all tiers',      '')
+  ].join('');
+
+  // Tier 1 table
+  document.getElementById('ovRetailerBody').innerHTML = t1.map(function(c){
+    var p=pct(c.gsIssued,c.contractedGs);
+    return '<tr><td><strong>'+c.clientName+'</strong></td><td>'+fmt(c.contractedGs)+'</td><td>'+fmt(c.gsIssued)+'</td>'+
+      '<td><div class="prog-bar" style="width:80px;display:inline-block;vertical-align:middle"><div class="prog-fill" style="width:'+p+'%"></div></div> <span style="font-size:10px;color:#aaa">'+p+'%</span></td>'+
+      '<td><span class="pill pill-'+c.status+'">'+c.status+'</span></td></tr>';
+  }).join('');
+
+  // Tier 2 table
+  document.getElementById('ovBrandBody').innerHTML = t2.map(function(c){
+    var p=pct(c.gsIssued,c.contractedGs);
+    var rels=relationships.filter(function(r){return r.brandCampaignId===c.id && r.status==='approved';});
+    return '<tr><td><strong>'+c.clientName+'</strong></td><td>'+fmt(c.contractedGs)+'</td><td>'+fmt(c.gsIssued)+'</td>'+
+      '<td><div class="prog-bar" style="width:80px;display:inline-block;vertical-align:middle"><div class="prog-fill" style="width:'+p+'%"></div></div> <span style="font-size:10px;color:#aaa">'+p+'%</span></td>'+
+      '<td style="font-size:10px;color:#1a3a88;">'+rels.map(function(r){return r.retailerName;}).join(', ')+'</td></tr>';
+  }).join('');
+
+  // Carbon
+  document.getElementById('carbonPanel').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'+
+    cStat('🌿',(tCO2/1000).toFixed(3)+'t','CO₂e offset')+
+    cStat('📜',tVcs.toFixed(4),'VCS credits')+
+    cStat('⛽',tFoss.toFixed(1)+' L','fossil fuel equiv.')+
+    cStat('🏭',equiv.netZeroPct+'%','Net Zero contrib.')+
+    '</div><div style="margin-top:10px;font-size:10px;color:#aaa;background:#f6faf0;padding:8px 10px;border-radius:4px;">'+
+    'Standard: <strong>'+equiv.carbonStandard+'</strong> · Project: <strong>'+equiv.projectRef+'</strong> · '+equiv.projectName+'</div>';
+
+  // Recent pins
+  document.getElementById('recentPinsBody').innerHTML = pins.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5).map(function(p){
+    return '<tr><td><span class="pin-badge">'+p.id+'</span></td><td><strong>'+p.retailer+'</strong></td>'+
+      '<td>'+p.userName+'</td><td>🌿 '+p.squares+'</td><td>'+p.date+'</td></tr>';
+  }).join('');
+}
+
+function kpi(label,value,sub,cls) {
+  return '<div class="kpi-card'+(cls?' '+cls:'')+'"><div class="kpi-label">'+label+'</div><div class="kpi-value">'+value+'</div><div class="kpi-sub">'+sub+'</div></div>';
+}
+function cStat(icon,val,lbl) {
+  return '<div style="background:#f6faf0;border-radius:6px;padding:10px;"><div style="font-size:17px;margin-bottom:3px">'+icon+'</div>'+
+    '<div style="font-size:16px;font-weight:bold;color:#1b3410;">'+val+'</div>'+
+    '<div style="font-size:10px;color:#aaa;">'+lbl+'</div></div>';
+}
+function fmt(n){return parseInt(n||0).toLocaleString();}
+function pct(a,b){return b>0?Math.round(a/b*100):0;}
+
+// ── EPOS Simulator ─────────────────────────────────────────────────────────
+function buildSimDropdowns() {
+  var sr = document.getElementById('simRetailer');
+  sr.innerHTML = '<option value="">— select retailer —</option>' +
+    retailers.filter(function(r){return r.active;}).map(function(r){
+      return '<option value="'+r.name+'">'+r.name+'</option>';
     }).join('');
 
-    // Carbon panel
-    document.getElementById('carbonPanel').innerHTML =
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
-      cStat('🌿', (tCO2/1000).toFixed(3)+' tonnes', 'CO₂e offset to date') +
-      cStat('📜', tVcs.toFixed(4), 'VCS credits generated') +
-      cStat('⛽', tFoss.toFixed(1)+' L', 'fossil fuel equivalent') +
-      cStat('🏭', equiv.netZeroPct+'%', 'Net Zero contribution') +
-      '</div>' +
-      '<div style="margin-top:12px;font-size:10px;color:#888;background:#f6faf0;padding:9px 11px;border-radius:4px;">' +
-      'Standard: <strong>' + equiv.carbonStandard + '</strong> &nbsp;·&nbsp; ' +
-      'Project: <strong>' + equiv.projectRef + '</strong> &nbsp;·&nbsp; ' + equiv.projectName + '</div>';
-
-    // Recent pins
-    var recent = pins.slice().sort(function(a,b){ return b.date.localeCompare(a.date); }).slice(0,6);
-    document.getElementById('recentPinsBody').innerHTML = recent.map(function(p) {
-      return '<tr><td><span class="pin-badge">' + p.id + '</span></td>' +
-        '<td><strong>' + p.retailer + '</strong></td><td>' + p.userName + '</td>' +
-        '<td>🌿 ' + p.squares + '</td>' +
-        '<td><span class="tag tag-' + (p.category||'food') + '">' + (p.category||'—') + '</span></td>' +
-        '<td>' + p.date + '</td></tr>';
+  var sp = document.getElementById('simProductPicker');
+  sp.innerHTML = '<option value="">— add a GS product —</option>' +
+    products.filter(function(p){return p.active;}).map(function(p){
+      return '<option value="'+p.id+'">'+p.productName+' (+'+p.gsPerUnit+' GS)</option>';
     }).join('');
-  }
 
-  function kpi(label, value, sub, hi) {
-    return '<div class="kpi-card'+(hi?' highlight':'')+'"><div class="kpi-label">'+label+'</div>' +
-      '<div class="kpi-value">'+value+'</div><div class="kpi-sub">'+sub+'</div></div>';
-  }
-  function cStat(icon, val, lbl) {
-    return '<div style="background:#f6faf0;border-radius:6px;padding:11px;">' +
-      '<div style="font-size:18px;margin-bottom:4px">'+icon+'</div>' +
-      '<div style="font-size:17px;font-weight:bold;color:#1b3410;">'+val+'</div>' +
-      '<div style="font-size:10px;color:#aaa;">'+lbl+'</div></div>';
-  }
-  function fmt(n) { return parseInt(n||0).toLocaleString(); }
-  function pct(a, b) { return b > 0 ? Math.round(a/b*100) : 0; }
+  simUpdate();
+}
 
-  // ── Campaigns ─────────────────────────────────────────────────────────────
-  function renderCampaigns() {
-    var g = document.getElementById('campaignGrid');
-    if (!campaigns.length) {
-      g.innerHTML = '<div class="empty-state"><div class="empty-icon">🤝</div>no campaigns yet</div>'; return;
+function simAddProduct() {
+  var picker = document.getElementById('simProductPicker');
+  var id = picker.value; if (!id) return;
+  var prd = products.find(function(p){return p.id===id;});
+  if (!prd) return;
+  // check retailer is approved for this brand
+  var retailer = document.getElementById('simRetailer').value;
+  if (retailer) {
+    var cam = campaigns.find(function(c){return c.id===prd.campaignId;});
+    var rel = relationships.find(function(r){return r.brandCampaignId===prd.campaignId && r.retailerName===retailer && r.status==='approved';});
+    if (!rel) {
+      var camName = cam ? cam.clientName : 'this brand';
+      // show warning but still add for demo purposes
     }
-    g.innerHTML = campaigns.map(function(c) {
-      var p = pct(c.gsIssued, c.contractedGs);
-      var co2 = (c.gsIssued * c.carbonKgPerGs / 1000).toFixed(3);
-      return '<div class="campaign-card">' +
-        '<div class="cc-header">' +
-          '<div><div class="cc-client">' + c.clientName + '</div><div class="cc-id">' + c.id + '</div></div>' +
-          '<span class="pill pill-' + c.status + '">' + c.status + '</span>' +
-        '</div>' +
-        '<div class="cc-body">' +
-          '<div>' +
-            '<div class="cc-progress-label"><span>' + fmt(c.gsIssued) + ' / ' + fmt(c.contractedGs) + ' GS issued</span><span>' + p + '%</span></div>' +
-            '<div class="prog-bar"><div class="prog-fill" style="width:' + p + '%"></div></div>' +
-          '</div>' +
-          '<div class="cc-meta">' +
-            '<div class="cc-meta-item"><div class="ml">GS / txn</div><div class="mv">' + fmt(c.gsPerTxn) + '</div></div>' +
-            '<div class="cc-meta-item"><div class="ml">rate / GS</div><div class="mv">£' + (c.rate||1).toFixed(2) + '</div></div>' +
-            '<div class="cc-meta-item"><div class="ml">CO₂e offset</div><div class="mv">' + co2 + 't</div></div>' +
-            '<div class="cc-meta-item"><div class="ml">contract £</div><div class="mv">£' + fmt(c.contractedGs*(c.rate||1)) + '</div></div>' +
-            '<div class="cc-meta-item"><div class="ml">net zero</div><div class="mv">' + (c.netZeroPct||0) + '%</div></div>' +
-            '<div class="cc-meta-item"><div class="ml">standard</div><div class="mv" style="font-size:10px">' + (c.carbonStandard||'VCS') + '</div></div>' +
-          '</div>' +
-          '<div class="cc-message">"' + (c.consumerMessage||'') + '"</div>' +
-          '<div class="cc-chips">' +
-            '<span class="chip chip-vcs">⚖ ' + (c.carbonKgPerGs||0) + ' kg CO₂e / GS</span>' +
-            '<span class="chip chip-vcs">📜 ' + (c.vcsCreditsPerGs||0) + ' VCS / GS</span>' +
-            '<span class="chip chip-fossil">⛽ ' + (c.fossilLitresPerGs||0) + ' L / GS</span>' +
-            '<span class="chip chip-nz">Net Zero ' + (c.netZeroPct||0) + '%</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="cc-footer">' +
-          '<button onclick="editCampaign(\'' + c.id + '\')" class="btn btn-secondary btn-xs">edit</button>' +
-          '<button onclick="deleteCampaign(\'' + c.id + '\')" class="btn btn-danger btn-xs">delete</button>' +
-        '</div>' +
-        '</div>';
-    }).join('');
+  }
+  if (!simBasketProducts.find(function(x){return x.id===id;})) {
+    simBasketProducts.push(prd);
+  }
+  picker.value = '';
+  simUpdate();
+}
+
+function simRemoveProduct(id) {
+  simBasketProducts = simBasketProducts.filter(function(p){return p.id!==id;});
+  simUpdate();
+}
+
+function simUpdate() {
+  // Chips
+  var chipsEl = document.getElementById('simProductsList');
+  chipsEl.innerHTML = simBasketProducts.map(function(p){
+    return '<div class="epos-product-chip">'+p.productName+' <span style="color:#aaffaa;font-size:9px">+'+p.gsPerUnit+' GS</span>'+
+      '<button onclick="simRemoveProduct(\''+p.id+'\')">×</button></div>';
+  }).join('') || '<span style="font-size:11px;color:rgba(255,255,255,0.3)">no gs products added yet</span>';
+
+  // Calculate
+  var retailerName = document.getElementById('simRetailer').value;
+  var basketVal    = parseFloat(document.getElementById('simBasket').value)||0;
+
+  var receiptEl = document.getElementById('simReceipt');
+  if (!retailerName) {
+    receiptEl.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:10px;">select a retailer to see the EPOS breakdown</div>';
+    return;
   }
 
-  function openCampaignModal() {
-    editingCamId = null;
-    document.getElementById('camModalTitle').textContent = 'new campaign';
-    document.getElementById('camSaveBtn').textContent = 'create campaign';
-    document.getElementById('camId').value = '';
-    ['camClient','camProductCodes','camMessage'].forEach(function(f){ document.getElementById(f).value=''; });
-    ['camContractedGs','camGsIssued','camGsPerTxn','camBudget','camStart','camEnd'].forEach(function(f){ document.getElementById(f).value=''; });
-    document.getElementById('camRate').value = '1.00';
-    document.getElementById('camStatus').value = 'draft';
-    document.getElementById('camCarbon').value  = equiv.carbonKgPerGs;
-    document.getElementById('camVcs').value     = equiv.vcsCreditsPerGs;
-    document.getElementById('camFossil').value  = equiv.fossilLitresPerGs;
-    document.getElementById('camNetZero').value = equiv.netZeroPct;
-    document.getElementById('camOffset').value  = equiv.offsetPct;
-    document.getElementById('camStandard').value = equiv.carbonStandard;
-    document.getElementById('campaignModal').classList.add('open');
-  }
-
-  function editCampaign(id) {
-    var c = campaigns.find(function(x){ return x.id===id; }); if (!c) return;
-    editingCamId = id;
-    document.getElementById('camModalTitle').textContent = 'edit — ' + c.clientName;
-    document.getElementById('camSaveBtn').textContent = 'save changes';
-    document.getElementById('camId').value          = c.id;
-    document.getElementById('camClient').value      = c.clientName;
-    document.getElementById('camContractedGs').value = c.contractedGs;
-    document.getElementById('camGsIssued').value    = c.gsIssued || 0;
-    document.getElementById('camGsPerTxn').value    = c.gsPerTxn;
-    document.getElementById('camRate').value        = c.rate || 1.00;
-    document.getElementById('camBudget').value      = c.budget || '';
-    document.getElementById('camStart').value       = c.startDate || '';
-    document.getElementById('camEnd').value         = c.endDate || '';
-    document.getElementById('camStatus').value      = c.status;
-    document.getElementById('camMessage').value     = c.consumerMessage || '';
-    document.getElementById('camProductCodes').value = c.productCodes || '';
-    document.getElementById('camCarbon').value      = c.carbonKgPerGs;
-    document.getElementById('camVcs').value         = c.vcsCreditsPerGs;
-    document.getElementById('camFossil').value      = c.fossilLitresPerGs;
-    document.getElementById('camNetZero').value     = c.netZeroPct;
-    document.getElementById('camOffset').value      = c.offsetPct;
-    document.getElementById('camStandard').value    = c.carbonStandard;
-    document.getElementById('campaignModal').classList.add('open');
-  }
-
-  function saveCampaign() {
-    var clientName = (document.getElementById('camClient').value||'').trim();
-    if (!clientName) { alert('Client name is required.'); return; }
-    var cam = {
-      id: editingCamId || genId(campaigns, 'CAM'),
-      clientName:      clientName,
-      contractedGs:    parseInt(document.getElementById('camContractedGs').value)||0,
-      gsIssued:        parseInt(document.getElementById('camGsIssued').value)||0,
-      gsPerTxn:        parseInt(document.getElementById('camGsPerTxn').value)||0,
-      rate:            parseFloat(document.getElementById('camRate').value)||1.00,
-      budget:          parseInt(document.getElementById('camBudget').value)||0,
-      startDate:       document.getElementById('camStart').value,
-      endDate:         document.getElementById('camEnd').value,
-      status:          document.getElementById('camStatus').value,
-      consumerMessage: document.getElementById('camMessage').value,
-      productCodes:    document.getElementById('camProductCodes').value,
-      carbonKgPerGs:   parseFloat(document.getElementById('camCarbon').value)||equiv.carbonKgPerGs,
-      vcsCreditsPerGs: parseFloat(document.getElementById('camVcs').value)||equiv.vcsCreditsPerGs,
-      fossilLitresPerGs: parseFloat(document.getElementById('camFossil').value)||equiv.fossilLitresPerGs,
-      netZeroPct:      parseInt(document.getElementById('camNetZero').value)||equiv.netZeroPct,
-      offsetPct:       parseInt(document.getElementById('camOffset').value)||equiv.offsetPct,
-      carbonStandard:  document.getElementById('camStandard').value
-    };
-    if (editingCamId) {
-      var i = campaigns.findIndex(function(x){ return x.id===editingCamId; });
-      campaigns[i] = cam;
-    } else { campaigns.push(cam); }
-    persist('campaigns'); closeCampaignModal(); renderCampaigns(); renderOverview();
-  }
-
-  function deleteCampaign(id) {
-    if (!confirm('Delete campaign ' + id + '?')) return;
-    campaigns = campaigns.filter(function(c){ return c.id!==id; });
-    persist('campaigns'); renderCampaigns(); renderOverview();
-  }
-
-  function closeCampaignModal() {
-    document.getElementById('campaignModal').classList.remove('open'); editingCamId = null;
-  }
-
-  // ── Pins ──────────────────────────────────────────────────────────────────
-  function renderAllPins() {
-    document.getElementById('pinCountLabel').textContent = '(' + pins.length + ')';
-    document.getElementById('allPinsBody').innerHTML = pins.map(function(p) {
-      return '<tr>' +
-        '<td><span class="pin-badge">' + p.id + '</span></td>' +
-        '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + p.title + '</td>' +
-        '<td>' + p.retailer + '</td><td>' + p.userName + '</td>' +
-        '<td>🌿 ' + p.squares + '</td>' +
-        '<td><span class="tag tag-' + (p.category||'food') + '">' + (p.category||'—') + '</span></td>' +
-        '<td style="font-family:monospace;font-size:9px;color:#ccc;">' + p.lat + ', ' + p.lng + '</td>' +
-        '<td>' + p.date + '</td>' +
-        '<td style="white-space:nowrap;">' +
-          '<button onclick="editPin(\'' + p.id + '\')" class="btn btn-secondary btn-xs">edit</button> ' +
-          '<button onclick="deletePin(\'' + p.id + '\')" class="btn btn-danger btn-xs">del</button>' +
-        '</td></tr>';
-    }).join('');
-  }
-
-  function initAdminMap() {
-    if (mapInitialised) return; mapInitialised = true;
-    adminMap = L.map('adminMap', { center:[-5.8,-60.2], zoom:6 });
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      { maxZoom:18 }).addTo(adminMap);
-    L.polygon(boundary, { color:'#6ab023', weight:2, fillOpacity:0.12 }).addTo(adminMap);
-    pins.forEach(function(p) {
-      L.circleMarker([p.lat,p.lng], { radius:5, color:'#6ab023', fillColor:'#6ab023', fillOpacity:0.7, weight:1 })
-       .bindTooltip(p.id + ' — ' + p.userName).addTo(adminMap);
-    });
-    adminMap.on('click', function(e) {
-      var lat = parseFloat(e.latlng.lat.toFixed(6)), lng = parseFloat(e.latlng.lng.toFixed(6));
-      document.getElementById('pinLat').value = lat;
-      document.getElementById('pinLng').value = lng;
-      checkDupe(lat, lng); placeTempMarker(lat, lng);
-    });
-  }
-
-  function placeTempMarker(lat, lng) {
-    if (tempMarker) adminMap.removeLayer(tempMarker);
-    tempMarker = L.circleMarker([lat,lng], { radius:7, color:'#cc7700', fillColor:'#ff9900', fillOpacity:0.9, weight:2 }).addTo(adminMap);
-  }
-
-  function checkDupe(lat, lng) {
-    var w = document.getElementById('dupeWarning');
-    var d = pins.find(function(p){ return p.id!==editingPinId && Math.abs(p.lat-lat)<0.005 && Math.abs(p.lng-lng)<0.005; });
-    w.style.display = d ? 'block' : 'none';
-    if (d) w.textContent = '⚠ ' + d.id + ' (' + d.userName + ') is very close. Move pin slightly.';
-  }
-
-  function openPinModal() {
-    editingPinId = null;
-    document.getElementById('pinModalTitle').textContent = 'add pin';
-    document.getElementById('pinSaveBtn').textContent = 'add pin';
-    document.getElementById('pinId').value = '';
-    ['pinLat','pinLng','pinTitle','pinRetailer','pinProductId','pinUserId','pinUserName','pinSquares','pinDescription','pinImage'].forEach(function(f){ document.getElementById(f).value=''; });
-    document.getElementById('pinDate').value = today();
-    document.getElementById('pinCategory').value = 'food';
-    document.getElementById('dupeWarning').style.display = 'none';
-    document.getElementById('pinModal').classList.add('open');
-    setTimeout(function(){ if (adminMap) adminMap.invalidateSize(); }, 100);
-  }
-
-  function editPin(id) {
-    var p = pins.find(function(x){ return x.id===id; }); if (!p) return;
-    editingPinId = id;
-    document.getElementById('pinModalTitle').textContent = 'edit pin — ' + id;
-    document.getElementById('pinSaveBtn').textContent = 'save changes';
-    document.getElementById('pinId').value          = p.id;
-    document.getElementById('pinLat').value         = p.lat;
-    document.getElementById('pinLng').value         = p.lng;
-    document.getElementById('pinTitle').value       = p.title;
-    document.getElementById('pinRetailer').value    = p.retailer;
-    document.getElementById('pinProductId').value   = p.productId || '';
-    document.getElementById('pinUserId').value      = p.userId || '';
-    document.getElementById('pinUserName').value    = p.userName;
-    document.getElementById('pinSquares').value     = p.squares;
-    document.getElementById('pinDate').value        = p.date;
-    document.getElementById('pinCategory').value    = p.category || 'food';
-    document.getElementById('pinDescription').value = p.description || '';
-    document.getElementById('pinImage').value       = p.image || '';
-    document.getElementById('pinModal').classList.add('open');
-    setTimeout(function(){ if (adminMap) { adminMap.setView([p.lat,p.lng],9); adminMap.invalidateSize(); placeTempMarker(p.lat,p.lng); } }, 100);
-  }
-
-  function savePin() {
-    var lat = parseFloat(document.getElementById('pinLat').value);
-    var lng = parseFloat(document.getElementById('pinLng').value);
-    if (!lat || !lng) { alert('Set a location on the map or enter coordinates.'); return; }
-    var dupe = pins.find(function(p){ return p.id!==editingPinId && Math.abs(p.lat-lat)<0.005 && Math.abs(p.lng-lng)<0.005; });
-    if (dupe) { alert('Pin ' + dupe.id + ' is too close. Each pin must have a unique position.'); return; }
-    var pin = {
-      id: editingPinId || genId(pins, 'PIN'),
-      lat: lat, lng: lng,
-      title:       document.getElementById('pinTitle').value,
-      description: document.getElementById('pinDescription').value,
-      image:       document.getElementById('pinImage').value || 'assets/images/amazon.png',
-      retailer:    document.getElementById('pinRetailer').value,
-      productId:   document.getElementById('pinProductId').value,
-      userId:      document.getElementById('pinUserId').value,
-      userName:    document.getElementById('pinUserName').value,
-      squares:     parseInt(document.getElementById('pinSquares').value),
-      date:        document.getElementById('pinDate').value,
-      category:    document.getElementById('pinCategory').value
-    };
-    if (editingPinId) { var i = pins.findIndex(function(x){ return x.id===editingPinId; }); pins[i] = pin; }
-    else { pins.push(pin); }
-    persist('pins'); closePinModal(); renderAllPins(); renderOverview();
-  }
-
-  function deletePin(id) {
-    if (!confirm('Delete pin ' + id + '?')) return;
-    pins = pins.filter(function(p){ return p.id!==id; });
-    persist('pins'); renderAllPins(); renderOverview();
-  }
-
-  function closePinModal() {
-    document.getElementById('pinModal').classList.remove('open');
-    if (tempMarker && adminMap) { adminMap.removeLayer(tempMarker); tempMarker = null; }
-    editingPinId = null;
-  }
-
-  // ── Retailers ─────────────────────────────────────────────────────────────
-  function renderRetailers() {
-    var g = document.getElementById('retailerGrid');
-    g.innerHTML = retailers.map(function(r) {
-      var cams = campaigns.filter(function(c){ return c.status==='active' && c.productCodes && c.clientName===r.name; }).length;
-      return '<div class="retailer-card">' +
-        '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
-          '<div><div class="ret-name">' + r.name + '</div><div class="ret-cat">' + r.category + '</div></div>' +
-          '<span class="pill ' + (r.active ? 'pill-active' : 'pill-draft') + '">' + (r.active ? 'active' : 'inactive') + '</span>' +
-        '</div>' +
-        '<div style="font-size:10px;color:#6ab023;">' + (cams ? cams + ' active campaign' + (cams>1?'s':'') : 'no active campaigns') + '</div>' +
-        '<div style="display:flex;gap:5px;">' +
-          '<button onclick="editRetailer(\'' + r.id + '\')" class="btn btn-secondary btn-xs">edit</button>' +
-          '<button onclick="deleteRetailer(\'' + r.id + '\')" class="btn btn-danger btn-xs">del</button>' +
-        '</div></div>';
-    }).join('');
-  }
-
-  function openRetailerModal() {
-    editingRetId = null;
-    document.getElementById('retModalTitle').textContent = 'add retailer';
-    document.getElementById('retId').value = '';
-    document.getElementById('retName').value = '';
-    document.getElementById('retCategory').value = 'grocery';
-    document.getElementById('retActive').value = 'true';
-    document.getElementById('retailerModal').classList.add('open');
-  }
-
-  function editRetailer(id) {
-    var r = retailers.find(function(x){ return x.id===id; }); if (!r) return;
-    editingRetId = id;
-    document.getElementById('retModalTitle').textContent = 'edit retailer';
-    document.getElementById('retId').value       = r.id;
-    document.getElementById('retName').value     = r.name;
-    document.getElementById('retCategory').value = r.category;
-    document.getElementById('retActive').value   = String(r.active);
-    document.getElementById('retailerModal').classList.add('open');
-  }
-
-  function saveRetailer() {
-    var name = (document.getElementById('retName').value||'').trim();
-    if (!name) { alert('Name required.'); return; }
-    var ret = {
-      id:       editingRetId || genId(retailers, 'RET'),
-      name:     name,
-      category: document.getElementById('retCategory').value,
-      active:   document.getElementById('retActive').value === 'true'
-    };
-    if (editingRetId) { var i = retailers.findIndex(function(x){ return x.id===editingRetId; }); retailers[i] = ret; }
-    else { retailers.push(ret); }
-    persist('retailers'); closeRetailerModal(); renderRetailers();
-  }
-
-  function deleteRetailer(id) {
-    if (!confirm('Delete retailer ' + id + '?')) return;
-    retailers = retailers.filter(function(r){ return r.id!==id; });
-    persist('retailers'); renderRetailers();
-  }
-
-  function closeRetailerModal() {
-    document.getElementById('retailerModal').classList.remove('open'); editingRetId = null;
-  }
-
-  // ── Equivalence ───────────────────────────────────────────────────────────
-  function populateEquivForm() {
-    document.getElementById('eqCarbon').value        = equiv.carbonKgPerGs;
-    document.getElementById('eqVcs').value           = equiv.vcsCreditsPerGs;
-    document.getElementById('eqFossil').value        = equiv.fossilLitresPerGs;
-    document.getElementById('eqNetZeroPct').value    = equiv.netZeroPct;
-    document.getElementById('eqOffsetPct').value     = equiv.offsetPct;
-    document.getElementById('eqStandard').value      = equiv.carbonStandard;
-    document.getElementById('eqProjectRef').value    = equiv.projectRef;
-    document.getElementById('eqProjectName').value   = equiv.projectName;
-    document.getElementById('eqEffectiveDate').value = equiv.effectiveDate;
-    document.getElementById('eqReviewDate').value    = equiv.reviewDate;
-    document.getElementById('eqApprovedBy').value    = equiv.approvedBy;
-    renderEquivCards();
-  }
-
-  function renderEquivCards() {
-    document.getElementById('equivCards').innerHTML = [
-      eCard('🌿', equiv.carbonKgPerGs + ' kg', 'CO₂e per green square',        'Fossil carbon offset per GS — minimum Verra VCS standard'),
-      eCard('📜', equiv.vcsCreditsPerGs,        'VCS credits per green square',  'Verified Carbon Standard — Verra registry only'),
-      eCard('⛽', equiv.fossilLitresPerGs+' L', 'Fossil fuel reduction per GS',  'Equivalent fossil fuel reduction in litres per GS'),
-      eCard('🏭', equiv.netZeroPct+'%',         'Net Zero contribution',          'Proportion of GS value allocated to the Net Zero pathway'),
-      eCard('🌳', equiv.offsetPct+'%',          'Offset contribution',            'Proportion allocated to verified forestry carbon offset'),
-      eCard('📋', equiv.carbonStandard,         'Carbon standard',               equiv.projectRef + ' · ' + equiv.projectName)
-    ].join('');
-  }
-
-  function eCard(icon, val, lbl, sub) {
-    return '<div class="equiv-card"><div class="equiv-icon">' + icon + '</div>' +
-      '<div class="equiv-val">' + val + '</div>' +
-      '<div class="equiv-lbl">' + lbl + '</div>' +
-      '<div class="equiv-sub">' + sub + '</div></div>';
-  }
-
-  function saveEquivalence() {
-    equiv = {
-      carbonKgPerGs:    parseFloat(document.getElementById('eqCarbon').value),
-      vcsCreditsPerGs:  parseFloat(document.getElementById('eqVcs').value),
-      fossilLitresPerGs: parseFloat(document.getElementById('eqFossil').value),
-      netZeroPct:       parseInt(document.getElementById('eqNetZeroPct').value),
-      offsetPct:        parseInt(document.getElementById('eqOffsetPct').value),
-      carbonStandard:   document.getElementById('eqStandard').value,
-      projectRef:       document.getElementById('eqProjectRef').value,
-      projectName:      document.getElementById('eqProjectName').value,
-      effectiveDate:    document.getElementById('eqEffectiveDate').value,
-      reviewDate:       document.getElementById('eqReviewDate').value,
-      approvedBy:       document.getElementById('eqApprovedBy').value
-    };
-    persist('equiv'); renderEquivCards(); renderOverview();
-    alert('Equivalence settings saved.');
-  }
-
-  // ── Export / Reset ────────────────────────────────────────────────────────
-  function exportAllData() {
-    var d = { pins:pins, campaigns:campaigns, retailers:retailers, equivalence:equiv, exported: new Date().toISOString() };
-    var blob = new Blob([JSON.stringify(d, null, 2)], { type:'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = 'mgs-data-' + today() + '.json'; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function resetAllData() {
-    if (!confirm('Reset ALL data to factory defaults? All changes will be lost.')) return;
-    localStorage.clear(); location.reload();
-  }
-
-  // ── Utilities ─────────────────────────────────────────────────────────────
-  function genId(arr, prefix) {
-    var max = arr.reduce(function(m,x){ return Math.max(m, parseInt((x.id||'').replace(prefix,''))||0); }, 0);
-    return prefix + String(max+1).padStart(3,'0');
-  }
-  function today() { return new Date().toISOString().split('T')[0]; }
-
-  // ── Modal close on backdrop ───────────────────────────────────────────────
-  ['campaignModal','pinModal','retailerModal'].forEach(function(id) {
-    document.getElementById(id).addEventListener('click', function(e) {
-      if (e.target === this) {
-        if (id==='campaignModal') closeCampaignModal();
-        if (id==='pinModal')      closePinModal();
-        if (id==='retailerModal') closeRetailerModal();
-      }
-    });
-  });
-  document.addEventListener('keydown', function(e) {
-    if (e.key==='Escape') { closeCampaignModal(); closePinModal(); closeRetailerModal(); }
+  // Find retailer campaign
+  var retCam = campaigns.find(function(c){
+    return c.participantType==='retailer' && c.clientName===retailerName && c.status==='active';
   });
 
-  loadData();
+  var rows = '<div class="epos-receipt-row" style="color:rgba(255,255,255,0.5);font-size:10px;"><span>TRANSACTION</span><span>'+retailerName+' · basket £'+basketVal.toFixed(2)+'</span></div>';
+
+  var totalGs = 0;
+  var messages = [];
+
+  // Tier 1
+  if (retCam) {
+    var retGs = retCam.gsPerTxn || Math.round(basketVal * 2.7);
+    totalGs += retGs;
+    rows += '<div class="epos-receipt-row"><span>🏪 '+retailerName+' (Tier 1 — basket)</span><span style="color:#6ab023;font-weight:bold">+'+retGs+' GS</span></div>';
+    messages.push(retCam.consumerMessage);
+  }
+
+  // Tier 2
+  simBasketProducts.forEach(function(prd) {
+    var cam = campaigns.find(function(c){return c.id===prd.campaignId;});
+    var rel = relationships.find(function(r){return r.brandCampaignId===prd.campaignId && r.retailerName===retailerName;});
+    var gs = prd.gsPerUnit;
+    totalGs += gs;
+    var relStatus = rel ? rel.status : 'not registered';
+    var relNote = rel && rel.status==='approved' ? '<span style="color:#6ab023;font-size:9px"> ✓ MGS approved</span>' : '<span style="color:#f0a500;font-size:9px"> ⚠ '+relStatus+'</span>';
+    rows += '<div class="epos-receipt-row brand-row"><span>📦 '+(cam?cam.clientName:'brand')+' — '+prd.productName+relNote+'</span><span style="font-weight:bold">+'+gs+' GS</span></div>';
+    if (cam && cam.consumerMessage) messages.push(cam.consumerMessage);
+  });
+
+  rows += '<div class="epos-receipt-row total"><span>TOTAL GREEN SQUARES TO ACCOUNT</span><span>🌿 '+totalGs+' GS</span></div>';
+
+  var msgHtml = messages.length ? '<div class="epos-message">'+messages[0]+'</div>' : '';
+  receiptEl.innerHTML = rows + msgHtml;
+}
+
+// ── Campaigns ──────────────────────────────────────────────────────────────
+function renderCampaigns() {
+  var g = document.getElementById('campaignGrid');
+  if (!campaigns.length) { g.innerHTML='<div class="empty-state"><div class="empty-icon">🤝</div>no campaigns</div>'; return; }
+  g.innerHTML = campaigns.map(function(c) {
+    var p = pct(c.gsIssued, c.contractedGs);
+    var isRetailer = c.participantType === 'retailer';
+    var co2 = (c.gsIssued * c.carbonKgPerGs / 1000).toFixed(3);
+    var relCount = relationships.filter(function(r){return r.brandCampaignId===c.id && r.status==='approved';}).length;
+    return '<div class="campaign-card">'+
+      '<div class="cc-header '+(isRetailer?'retailer-hdr':'brand-hdr')+'">'+
+        '<div>'+
+          '<div class="cc-client">'+c.clientName+'</div>'+
+          '<div class="cc-id-row">'+
+            '<span class="cc-id">'+c.id+'</span>'+
+            '<span class="tier-badge '+(isRetailer?'tier-retailer':'tier-brand')+'">Tier '+(isRetailer?'1 retailer':'2 brand')+'</span>'+
+          '</div>'+
+        '</div>'+
+        '<span class="pill pill-'+c.status+'">'+c.status+'</span>'+
+      '</div>'+
+      '<div class="cc-body">'+
+        '<div><div class="cc-prog-label"><span>'+fmt(c.gsIssued)+' / '+fmt(c.contractedGs)+' GS</span><span>'+p+'%</span></div>'+
+        '<div class="prog-bar"><div class="prog-fill" style="width:'+p+'%"></div></div></div>'+
+        '<div class="cc-meta">'+
+          '<div><div class="ml">'+(isRetailer?'GS / txn':'GS / unit')+'</div><div class="mv">'+fmt(isRetailer?c.gsPerTxn:c.gsPerUnit)+'</div></div>'+
+          '<div><div class="ml">CO₂e offset</div><div class="mv">'+co2+'t</div></div>'+
+          '<div><div class="ml">contract £</div><div class="mv">£'+fmt(c.contractedGs*(c.rate||1))+'</div></div>'+
+        '</div>'+
+        '<div class="cc-message">"'+(c.consumerMessage||'')+'"</div>'+
+        (!isRetailer && c.approvedRetailers ? '<div class="cc-retailers">🔗 approved at: '+c.approvedRetailers+(relCount?' ('+relCount+' MGS verified)':'')+'</div>' : '')+
+        '<div class="cc-chips">'+
+          '<span class="chip chip-green">'+c.carbonStandard+'</span>'+
+          '<span class="chip chip-green">'+c.carbonKgPerGs+' kg CO₂e</span>'+
+          '<span class="chip chip-blue">Net Zero '+c.netZeroPct+'%</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="cc-footer">'+
+        '<button onclick="editCampaign(\''+c.id+'\')" class="btn btn-secondary btn-xs">edit</button>'+
+        '<button onclick="deleteCampaign(\''+c.id+'\')" class="btn btn-danger btn-xs">delete</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function openCampaignModal(participantType) {
+  editingCamId = null;
+  var isRetailer = participantType === 'retailer';
+  document.getElementById('camModalHeader').className = 'modal-header'+(isRetailer?'':' brand-header');
+  document.getElementById('camModalTitle').textContent = 'new '+(isRetailer?'retailer':'brand')+' campaign';
+  document.getElementById('camSaveBtn').textContent = 'create campaign';
+  document.getElementById('camId').value = '';
+  document.getElementById('camParticipantType').value = participantType;
+  document.getElementById('camTierBadge').innerHTML = '<span class="tier-badge '+(isRetailer?'tier-retailer':'tier-brand')+'">Tier '+(isRetailer?'1 — Retailer Campaign':'2 — Brand Campaign')+'</span><span style="font-size:10px;color:#888;margin-left:8px;">'+(isRetailer?'GS awarded on basket value at EPOS':'GS awarded per product unit scanned')+'</span>';
+  document.getElementById('camCampaignType').value = isRetailer ? 'retailer-basket' : 'product-purchase';
+  document.getElementById('camGsPerTxnGroup').style.display = isRetailer ? '' : 'none';
+  document.getElementById('camGsPerUnitGroup').style.display = isRetailer ? 'none' : '';
+  document.getElementById('camBrandRetailersDiv').style.display = isRetailer ? 'none' : '';
+  document.getElementById('camBrandRetailersGroup').style.display = isRetailer ? 'none' : '';
+  ['camClient','camProductCodes','camMessage','camApprovedRetailers'].forEach(function(f){document.getElementById(f).value='';});
+  ['camContractedGs','camGsIssued','camGsPerTxn','camGsPerUnit','camBudget','camStart','camEnd'].forEach(function(f){document.getElementById(f).value='';});
+  document.getElementById('camRate').value='1.00'; document.getElementById('camStatus').value='draft';
+  document.getElementById('camCarbon').value=equiv.carbonKgPerGs;
+  document.getElementById('camVcs').value=equiv.vcsCreditsPerGs;
+  document.getElementById('camFossil').value=equiv.fossilLitresPerGs;
+  document.getElementById('camNetZero').value=equiv.netZeroPct;
+  document.getElementById('camOffset').value=equiv.offsetPct;
+  document.getElementById('camStandard').value=equiv.carbonStandard;
+  document.getElementById('campaignModal').classList.add('open');
+}
+
+function editCampaign(id) {
+  var c=campaigns.find(function(x){return x.id===id;}); if(!c) return;
+  editingCamId = id;
+  var isRetailer = c.participantType === 'retailer';
+  document.getElementById('camModalHeader').className = 'modal-header'+(isRetailer?'':' brand-header');
+  document.getElementById('camModalTitle').textContent = 'edit — '+c.clientName;
+  document.getElementById('camSaveBtn').textContent = 'save changes';
+  document.getElementById('camId').value = c.id;
+  document.getElementById('camParticipantType').value = c.participantType;
+  document.getElementById('camTierBadge').innerHTML = '<span class="tier-badge '+(isRetailer?'tier-retailer':'tier-brand')+'">Tier '+(isRetailer?'1 Retailer':'2 Brand')+'</span>';
+  document.getElementById('camClient').value = c.clientName;
+  document.getElementById('camCampaignType').value = c.campaignType;
+  document.getElementById('camContractedGs').value = c.contractedGs;
+  document.getElementById('camGsIssued').value = c.gsIssued||0;
+  document.getElementById('camGsPerTxn').value = c.gsPerTxn||0;
+  document.getElementById('camGsPerUnit').value = c.gsPerUnit||0;
+  document.getElementById('camRate').value = c.rate||1.00;
+  document.getElementById('camBudget').value = c.budget||'';
+  document.getElementById('camStart').value = c.startDate||'';
+  document.getElementById('camEnd').value = c.endDate||'';
+  document.getElementById('camStatus').value = c.status;
+  document.getElementById('camMessage').value = c.consumerMessage||'';
+  document.getElementById('camProductCodes').value = c.productCodes||'';
+  document.getElementById('camApprovedRetailers').value = c.approvedRetailers||'';
+  document.getElementById('camGsPerTxnGroup').style.display = isRetailer ? '' : 'none';
+  document.getElementById('camGsPerUnitGroup').style.display = isRetailer ? 'none' : '';
+  document.getElementById('camBrandRetailersDiv').style.display = isRetailer ? 'none' : '';
+  document.getElementById('camBrandRetailersGroup').style.display = isRetailer ? 'none' : '';
+  document.getElementById('camCarbon').value=c.carbonKgPerGs;
+  document.getElementById('camVcs').value=c.vcsCreditsPerGs;
+  document.getElementById('camFossil').value=c.fossilLitresPerGs;
+  document.getElementById('camNetZero').value=c.netZeroPct;
+  document.getElementById('camOffset').value=c.offsetPct;
+  document.getElementById('camStandard').value=c.carbonStandard;
+  document.getElementById('campaignModal').classList.add('open');
+}
+
+function saveCampaign() {
+  var name=(document.getElementById('camClient').value||'').trim();
+  if(!name){alert('Client name required.');return;}
+  var pt=document.getElementById('camParticipantType').value;
+  var isRetailer=pt==='retailer';
+  var cam={
+    id:editingCamId||genId(campaigns,'CAM'), participantType:pt,
+    campaignType:document.getElementById('camCampaignType').value,
+    clientName:name,
+    contractedGs:parseInt(document.getElementById('camContractedGs').value)||0,
+    gsIssued:parseInt(document.getElementById('camGsIssued').value)||0,
+    gsPerTxn:isRetailer?parseInt(document.getElementById('camGsPerTxn').value)||0:0,
+    gsPerUnit:isRetailer?0:parseInt(document.getElementById('camGsPerUnit').value)||0,
+    rate:parseFloat(document.getElementById('camRate').value)||1.00,
+    budget:parseInt(document.getElementById('camBudget').value)||0,
+    startDate:document.getElementById('camStart').value,
+    endDate:document.getElementById('camEnd').value,
+    status:document.getElementById('camStatus').value,
+    consumerMessage:document.getElementById('camMessage').value,
+    productCodes:document.getElementById('camProductCodes').value,
+    approvedRetailers:document.getElementById('camApprovedRetailers').value,
+    carbonKgPerGs:parseFloat(document.getElementById('camCarbon').value)||equiv.carbonKgPerGs,
+    vcsCreditsPerGs:parseFloat(document.getElementById('camVcs').value)||equiv.vcsCreditsPerGs,
+    fossilLitresPerGs:parseFloat(document.getElementById('camFossil').value)||equiv.fossilLitresPerGs,
+    netZeroPct:parseInt(document.getElementById('camNetZero').value)||equiv.netZeroPct,
+    offsetPct:parseInt(document.getElementById('camOffset').value)||equiv.offsetPct,
+    carbonStandard:document.getElementById('camStandard').value
+  };
+  if(editingCamId){var i=campaigns.findIndex(function(x){return x.id===editingCamId;});campaigns[i]=cam;}
+  else{campaigns.push(cam);}
+  persist('campaigns'); closeCampaignModal(); renderCampaigns(); renderOverview();
+}
+
+function deleteCampaign(id){
+  if(!confirm('Delete campaign '+id+'?'))return;
+  campaigns=campaigns.filter(function(c){return c.id!==id;});
+  persist('campaigns'); renderCampaigns(); renderOverview();
+}
+function closeCampaignModal(){document.getElementById('campaignModal').classList.remove('open');editingCamId=null;}
+
+// ── Products ───────────────────────────────────────────────────────────────
+function renderProducts() {
+  document.getElementById('productCountLabel').textContent='('+products.length+')';
+  document.getElementById('allProductsBody').innerHTML = products.map(function(p){
+    var cam=campaigns.find(function(c){return c.id===p.campaignId;});
+    return '<tr>'+
+      '<td><span class="pin-badge">'+p.id+'</span></td>'+
+      '<td><strong>'+p.productName+'</strong></td>'+
+      '<td>'+p.brand+'</td>'+
+      '<td style="font-family:monospace;font-size:10px;">'+p.sku+'</td>'+
+      '<td style="font-weight:bold;color:#1a3a88;">🌿 '+p.gsPerUnit+'</td>'+
+      '<td><span style="font-size:10px;color:#1a3a88;">'+(cam?cam.clientName:'—')+'</span></td>'+
+      '<td><span class="tag tag-'+(p.category||'grocery')+'">'+p.category+'</span></td>'+
+      '<td><span class="pill '+(p.active?'pill-active':'pill-draft')+'">'+(p.active?'active':'inactive')+'</span></td>'+
+      '<td><button onclick="editProduct(\''+p.id+'\')" class="btn btn-secondary btn-xs">edit</button> '+
+      '<button onclick="deleteProduct(\''+p.id+'\')" class="btn btn-danger btn-xs">del</button></td></tr>';
+  }).join('');
+}
+
+function openProductModal(){
+  editingPrdId=null;
+  document.getElementById('prdModalTitle').textContent='register gs product';
+  document.getElementById('prdId').value='';
+  ['prdName','prdBrand','prdSku'].forEach(function(f){document.getElementById(f).value='';});
+  document.getElementById('prdGs').value='';
+  document.getElementById('prdCategory').value='grocery';
+  document.getElementById('prdActive').value='true';
+  var sel=document.getElementById('prdCampaign');
+  sel.innerHTML=campaigns.filter(function(c){return c.participantType==='brand';}).map(function(c){
+    return '<option value="'+c.id+'">'+c.clientName+'</option>';
+  }).join('');
+  document.getElementById('productModal').classList.add('open');
+}
+
+function editProduct(id){
+  var p=products.find(function(x){return x.id===id;}); if(!p)return;
+  editingPrdId=id;
+  document.getElementById('prdModalTitle').textContent='edit product — '+p.sku;
+  document.getElementById('prdId').value=p.id;
+  document.getElementById('prdName').value=p.productName;
+  document.getElementById('prdBrand').value=p.brand;
+  document.getElementById('prdSku').value=p.sku;
+  document.getElementById('prdGs').value=p.gsPerUnit;
+  document.getElementById('prdCategory').value=p.category||'grocery';
+  document.getElementById('prdActive').value=String(p.active);
+  var sel=document.getElementById('prdCampaign');
+  sel.innerHTML=campaigns.filter(function(c){return c.participantType==='brand';}).map(function(c){
+    return '<option value="'+c.id+'"'+(c.id===p.campaignId?' selected':'')+'>'+c.clientName+'</option>';
+  }).join('');
+  document.getElementById('productModal').classList.add('open');
+}
+
+function saveProduct(){
+  var name=(document.getElementById('prdName').value||'').trim();
+  if(!name){alert('Product name required.');return;}
+  var prd={
+    id:editingPrdId||genId(products,'PRD'),
+    productName:name, brand:document.getElementById('prdBrand').value,
+    sku:document.getElementById('prdSku').value,
+    gsPerUnit:parseInt(document.getElementById('prdGs').value)||0,
+    category:document.getElementById('prdCategory').value,
+    campaignId:document.getElementById('prdCampaign').value,
+    active:document.getElementById('prdActive').value==='true'
+  };
+  if(editingPrdId){var i=products.findIndex(function(x){return x.id===editingPrdId;});products[i]=prd;}
+  else{products.push(prd);}
+  persist('products'); closeProductModal(); renderProducts(); buildSimDropdowns();
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete product '+id+'?'))return;
+  products=products.filter(function(p){return p.id!==id;});
+  persist('products'); renderProducts(); buildSimDropdowns();
+}
+function closeProductModal(){document.getElementById('productModal').classList.remove('open');editingPrdId=null;}
+
+// ── Relationships ──────────────────────────────────────────────────────────
+function renderRelationships(){
+  var brandCams=campaigns.filter(function(c){return c.participantType==='brand';});
+  var container=document.getElementById('relGroups');
+  if(!brandCams.length){container.innerHTML='<div class="empty-state"><div class="empty-icon">🔗</div>no brand campaigns yet</div>';return;}
+  container.innerHTML=brandCams.map(function(bc){
+    var rels=relationships.filter(function(r){return r.brandCampaignId===bc.id;});
+    var rows=rels.length?rels.map(function(r){
+      return '<tr>'+
+        '<td><strong>'+r.retailerName+'</strong></td>'+
+        '<td><span class="pill pill-'+r.status+'">'+r.status+'</span></td>'+
+        '<td style="font-size:10px;color:#aaa;">'+(r.approvalDate||'—')+'</td>'+
+        '<td style="font-family:monospace;font-size:10px;color:#aaa;">'+(r.mgsRef||'—')+'</td>'+
+        '<td><button onclick="editRel(\''+r.id+'\')" class="btn btn-secondary btn-xs">edit</button> '+
+        '<button onclick="deleteRel(\''+r.id+'\')" class="btn btn-danger btn-xs">del</button></td></tr>';
+    }).join(''):'<tr><td colspan="5" class="empty-state" style="padding:14px;">no retailer relationships yet</td></tr>';
+    return '<div class="rel-group">'+
+      '<div class="rel-group-title">'+bc.clientName+' <span style="font-weight:normal;font-size:10px;opacity:0.6">'+bc.id+'</span></div>'+
+      '<div class="rel-group-body"><table class="data-table">'+
+      '<thead><tr><th>retailer</th><th>mgs status</th><th>approved date</th><th>mgs ref</th><th></th></tr></thead>'+
+      '<tbody>'+rows+'</tbody></table></div></div>';
+  }).join('');
+}
+
+function openRelModal(){
+  editingRelId=null;
+  document.getElementById('relId').value='';
+  var sel=document.getElementById('relCampaign');
+  sel.innerHTML=campaigns.filter(function(c){return c.participantType==='brand';}).map(function(c){
+    return '<option value="'+c.id+'">'+c.clientName+'</option>';
+  }).join('');
+  document.getElementById('relRetailer').value='';
+  document.getElementById('relStatus').value='pending';
+  document.getElementById('relApprovalDate').value='';
+  document.getElementById('relMgsRef').value='';
+  document.getElementById('relModal').classList.add('open');
+}
+
+function editRel(id){
+  var r=relationships.find(function(x){return x.id===id;}); if(!r)return;
+  editingRelId=id;
+  var sel=document.getElementById('relCampaign');
+  sel.innerHTML=campaigns.filter(function(c){return c.participantType==='brand';}).map(function(c){
+    return '<option value="'+c.id+'"'+(c.id===r.brandCampaignId?' selected':'')+'>'+c.clientName+'</option>';
+  }).join('');
+  document.getElementById('relId').value=r.id;
+  document.getElementById('relRetailer').value=r.retailerName;
+  document.getElementById('relStatus').value=r.status;
+  document.getElementById('relApprovalDate').value=r.approvalDate||'';
+  document.getElementById('relMgsRef').value=r.mgsRef||'';
+  document.getElementById('relModal').classList.add('open');
+}
+
+function saveRel(){
+  var ret=(document.getElementById('relRetailer').value||'').trim();
+  if(!ret){alert('Retailer name required.');return;}
+  var rel={
+    id:editingRelId||genId(relationships,'REL'),
+    brandCampaignId:document.getElementById('relCampaign').value,
+    retailerName:ret,
+    status:document.getElementById('relStatus').value,
+    approvalDate:document.getElementById('relApprovalDate').value,
+    mgsRef:document.getElementById('relMgsRef').value
+  };
+  if(editingRelId){var i=relationships.findIndex(function(x){return x.id===editingRelId;});relationships[i]=rel;}
+  else{relationships.push(rel);}
+  persist('rels'); closeRelModal(); renderRelationships(); renderOverview();
+}
+
+function deleteRel(id){
+  if(!confirm('Delete relationship '+id+'?'))return;
+  relationships=relationships.filter(function(r){return r.id!==id;});
+  persist('rels'); renderRelationships(); renderOverview();
+}
+function closeRelModal(){document.getElementById('relModal').classList.remove('open');editingRelId=null;}
+
+// ── Retailers ──────────────────────────────────────────────────────────────
+function renderRetailers(){
+  document.getElementById('retailerGrid').innerHTML=retailers.map(function(r){
+    var cams=campaigns.filter(function(c){return c.participantType==='retailer'&&c.clientName===r.name&&c.status==='active';}).length;
+    var brandRels=relationships.filter(function(x){return x.retailerName===r.name&&x.status==='approved';}).length;
+    return '<div class="retailer-card">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
+        '<div><div style="font-size:14px;font-weight:bold;color:#1b3410;">'+r.name+'</div><div style="font-size:10px;color:#888;">'+r.category+'</div></div>'+
+        '<span class="pill '+(r.active?'pill-active':'pill-draft')+'">'+(r.active?'active':'inactive')+'</span>'+
+      '</div>'+
+      (cams?'<div style="font-size:10px;color:#6ab023;">'+cams+' active own campaign'+(cams>1?'s':'')+'</div>':'<div style="font-size:10px;color:#aaa;">no own campaign</div>')+
+      (brandRels?'<div style="font-size:10px;color:#1a3a88;">🔗 '+brandRels+' brand relationship'+(brandRels>1?'s':'')+'</div>':'')+
+      '<div style="display:flex;gap:4px;">'+
+        '<button onclick="editRetailer(\''+r.id+'\')" class="btn btn-secondary btn-xs">edit</button>'+
+        '<button onclick="deleteRetailer(\''+r.id+'\')" class="btn btn-danger btn-xs">del</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function openRetailerModal(){
+  editingRetId=null;
+  document.getElementById('retModalTitle').textContent='add retailer';
+  document.getElementById('retId').value='';
+  document.getElementById('retName').value='';
+  document.getElementById('retCategory').value='grocery';
+  document.getElementById('retActive').value='true';
+  document.getElementById('retailerModal').classList.add('open');
+}
+
+function editRetailer(id){
+  var r=retailers.find(function(x){return x.id===id;}); if(!r)return;
+  editingRetId=id;
+  document.getElementById('retModalTitle').textContent='edit retailer';
+  document.getElementById('retId').value=r.id;
+  document.getElementById('retName').value=r.name;
+  document.getElementById('retCategory').value=r.category;
+  document.getElementById('retActive').value=String(r.active);
+  document.getElementById('retailerModal').classList.add('open');
+}
+
+function saveRetailer(){
+  var name=(document.getElementById('retName').value||'').trim();
+  if(!name){alert('Name required.');return;}
+  var ret={id:editingRetId||genId(retailers,'RET'),name:name,category:document.getElementById('retCategory').value,active:document.getElementById('retActive').value==='true'};
+  if(editingRetId){var i=retailers.findIndex(function(x){return x.id===editingRetId;});retailers[i]=ret;}
+  else{retailers.push(ret);}
+  persist('retailers'); closeRetailerModal(); renderRetailers(); buildSimDropdowns();
+}
+
+function deleteRetailer(id){
+  if(!confirm('Delete retailer '+id+'?'))return;
+  retailers=retailers.filter(function(r){return r.id!==id;});
+  persist('retailers'); renderRetailers(); buildSimDropdowns();
+}
+function closeRetailerModal(){document.getElementById('retailerModal').classList.remove('open');editingRetId=null;}
+
+// ── Pins ───────────────────────────────────────────────────────────────────
+function renderAllPins(){
+  document.getElementById('pinCountLabel').textContent='('+pins.length+')';
+  document.getElementById('allPinsBody').innerHTML=pins.map(function(p){
+    return '<tr>'+
+      '<td><span class="pin-badge">'+p.id+'</span></td>'+
+      '<td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.title+'</td>'+
+      '<td>'+p.retailer+'</td><td>'+p.userName+'</td>'+
+      '<td>🌿 '+p.squares+'</td>'+
+      '<td><span class="tag tag-'+(p.category||'food')+'">'+(p.category||'—')+'</span></td>'+
+      '<td style="font-family:monospace;font-size:9px;color:#ccc;">'+p.lat+', '+p.lng+'</td>'+
+      '<td>'+p.date+'</td>'+
+      '<td style="white-space:nowrap;">'+
+        '<button onclick="editPin(\''+p.id+'\')" class="btn btn-secondary btn-xs">edit</button> '+
+        '<button onclick="deletePin(\''+p.id+'\')" class="btn btn-danger btn-xs">del</button>'+
+      '</td></tr>';
+  }).join('');
+}
+
+function initAdminMap(){
+  if(mapInitialised)return; mapInitialised=true;
+  adminMap=L.map('adminMap',{center:[-5.8,-60.2],zoom:6});
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18}).addTo(adminMap);
+  L.polygon(boundary,{color:'#6ab023',weight:2,fillOpacity:0.12}).addTo(adminMap);
+  pins.forEach(function(p){
+    L.circleMarker([p.lat,p.lng],{radius:5,color:'#6ab023',fillColor:'#6ab023',fillOpacity:0.7,weight:1}).bindTooltip(p.id+' — '+p.userName).addTo(adminMap);
+  });
+  adminMap.on('click',function(e){
+    var lat=parseFloat(e.latlng.lat.toFixed(6)),lng=parseFloat(e.latlng.lng.toFixed(6));
+    document.getElementById('pinLat').value=lat; document.getElementById('pinLng').value=lng;
+    checkDupe(lat,lng); placeTempMarker(lat,lng);
+  });
+}
+
+function placeTempMarker(lat,lng){
+  if(tempMarker)adminMap.removeLayer(tempMarker);
+  tempMarker=L.circleMarker([lat,lng],{radius:7,color:'#cc7700',fillColor:'#ff9900',fillOpacity:0.9,weight:2}).addTo(adminMap);
+}
+
+function checkDupe(lat,lng){
+  var w=document.getElementById('dupeWarning');
+  var d=pins.find(function(p){return p.id!==editingPinId&&Math.abs(p.lat-lat)<0.005&&Math.abs(p.lng-lng)<0.005;});
+  w.style.display=d?'block':'none';
+  if(d)w.textContent='⚠ '+d.id+' ('+d.userName+') is very close. Move pin slightly.';
+}
+
+function openPinModal(){
+  editingPinId=null;
+  document.getElementById('pinModalTitle').textContent='add pin';
+  document.getElementById('pinSaveBtn').textContent='add pin';
+  document.getElementById('pinId').value='';
+  ['pinLat','pinLng','pinTitle','pinRetailer','pinProductId','pinUserId','pinUserName','pinSquares','pinDescription','pinImage'].forEach(function(f){document.getElementById(f).value='';});
+  document.getElementById('pinDate').value=today();
+  document.getElementById('pinCategory').value='food';
+  document.getElementById('dupeWarning').style.display='none';
+  document.getElementById('pinModal').classList.add('open');
+  setTimeout(function(){if(adminMap)adminMap.invalidateSize();},100);
+}
+
+function editPin(id){
+  var p=pins.find(function(x){return x.id===id;}); if(!p)return;
+  editingPinId=id;
+  document.getElementById('pinModalTitle').textContent='edit pin — '+id;
+  document.getElementById('pinSaveBtn').textContent='save changes';
+  document.getElementById('pinId').value=p.id; document.getElementById('pinLat').value=p.lat;
+  document.getElementById('pinLng').value=p.lng; document.getElementById('pinTitle').value=p.title;
+  document.getElementById('pinRetailer').value=p.retailer; document.getElementById('pinProductId').value=p.productId||'';
+  document.getElementById('pinUserId').value=p.userId||''; document.getElementById('pinUserName').value=p.userName;
+  document.getElementById('pinSquares').value=p.squares; document.getElementById('pinDate').value=p.date;
+  document.getElementById('pinCategory').value=p.category||'food'; document.getElementById('pinDescription').value=p.description||'';
+  document.getElementById('pinImage').value=p.image||'';
+  document.getElementById('pinModal').classList.add('open');
+  setTimeout(function(){if(adminMap){adminMap.setView([p.lat,p.lng],9);adminMap.invalidateSize();placeTempMarker(p.lat,p.lng);}},100);
+}
+
+function savePin(){
+  var lat=parseFloat(document.getElementById('pinLat').value),lng=parseFloat(document.getElementById('pinLng').value);
+  if(!lat||!lng){alert('Set a location on the map or enter coordinates.');return;}
+  var dupe=pins.find(function(p){return p.id!==editingPinId&&Math.abs(p.lat-lat)<0.005&&Math.abs(p.lng-lng)<0.005;});
+  if(dupe){alert('Pin '+dupe.id+' is too close.');return;}
+  var pin={
+    id:editingPinId||genId(pins,'PIN'), lat:lat, lng:lng,
+    title:document.getElementById('pinTitle').value,
+    description:document.getElementById('pinDescription').value,
+    image:document.getElementById('pinImage').value||'assets/images/amazon.png',
+    retailer:document.getElementById('pinRetailer').value,
+    productId:document.getElementById('pinProductId').value,
+    userId:document.getElementById('pinUserId').value,
+    userName:document.getElementById('pinUserName').value,
+    squares:parseInt(document.getElementById('pinSquares').value),
+    date:document.getElementById('pinDate').value,
+    category:document.getElementById('pinCategory').value
+  };
+  if(editingPinId){var i=pins.findIndex(function(x){return x.id===editingPinId;});pins[i]=pin;}
+  else{pins.push(pin);}
+  persist('pins'); closePinModal(); renderAllPins(); renderOverview();
+}
+
+function deletePin(id){
+  if(!confirm('Delete pin '+id+'?'))return;
+  pins=pins.filter(function(p){return p.id!==id;});
+  persist('pins'); renderAllPins(); renderOverview();
+}
+function closePinModal(){
+  document.getElementById('pinModal').classList.remove('open');
+  if(tempMarker&&adminMap){adminMap.removeLayer(tempMarker);tempMarker=null;}
+  editingPinId=null;
+}
+
+// ── Equivalence ────────────────────────────────────────────────────────────
+function populateEquivForm(){
+  document.getElementById('eqCarbon').value=equiv.carbonKgPerGs;
+  document.getElementById('eqVcs').value=equiv.vcsCreditsPerGs;
+  document.getElementById('eqFossil').value=equiv.fossilLitresPerGs;
+  document.getElementById('eqNetZeroPct').value=equiv.netZeroPct;
+  document.getElementById('eqOffsetPct').value=equiv.offsetPct;
+  document.getElementById('eqStandard').value=equiv.carbonStandard;
+  document.getElementById('eqProjectRef').value=equiv.projectRef;
+  document.getElementById('eqProjectName').value=equiv.projectName;
+  document.getElementById('eqEffectiveDate').value=equiv.effectiveDate;
+  document.getElementById('eqReviewDate').value=equiv.reviewDate;
+  document.getElementById('eqApprovedBy').value=equiv.approvedBy;
+  renderEquivCards();
+}
+
+function renderEquivCards(){
+  document.getElementById('equivCards').innerHTML=[
+    eCard('🌿',equiv.carbonKgPerGs+' kg','CO₂e per green square','Fossil carbon offset per GS — minimum Verra VCS standard'),
+    eCard('📜',equiv.vcsCreditsPerGs,'VCS credits per green square','Verified Carbon Standard — Verra registry only'),
+    eCard('⛽',equiv.fossilLitresPerGs+' L','Fossil fuel reduction per GS','Equivalent fossil fuel reduction in litres per GS'),
+    eCard('🏭',equiv.netZeroPct+'%','Net Zero contribution','Proportion allocated to the Net Zero pathway'),
+    eCard('🌳',equiv.offsetPct+'%','Offset contribution','Proportion allocated to verified forestry carbon offset'),
+    eCard('📋',equiv.carbonStandard,'Carbon standard',equiv.projectRef+' · '+equiv.projectName)
+  ].join('');
+}
+
+function eCard(icon,val,lbl,sub){
+  return '<div class="equiv-card"><div class="equiv-icon">'+icon+'</div>'+
+    '<div class="equiv-val">'+val+'</div><div class="equiv-lbl">'+lbl+'</div>'+
+    '<div class="equiv-sub">'+sub+'</div></div>';
+}
+
+function saveEquivalence(){
+  equiv={
+    carbonKgPerGs:parseFloat(document.getElementById('eqCarbon').value),
+    vcsCreditsPerGs:parseFloat(document.getElementById('eqVcs').value),
+    fossilLitresPerGs:parseFloat(document.getElementById('eqFossil').value),
+    netZeroPct:parseInt(document.getElementById('eqNetZeroPct').value),
+    offsetPct:parseInt(document.getElementById('eqOffsetPct').value),
+    carbonStandard:document.getElementById('eqStandard').value,
+    projectRef:document.getElementById('eqProjectRef').value,
+    projectName:document.getElementById('eqProjectName').value,
+    effectiveDate:document.getElementById('eqEffectiveDate').value,
+    reviewDate:document.getElementById('eqReviewDate').value,
+    approvedBy:document.getElementById('eqApprovedBy').value
+  };
+  persist('equiv'); renderEquivCards(); renderOverview(); alert('Equivalence settings saved.');
+}
+
+// ── Export / Reset ─────────────────────────────────────────────────────────
+function exportAllData(){
+  var d={pins,campaigns,products,relationships,retailers,equivalence:equiv,exported:new Date().toISOString()};
+  var blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='mgs-data-'+today()+'.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAllData(){
+  if(!confirm('Reset ALL data to factory defaults?'))return;
+  localStorage.clear(); location.reload();
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function genId(arr,prefix){
+  var max=arr.reduce(function(m,x){return Math.max(m,parseInt((x.id||'').replace(prefix,''))||0);},0);
+  return prefix+String(max+1).padStart(3,'0');
+}
+function today(){return new Date().toISOString().split('T')[0];}
+
+['campaignModal','pinModal','productModal','relModal','retailerModal'].forEach(function(id){
+  document.getElementById(id).addEventListener('click',function(e){
+    if(e.target===this){
+      closeCampaignModal(); closePinModal(); closeProductModal(); closeRelModal(); closeRetailerModal();
+    }
+  });
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeCampaignModal();closePinModal();closeProductModal();closeRelModal();closeRetailerModal();}
+});
+
+loadData();
 </script>
 </body>
 </html>
